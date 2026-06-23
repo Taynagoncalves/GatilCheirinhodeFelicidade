@@ -65,5 +65,5 @@ CREATE TABLE IF NOT EXISTS aplicacoes (
   criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX IF NOT EXISTS idx_gatos_status ON gatos(status);
-CREATE INDEX IF NOT EXISTS idx_aplicacoes_proxima_dose ON aplicacoes(proxima_dose);
+CREATE INDEX idx_gatos_status ON gatos(status);
+CREATE INDEX idx_aplicacoes_proxima_dose ON aplicacoes(proxima_dose);

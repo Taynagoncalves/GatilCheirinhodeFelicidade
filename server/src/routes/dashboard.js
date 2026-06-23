@@ -4,10 +4,10 @@ const pool = require('../db/pool');
 const router = express.Router();
 
 router.get('/', async (req, res) => {
-  const { rows: g } = await pool.query('SELECT COUNT(*) AS total_gatos FROM gatos');
-  const { rows: n } = await pool.query('SELECT COUNT(*) AS total_ninhadas FROM ninhadas');
+  const [[{ total_gatos }]] = await pool.query('SELECT COUNT(*) AS total_gatos FROM gatos');
+  const [[{ total_ninhadas }]] = await pool.query('SELECT COUNT(*) AS total_ninhadas FROM ninhadas');
 
-  const { rows: proximas_doses } = await pool.query(
+  const [proximas_doses] = await pool.query(
     `SELECT a.id, a.proxima_dose, g.nome AS gato_nome, g.foto_url AS gato_foto, med.nome AS medicamento_nome
      FROM aplicacoes a
      JOIN gatos g ON a.gato_id = g.id
@@ -17,7 +17,7 @@ router.get('/', async (req, res) => {
      LIMIT 5`
   );
 
-  const { rows: ultimos_registros } = await pool.query(
+  const [ultimos_registros] = await pool.query(
     `SELECT a.id, a.data_aplicada, a.tipo, g.nome AS gato_nome, g.foto_url AS gato_foto, med.nome AS medicamento_nome
      FROM aplicacoes a
      JOIN gatos g ON a.gato_id = g.id
@@ -27,8 +27,8 @@ router.get('/', async (req, res) => {
   );
 
   res.json({
-    total_gatos: Number(g[0].total_gatos),
-    total_ninhadas: Number(n[0].total_ninhadas),
+    total_gatos: Number(total_gatos),
+    total_ninhadas: Number(total_ninhadas),
     proximas_doses,
     ultimos_registros,
   });

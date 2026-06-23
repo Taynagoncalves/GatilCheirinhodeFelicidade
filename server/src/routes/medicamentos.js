@@ -9,24 +9,24 @@ router.get('/', async (req, res) => {
   const params = [];
   if (busca) {
     params.push(`%${busca}%`);
-    sql += ` AND nome ILIKE $${params.length}`;
+    sql += ' AND nome LIKE ?';
   }
   sql += ' ORDER BY nome ASC';
-  const { rows } = await pool.query(sql, params);
+  const [rows] = await pool.query(sql, params);
   res.json(rows);
 });
 
 router.post('/', async (req, res) => {
   const { nome, categoria } = req.body;
-  const { rows } = await pool.query(
-    'INSERT INTO medicamentos (nome, categoria) VALUES ($1, $2) RETURNING id',
+  const [result] = await pool.query(
+    'INSERT INTO medicamentos (nome, categoria) VALUES (?, ?)',
     [nome, categoria || 'outro']
   );
-  res.status(201).json({ id: rows[0].id });
+  res.status(201).json({ id: result.insertId });
 });
 
 router.delete('/:id', async (req, res) => {
-  await pool.query('DELETE FROM medicamentos WHERE id = $1', [req.params.id]);
+  await pool.query('DELETE FROM medicamentos WHERE id = ?', [req.params.id]);
   res.json({ ok: true });
 });
 

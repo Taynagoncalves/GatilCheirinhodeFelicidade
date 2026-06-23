@@ -10,34 +10,34 @@ router.get('/', async (req, res) => {
   const params = [];
   if (busca) {
     params.push(`%${busca}%`);
-    sql += ` AND nome ILIKE $${params.length}`;
+    sql += ' AND nome LIKE ?';
   }
   if (status) {
     params.push(status);
-    sql += ` AND status = $${params.length}`;
+    sql += ' AND status = ?';
   }
   sql += ' ORDER BY criado_em DESC';
-  const { rows } = await pool.query(sql, params);
+  const [rows] = await pool.query(sql, params);
   res.json(rows);
 });
 
 router.get('/:id', async (req, res) => {
-  const { rows } = await pool.query(
+  const [rows] = await pool.query(
     `SELECT g.*, m.nome AS mae_nome, m.foto_url AS mae_foto, p.nome AS pai_nome, p.foto_url AS pai_foto, n.nome AS ninhada_nome
      FROM gatos g
      LEFT JOIN pais m ON g.mae_id = m.id
      LEFT JOIN pais p ON g.pai_id = p.id
      LEFT JOIN ninhadas n ON g.ninhada_id = n.id
-     WHERE g.id = $1`,
+     WHERE g.id = ?`,
     [req.params.id]
   );
   if (!rows.length) return res.status(404).json({ error: 'Não encontrado' });
 
-  const { rows: historico } = await pool.query(
+  const [historico] = await pool.query(
     `SELECT a.*, med.nome AS medicamento_nome, med.categoria
      FROM aplicacoes a
      JOIN medicamentos med ON a.medicamento_id = med.id
-     WHERE a.gato_id = $1
+     WHERE a.gato_id = ?
      ORDER BY a.data_aplicada DESC`,
     [req.params.id]
   );
@@ -48,9 +48,9 @@ router.get('/:id', async (req, res) => {
 router.post('/', upload.single('foto'), async (req, res) => {
   const { nome, cor, sexo, data_nascimento, ninhada_id, mae_id, pai_id, status, observacoes } = req.body;
   const foto_url = req.file ? req.file.path : null;
-  const { rows } = await pool.query(
+  const [result] = await pool.query(
     `INSERT INTO gatos (nome, cor, sexo, data_nascimento, ninhada_id, mae_id, pai_id, status, foto_url, observacoes)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id`,
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       nome || null,
       cor || null,
@@ -64,7 +64,7 @@ router.post('/', upload.single('foto'), async (req, res) => {
       observacoes || null,
     ]
   );
-  res.status(201).json({ id: rows[0].id });
+  res.status(201).json({ id: result.insertId });
 });
 
 router.put('/:id', upload.single('foto'), async (req, res) => {
@@ -80,19 +80,19 @@ router.put('/:id', upload.single('foto'), async (req, res) => {
     status || 'disponivel',
     observacoes || null,
   ];
-  let sql = `UPDATE gatos SET nome=$1, cor=$2, sexo=$3, data_nascimento=$4, ninhada_id=$5, mae_id=$6, pai_id=$7, status=$8, observacoes=$9`;
+  let sql = 'UPDATE gatos SET nome=?, cor=?, sexo=?, data_nascimento=?, ninhada_id=?, mae_id=?, pai_id=?, status=?, observacoes=?';
   if (req.file) {
     fields.push(req.file.path);
-    sql += `, foto_url=$${fields.length}`;
+    sql += ', foto_url=?';
   }
   fields.push(req.params.id);
-  sql += ` WHERE id=$${fields.length}`;
+  sql += ' WHERE id=?';
   await pool.query(sql, fields);
   res.json({ ok: true });
 });
 
 router.delete('/:id', async (req, res) => {
-  await pool.query('DELETE FROM gatos WHERE id = $1', [req.params.id]);
+  await pool.query('DELETE FROM gatos WHERE id = ?', [req.params.id]);
   res.json({ ok: true });
 });
 

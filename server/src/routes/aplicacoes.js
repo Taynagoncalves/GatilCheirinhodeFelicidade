@@ -14,25 +14,25 @@ router.get('/', async (req, res) => {
   const params = [];
   if (tipo) {
     params.push(tipo);
-    sql += ` AND a.tipo = $${params.length}`;
+    sql += ' AND a.tipo = ?';
   }
   sql += ' ORDER BY a.data_aplicada DESC';
-  const { rows } = await pool.query(sql, params);
+  const [rows] = await pool.query(sql, params);
   res.json(rows);
 });
 
 router.post('/', async (req, res) => {
   const { gato_id, medicamento_id, tipo, data_aplicada, proxima_dose, observacoes } = req.body;
-  const { rows } = await pool.query(
+  const [result] = await pool.query(
     `INSERT INTO aplicacoes (gato_id, medicamento_id, tipo, data_aplicada, proxima_dose, observacoes)
-     VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
+     VALUES (?, ?, ?, ?, ?, ?)`,
     [gato_id, medicamento_id, tipo || 'medicamento', data_aplicada, proxima_dose || null, observacoes || null]
   );
-  res.status(201).json({ id: rows[0].id });
+  res.status(201).json({ id: result.insertId });
 });
 
 router.delete('/:id', async (req, res) => {
-  await pool.query('DELETE FROM aplicacoes WHERE id = $1', [req.params.id]);
+  await pool.query('DELETE FROM aplicacoes WHERE id = ?', [req.params.id]);
   res.json({ ok: true });
 });
 
