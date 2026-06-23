@@ -1,29 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
-  <!-- orelhas -->
-  <polygon points="15,40 25,10 38,38" fill="#f4a261"/>
-  <polygon points="62,38 75,10 85,40" fill="#f4a261"/>
-  <polygon points="19,38 25,18 35,37" fill="#ffcba4"/>
-  <polygon points="65,37 75,18 81,38" fill="#ffcba4"/>
-  <!-- cabeça -->
-  <ellipse cx="50" cy="58" rx="38" ry="35" fill="#f4a261"/>
-  <!-- olhos -->
-  <ellipse cx="36" cy="52" rx="7" ry="8" fill="white"/>
-  <ellipse cx="64" cy="52" rx="7" ry="8" fill="white"/>
-  <ellipse cx="36" cy="53" rx="4" ry="6" fill="#2d6a4f"/>
-  <ellipse cx="64" cy="53" rx="4" ry="6" fill="#2d6a4f"/>
-  <circle cx="35" cy="52" r="2" fill="black"/>
-  <circle cx="63" cy="52" r="2" fill="black"/>
-  <circle cx="34" cy="50" r="1" fill="white"/>
-  <circle cx="62" cy="50" r="1" fill="white"/>
-  <!-- nariz -->
-  <polygon points="50,63 46,68 54,68" fill="#e76f51"/>
-  <!-- boca -->
-  <path d="M46,68 Q50,74 54,68" stroke="#c44" stroke-width="1.5" fill="none"/>
-  <!-- bigodes -->
-  <line x1="12" y1="63" x2="44" y2="67" stroke="#888" stroke-width="1.2"/>
-  <line x1="12" y1="68" x2="44" y2="69" stroke="#888" stroke-width="1.2"/>
-  <line x1="12" y1="73" x2="44" y2="71" stroke="#888" stroke-width="1.2"/>
-  <line x1="56" y1="67" x2="88" y2="63" stroke="#888" stroke-width="1.2"/>
-  <line x1="56" y1="69" x2="88" y2="68" stroke="#888" stroke-width="1.2"/>
-  <line x1="56" y1="71" x2="88" y2="73" stroke="#888" stroke-width="1.2"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- dedos -->
+  <ellipse cx="28" cy="30" rx="10" ry="13" fill="#e07b7b"/>
+  <ellipse cx="50" cy="24" rx="10" ry="13" fill="#e07b7b"/>
+  <ellipse cx="72" cy="30" rx="10" ry="13" fill="#e07b7b"/>
+  <ellipse cx="16" cy="50" rx="9" ry="12" fill="#e07b7b"/>
+  <ellipse cx="84" cy="50" rx="9" ry="12" fill="#e07b7b"/>
+  <!-- palma -->
+  <ellipse cx="50" cy="65" rx="32" ry="28" fill="#e07b7b"/>
 </svg>
