@@ -1,0 +1,92 @@
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Cat, PawPrint, Plus, Syringe, ClipboardList, CalendarClock } from 'lucide-react';
+import Layout from '../components/Layout';
+import EmptyState from '../components/EmptyState';
+import api from '../api/client';
+
+export default function Home() {
+  const navigate = useNavigate();
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    api.get('/dashboard').then((res) => setData(res.data));
+  }, []);
+
+  return (
+    <Layout title="Cheirinho de Felicidade" subtitle="Organização e Controle dos Gatos" showNotification>
+      <div className="stats-grid">
+        <div className="stat-card">
+          <span className="stat-icon"><Cat size={18} /></span>
+          <span className="stat-value">{data?.total_gatos ?? '—'}</span>
+          <span className="stat-label">Gatos cadastrados</span>
+        </div>
+        <div className="stat-card">
+          <span className="stat-icon"><PawPrint size={18} /></span>
+          <span className="stat-value">{data?.total_ninhadas ?? '—'}</span>
+          <span className="stat-label">Ninhadas</span>
+        </div>
+      </div>
+
+      <div className="quick-actions">
+        <button className="btn btn-primary" onClick={() => navigate('/gatos/novo')}>
+          <Plus size={18} /> Cadastrar Gato
+        </button>
+        <button className="btn btn-secondary" onClick={() => navigate('/ninhadas/nova')}>
+          <PawPrint size={18} /> Nova Ninhada
+        </button>
+        <button className="btn btn-secondary" onClick={() => navigate('/saude/registrar')}>
+          <Syringe size={18} /> Registrar Dose
+        </button>
+      </div>
+
+      <section>
+        <h2 className="section-title">Próximas doses</h2>
+        {data && data.proximas_doses.length === 0 && (
+          <EmptyState icon={CalendarClock} title="Nenhuma dose agendada" description="As próximas doses cadastradas aparecerão aqui." />
+        )}
+        {data?.proximas_doses.length > 0 && (
+          <ul style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {data.proximas_doses.map((d) => (
+              <li key={d.id} className="list-row">
+                {d.gato_foto ? (
+                  <img src={d.gato_foto} alt={d.gato_nome} className="card-photo" style={{ width: 48, height: 48 }} />
+                ) : (
+                  <span className="card-photo-placeholder" style={{ width: 48, height: 48 }}><Cat size={20} /></span>
+                )}
+                <div>
+                  <p className="card-title" style={{ fontSize: '0.95rem' }}>{d.gato_nome || 'Sem nome'}</p>
+                  <p className="card-meta">{d.medicamento_nome} · {new Date(d.proxima_dose).toLocaleDateString('pt-BR')}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      <section>
+        <h2 className="section-title">Últimos registros</h2>
+        {data && data.ultimos_registros.length === 0 && (
+          <EmptyState icon={ClipboardList} title="Nenhum registro ainda" description="Os registros de saúde mais recentes aparecerão aqui." />
+        )}
+        {data?.ultimos_registros.length > 0 && (
+          <ul style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {data.ultimos_registros.map((r) => (
+              <li key={r.id} className="list-row">
+                {r.gato_foto ? (
+                  <img src={r.gato_foto} alt={r.gato_nome} className="card-photo" style={{ width: 48, height: 48 }} />
+                ) : (
+                  <span className="card-photo-placeholder" style={{ width: 48, height: 48 }}><Cat size={20} /></span>
+                )}
+                <div>
+                  <p className="card-title" style={{ fontSize: '0.95rem' }}>{r.gato_nome || 'Sem nome'}</p>
+                  <p className="card-meta">{r.medicamento_nome} · {new Date(r.data_aplicada).toLocaleDateString('pt-BR')}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+    </Layout>
+  );
+}
