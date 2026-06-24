@@ -29,6 +29,15 @@ router.get('/', async (req, res) => {
      LIMIT 5`
   );
 
+  const [[fin]] = await pool.query(`
+    SELECT
+      COALESCE(SUM(CASE WHEN tipo = 'entrada' THEN valor ELSE 0 END), 0) AS entradas,
+      COALESCE(SUM(CASE WHEN tipo = 'saida'   THEN valor ELSE 0 END), 0) AS saidas
+    FROM financeiro
+    WHERE MONTH(data_registro) = MONTH(CURRENT_DATE)
+      AND YEAR(data_registro)  = YEAR(CURRENT_DATE)
+  `);
+
   res.json({
     total_gatos: Number(total_gatos),
     total_ninhadas: Number(total_ninhadas),
@@ -36,6 +45,9 @@ router.get('/', async (req, res) => {
     total_vendidos: Number(total_vendidos),
     proximas_doses,
     ultimos_registros,
+    fin_entradas: Number(fin.entradas),
+    fin_saidas: Number(fin.saidas),
+    fin_saldo: Number(fin.entradas) - Number(fin.saidas),
   });
 });
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Cat, PawPrint, Plus, CalendarClock, X, Users } from 'lucide-react';
+import { Cat, PawPrint, Plus, CalendarClock, X, Users, Wallet, TrendingUp, TrendingDown } from 'lucide-react';
 import Layout from '../components/Layout';
 import EmptyState from '../components/EmptyState';
 import { usePush } from '../hooks/usePush';
@@ -87,6 +87,34 @@ export default function Home() {
           <span className="stat-icon"><PawPrint size={18} /></span>
           <span className="stat-value">{data?.total_vendidos ?? '—'}</span>
           <span className="stat-label">Vendidos</span>
+        </div>
+      </div>
+
+      <div
+        className="card"
+        style={{ cursor: 'pointer', background: 'linear-gradient(135deg, var(--color-primary), #7b5ea7)', color: '#fff' }}
+        onClick={() => navigate('/financeiro')}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+          <Wallet size={18} style={{ opacity: 0.9 }} />
+          <p style={{ margin: 0, fontWeight: 700, fontSize: '0.9rem' }}>Financeiro · mês atual</p>
+        </div>
+        <div style={{ display: 'flex', gap: 20 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <TrendingUp size={15} />
+            <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>
+              {(data?.fin_entradas ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+            </span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <TrendingDown size={15} />
+            <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>
+              {(data?.fin_saidas ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+            </span>
+          </div>
+          <div style={{ marginLeft: 'auto', fontWeight: 800, fontSize: '1rem' }}>
+            {(data?.fin_saldo ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+          </div>
         </div>
       </div>
 

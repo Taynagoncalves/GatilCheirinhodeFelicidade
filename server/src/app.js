@@ -28,6 +28,18 @@ async function initDb() {
     try { await pool.query(sql); } catch (e) { if (e.errno !== 1060) throw e; }
   }
   await pool.query(`
+    CREATE TABLE IF NOT EXISTS financeiro (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      tipo ENUM('entrada','saida') NOT NULL,
+      categoria VARCHAR(100) NOT NULL,
+      descricao VARCHAR(300),
+      valor DECIMAL(10,2) NOT NULL,
+      gato_id INT NULL,
+      data_registro DATE NOT NULL,
+      criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+  await pool.query(`
     CREATE TABLE IF NOT EXISTS historico_peso (
       id INT AUTO_INCREMENT PRIMARY KEY,
       tipo ENUM('gato','pai') NOT NULL,
@@ -53,6 +65,7 @@ app.use('/api/medicamentos', require('./routes/medicamentos'));
 app.use('/api/aplicacoes', require('./routes/aplicacoes'));
 app.use('/api/push', require('./routes/push'));
 app.use('/api/notificacoes', require('./routes/notificacoes'));
+app.use('/api/financeiro', require('./routes/financeiro'));
 
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 
