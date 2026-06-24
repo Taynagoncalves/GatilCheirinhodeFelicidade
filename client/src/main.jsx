@@ -5,10 +5,16 @@ import './index.css'
 import App from './App.jsx'
 import { ToastProvider } from './components/Toast.jsx'
 import SplashScreen from './components/SplashScreen.jsx'
+import Onboarding from './components/Onboarding.jsx'
 
 function Root() {
   const [splash, setSplash] = useState(true);
-  return splash ? <SplashScreen onDone={() => setSplash(false)} /> : (
+  const [onboarding, setOnboarding] = useState(!localStorage.getItem('onboarding_visto'));
+
+  if (splash) return <SplashScreen onDone={() => setSplash(false)} />;
+  if (onboarding) return <Onboarding onDone={() => setOnboarding(false)} />;
+
+  return (
     <BrowserRouter>
       <ToastProvider>
         <App />
