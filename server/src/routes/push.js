@@ -2,6 +2,7 @@ const express = require('express');
 const webpush = require('web-push');
 const cron = require('node-cron');
 const pool = require('../db/pool');
+const { notificar } = require('../services/notificacoes');
 
 const router = express.Router();
 
@@ -10,23 +11,6 @@ webpush.setVapidDetails(
   process.env.VAPID_PUBLIC_KEY,
   process.env.VAPID_PRIVATE_KEY
 );
-
-async function getSubscriptions() {
-  const [rows] = await pool.query('SELECT subscription FROM push_subscriptions');
-  return rows.map((r) => (typeof r.subscription === 'string' ? JSON.parse(r.subscription) : r.subscription));
-}
-
-async function sendToAll(payload) {
-  const subs = await getSubscriptions();
-  if (subs.length === 0) return { sent: 0, failed: 0 };
-
-  const results = await Promise.allSettled(
-    subs.map((sub) => webpush.sendNotification(sub, JSON.stringify(payload)))
-  );
-
-  const failed = results.filter((r) => r.status === 'rejected').length;
-  return { sent: subs.length - failed, failed };
-}
 
 router.get('/vapid-public-key', (req, res) => {
   res.json({ key: process.env.VAPID_PUBLIC_KEY });
@@ -47,18 +31,19 @@ router.post('/subscribe', async (req, res) => {
 });
 
 router.post('/test', async (req, res) => {
-  const result = await sendToAll({
-    title: 'Cheirinho de Felicidade',
-    body: 'Notificacao de teste funcionando!',
-  });
-  res.json(result);
+  try {
+    await notificar('Cheirinho de Felicidade', 'Notificação de teste funcionando!');
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 // Cron: todo dia as 8h verifica doses do dia e do dia seguinte
 cron.schedule('0 8 * * *', async () => {
   try {
     const [doses] = await pool.query(
-      `SELECT a.proxima_dose, g.nome AS gato_nome, med.nome AS medicamento_nome
+      `SELECT a.proxima_dose, g.nome AS gato_nome, med.nome AS medicamento_nome, a.tipo
        FROM aplicacoes a
        JOIN gatos g ON a.gato_id = g.id
        JOIN medicamentos med ON a.medicamento_id = med.id
@@ -71,20 +56,18 @@ cron.schedule('0 8 * * *', async () => {
       const hoje = new Date();
       hoje.setHours(0, 0, 0, 0);
       const ehHoje = data.getTime() === hoje.getTime();
+      const tipoLabel = dose.tipo === 'vacina' ? 'vacina' : 'medicamento';
 
-      const body = ehHoje
-        ? `Hoje e dia de dar ${dose.medicamento_nome} para ${dose.gato_nome}!`
-        : `Amanha e dia de dar ${dose.medicamento_nome} para ${dose.gato_nome}.`;
+      const corpo = ehHoje
+        ? `Hoje é dia de dar ${tipoLabel} ${dose.medicamento_nome} para ${dose.gato_nome}!`
+        : `Amanhã é dia de dar ${tipoLabel} ${dose.medicamento_nome} para ${dose.gato_nome}.`;
 
-      await sendToAll({
-        title: 'Lembrete de medicamento',
-        body,
-      });
+      await notificar('Lembrete de dose', corpo);
     }
 
-    console.log(`[cron] Notificacoes de doses enviadas: ${doses.length} doses verificadas`);
+    console.log(`[cron] ${doses.length} doses verificadas`);
   } catch (e) {
-    console.error('[cron] Erro ao enviar notificacoes de doses:', e);
+    console.error('[cron] Erro:', e);
   }
 }, { timezone: 'America/Sao_Paulo' });
 

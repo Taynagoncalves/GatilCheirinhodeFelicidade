@@ -1,15 +1,8 @@
 const express = require('express');
-const webpush = require('web-push');
 const pool = require('../db/pool');
+const { notificar } = require('../services/notificacoes');
 
 const router = express.Router();
-
-async function sendToAll(payload) {
-  const [rows] = await pool.query('SELECT subscription FROM push_subscriptions');
-  if (!rows.length) return;
-  const subs = rows.map((r) => (typeof r.subscription === 'string' ? JSON.parse(r.subscription) : r.subscription));
-  await Promise.allSettled(subs.map((sub) => webpush.sendNotification(sub, JSON.stringify(payload))));
-}
 
 function diasAte(dataStr) {
   const hoje = new Date();
@@ -53,15 +46,15 @@ router.post('/', async (req, res) => {
     const [[{ med_nome }]] = await pool.query('SELECT nome AS med_nome FROM medicamentos WHERE id = ?', [medicamento_id]);
     const tipoLabel = (tipo === 'vacina') ? 'Vacina' : 'Medicamento';
 
-    let body = `${tipoLabel} ${med_nome} registrado para ${gato_nome}.`;
+    let corpo = `${tipoLabel} ${med_nome} registrado para ${gato_nome}.`;
     if (proxima_dose) {
       const dias = diasAte(proxima_dose);
-      if (dias === 0) body += ' Próxima dose é hoje!';
-      else if (dias === 1) body += ' Falta 1 dia para a próxima dose.';
-      else body += ` Faltam ${dias} dias para a próxima dose.`;
+      if (dias === 0) corpo += ' Próxima dose é hoje!';
+      else if (dias === 1) corpo += ' Falta 1 dia para a próxima dose.';
+      else corpo += ` Faltam ${dias} dias para a próxima dose.`;
     }
 
-    await sendToAll({ title: `${tipoLabel} registrado`, body });
+    await notificar(`${tipoLabel} registrado`, corpo);
   } catch (e) {
     console.error('Erro ao enviar notificacao de registro:', e);
   }

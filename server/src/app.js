@@ -13,6 +13,14 @@ async function initDb() {
       criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `);
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS notificacoes (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      titulo VARCHAR(200) NOT NULL,
+      corpo TEXT NOT NULL,
+      criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
 }
 initDb().catch((e) => console.error('initDb error:', e));
 
@@ -28,6 +36,7 @@ app.use('/api/gatos', require('./routes/gatos'));
 app.use('/api/medicamentos', require('./routes/medicamentos'));
 app.use('/api/aplicacoes', require('./routes/aplicacoes'));
 app.use('/api/push', require('./routes/push'));
+app.use('/api/notificacoes', require('./routes/notificacoes'));
 
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 

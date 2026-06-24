@@ -3,16 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { PawPrint, ChevronLeft, Bell, Trash2, BellRing, X } from 'lucide-react';
 import api from '../api/client';
 
-const STORAGE_CLEARED = 'notificacoes_limpas';
 const STORAGE_LIDAS = 'notificacoes_lidas';
 
 export default function Header({ title, subtitle, showBack, showNotification }) {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-  const [doses, setDoses] = useState([]);
-  const [cleared, setCleared] = useState(() => {
-    try { return JSON.parse(localStorage.getItem(STORAGE_CLEARED) || '[]'); } catch { return []; }
-  });
+  const [notifs, setNotifs] = useState([]);
   const [lidas, setLidas] = useState(() => {
     try { return JSON.parse(localStorage.getItem(STORAGE_LIDAS) || '[]'); } catch { return []; }
   });
@@ -21,7 +17,7 @@ export default function Header({ title, subtitle, showBack, showNotification }) 
 
   useEffect(() => {
     if (!open) return;
-    api.get('/dashboard').then((res) => setDoses(res.data.proximas_doses || []));
+    api.get('/notificacoes').then((res) => setNotifs(res.data));
   }, [open]);
 
   useEffect(() => {
@@ -32,8 +28,7 @@ export default function Header({ title, subtitle, showBack, showNotification }) 
     return () => document.removeEventListener('mousedown', handleClick);
   }, [open]);
 
-  const visiveis = doses.filter((d) => !cleared.includes(d.id));
-  const temNaoLidas = visiveis.some((d) => !lidas.includes(d.id));
+  const temNaoLidas = notifs.some((n) => !lidas.includes(n.id));
 
   function marcarLida(id) {
     const novas = [...new Set([...lidas, id])];
@@ -41,17 +36,26 @@ export default function Header({ title, subtitle, showBack, showNotification }) 
     localStorage.setItem(STORAGE_LIDAS, JSON.stringify(novas));
   }
 
-  function limpar() {
-    const ids = doses.map((d) => d.id);
-    const novoCleared = [...new Set([...cleared, ...ids])];
-    setCleared(novoCleared);
-    localStorage.setItem(STORAGE_CLEARED, JSON.stringify(novoCleared));
+  async function limpar() {
+    await api.delete('/notificacoes');
+    setNotifs([]);
+    setLidas([]);
+    localStorage.setItem(STORAGE_LIDAS, '[]');
   }
 
   async function testar() {
     setTestando(true);
-    try { await api.post('/push/test'); } catch {}
+    try {
+      await api.post('/push/test');
+      const res = await api.get('/notificacoes');
+      setNotifs(res.data);
+    } catch {}
     setTestando(false);
+  }
+
+  function formatarData(criado_em) {
+    const d = new Date(criado_em);
+    return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
   }
 
   return (
@@ -91,29 +95,26 @@ export default function Header({ title, subtitle, showBack, showNotification }) 
               </div>
 
               <div className="notif-list">
-                {visiveis.length === 0 ? (
+                {notifs.length === 0 ? (
                   <div className="notif-empty">
                     <BellRing size={32} style={{ opacity: 0.3 }} />
                     <p>Nenhuma notificação</p>
                   </div>
                 ) : (
-                  visiveis.map((d) => {
-                    const lida = lidas.includes(d.id);
+                  notifs.map((n) => {
+                    const lida = lidas.includes(n.id);
                     return (
                       <div
-                        key={d.id}
+                        key={n.id}
                         className={`notif-item${lida ? '' : ' notif-item-nova'}`}
-                        style={{ cursor: 'pointer' }}
-                        onClick={() => {
-                          marcarLida(d.id);
-                          navigate(`/gatos/${d.gato_id}`);
-                          setOpen(false);
-                        }}
+                        style={{ cursor: 'default' }}
+                        onClick={() => marcarLida(n.id)}
                       >
                         <div className={`notif-dot-blue${lida ? ' notif-dot-lida' : ''}`} />
                         <div style={{ flex: 1 }}>
-                          <p className="notif-item-title">{d.gato_nome}</p>
-                          <p className="notif-item-sub">{d.medicamento_nome} · próxima: {d.proxima_dose.split('-').reverse().join('/')}</p>
+                          <p className="notif-item-title">{n.titulo}</p>
+                          <p className="notif-item-sub">{n.corpo}</p>
+                          <p className="notif-item-sub" style={{ marginTop: 2, opacity: 0.6 }}>{formatarData(n.criado_em)}</p>
                         </div>
                         {!lida && <span className="notif-badge-nova">Nova</span>}
                       </div>
@@ -123,7 +124,7 @@ export default function Header({ title, subtitle, showBack, showNotification }) 
               </div>
 
               <div className="notif-panel-footer">
-                <button className="notif-btn" onClick={limpar} disabled={visiveis.length === 0}>
+                <button className="notif-btn" onClick={limpar} disabled={notifs.length === 0}>
                   <Trash2 size={14} /> Limpar
                 </button>
                 <button className="notif-btn notif-btn-primary" onClick={testar} disabled={testando}>
