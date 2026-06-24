@@ -21,8 +21,12 @@ async function initDb() {
       criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `);
-  await pool.query(`ALTER TABLE gatos ADD COLUMN IF NOT EXISTS peso DECIMAL(7,1) NULL`);
-  await pool.query(`ALTER TABLE pais  ADD COLUMN IF NOT EXISTS peso DECIMAL(7,1) NULL`);
+  for (const sql of [
+    `ALTER TABLE gatos ADD COLUMN peso DECIMAL(7,1) NULL`,
+    `ALTER TABLE pais  ADD COLUMN peso DECIMAL(7,1) NULL`,
+  ]) {
+    try { await pool.query(sql); } catch (e) { if (e.errno !== 1060) throw e; }
+  }
 }
 initDb().catch((e) => console.error('initDb error:', e));
 
