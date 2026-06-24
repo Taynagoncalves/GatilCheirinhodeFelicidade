@@ -8,7 +8,7 @@ router.get('/', async (req, res) => {
   const [[{ total_ninhadas }]] = await pool.query('SELECT COUNT(*) AS total_ninhadas FROM ninhadas');
 
   const [proximas_doses] = await pool.query(
-    `SELECT a.id, a.proxima_dose, g.nome AS gato_nome, g.foto_url AS gato_foto, med.nome AS medicamento_nome
+    `SELECT a.id, DATE_FORMAT(a.proxima_dose, '%Y-%m-%d') AS proxima_dose, g.nome AS gato_nome, g.foto_url AS gato_foto, med.nome AS medicamento_nome
      FROM aplicacoes a
      JOIN gatos g ON a.gato_id = g.id
      JOIN medicamentos med ON a.medicamento_id = med.id

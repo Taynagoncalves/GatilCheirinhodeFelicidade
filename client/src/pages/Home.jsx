@@ -70,7 +70,7 @@ export default function Home() {
                 )}
                 <div>
                   <p className="card-title" style={{ fontSize: '0.95rem' }}>{d.gato_nome || 'Sem nome'}</p>
-                  <p className="card-meta">{d.medicamento_nome} · próxima: {new Date(d.proxima_dose).toLocaleDateString('pt-BR')}</p>
+                  <p className="card-meta">{d.medicamento_nome} · próxima: {d.proxima_dose.split('-').reverse().join('/')}</p>
                 </div>
               </li>
             ))}
