@@ -17,6 +17,7 @@ const STATUS_OPTIONS = [
 export default function GatosList() {
   const navigate = useNavigate();
   const [busca, setBusca] = useState('');
+  const [sexo, setSexo] = useState('');
   const [gatos, setGatos] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [statusOpen, setStatusOpen] = useState(null);
@@ -31,10 +32,10 @@ export default function GatosList() {
   };
 
   const load = () => {
-    api.get('/gatos', { params: { busca: busca || undefined } }).then((res) => setGatos(res.data));
+    api.get('/gatos', { params: { busca: busca || undefined, sexo: sexo || undefined } }).then((res) => setGatos(res.data));
   };
 
-  useEffect(() => { load(); }, [busca]);
+  useEffect(() => { load(); }, [busca, sexo]);
 
   const changeStatus = async (id, status) => {
     await api.patch(`/gatos/${id}/status`, { status });
@@ -48,6 +49,12 @@ export default function GatosList() {
       <button className="btn btn-primary" onClick={() => setShowModal(true)}>
         <Plus size={18} /> Cadastrar Gato
       </button>
+
+      <div className="tabs">
+        <button className={`tab${sexo === '' ? ' active' : ''}`} onClick={() => setSexo('')}>Todos</button>
+        <button className={`tab${sexo === 'macho' ? ' active' : ''}`} onClick={() => setSexo('macho')}>Machos</button>
+        <button className={`tab${sexo === 'femea' ? ' active' : ''}`} onClick={() => setSexo('femea')}>Fêmeas</button>
+      </div>
 
       <div className="search-input">
         <Search size={18} />

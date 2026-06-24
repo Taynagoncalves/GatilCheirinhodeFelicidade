@@ -5,7 +5,7 @@ const { upload } = require('../config/cloudinary');
 const router = express.Router();
 
 router.get('/', async (req, res) => {
-  const { busca, status } = req.query;
+  const { busca, status, sexo } = req.query;
   let sql = `
     SELECT g.id, g.nome, g.cor, g.sexo, DATE_FORMAT(g.data_nascimento, '%Y-%m-%d') AS data_nascimento,
            g.ninhada_id, g.mae_id, g.pai_id, g.status, g.foto_url, g.observacoes,
@@ -23,6 +23,10 @@ router.get('/', async (req, res) => {
   if (status) {
     params.push(status);
     sql += ' AND g.status = ?';
+  }
+  if (sexo) {
+    params.push(sexo);
+    sql += ' AND g.sexo = ?';
   }
   sql += ' ORDER BY g.criado_em DESC';
   const [rows] = await pool.query(sql, params);
