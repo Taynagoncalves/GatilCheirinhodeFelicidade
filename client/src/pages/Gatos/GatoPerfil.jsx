@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Cat, Syringe, Pill, Plus, Trash2, Weight, X } from 'lucide-react';
+import { Cat, Syringe, Pill, Plus, Trash2, Weight, X, Scale } from 'lucide-react';
 import { formatarPeso } from '../../utils/peso';
 import Layout from '../../components/Layout';
 import StatusBadge from '../../components/StatusBadge';
@@ -78,8 +78,6 @@ export default function GatoPerfil() {
 
   if (!gato) return null;
 
-  const medicamentosAtivos = gato.historico.filter((h) => h.proxima_dose);
-
   return (
     <Layout title="Perfil do Gato" showBack>
       <div className="card" data-tour="perfil-info">
@@ -131,7 +129,10 @@ export default function GatoPerfil() {
                 </span>
                 <div style={{ flex: 1 }}>
                   <p className="card-title" style={{ fontSize: '0.92rem' }}>{h.medicamento_nome}</p>
-                  <p className="card-meta">{h.data_aplicada.split('-').reverse().join('/')}</p>
+                  <p className="card-meta">
+                    Data aplicada: {h.data_aplicada.split('-').reverse().join('/')}
+                    {h.proxima_dose && <><br />Próxima dose: {h.proxima_dose.split('-').reverse().join('/')}</>}
+                  </p>
                 </div>
                 <button
                   className="icon-btn"
@@ -146,17 +147,20 @@ export default function GatoPerfil() {
         )}
       </section>
 
-      <section data-tour="perfil-ativos">
-        <h2 className="section-title">Medicamentos Ativos</h2>
-        {medicamentosAtivos.length === 0 ? (
-          <EmptyState icon={Syringe} title="Nenhuma dose futura agendada" />
+      <section>
+        <h2 className="section-title">Histórico de Peso</h2>
+        {(!gato.historico_peso || gato.historico_peso.length === 0) ? (
+          <EmptyState icon={Scale} title="Nenhum peso registrado" description="Registre o peso para acompanhar o crescimento." />
         ) : (
           <div className="card">
-            {medicamentosAtivos.map((m) => (
-              <div key={m.id} className="list-row" style={{ marginBottom: 8, border: 'none', background: 'var(--color-bg)' }}>
+            {gato.historico_peso.map((h) => (
+              <div key={h.id} className="list-row" style={{ marginBottom: 8, border: 'none', background: 'var(--color-bg)', display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span className="card-photo-placeholder" style={{ width: 40, height: 40, flexShrink: 0 }}>
+                  <Scale size={18} />
+                </span>
                 <div style={{ flex: 1 }}>
-                  <p className="card-title" style={{ fontSize: '0.92rem' }}>{m.medicamento_nome}</p>
-                  <p className="card-meta">Próxima dose: {m.proxima_dose.split('-').reverse().join('/')}</p>
+                  <p className="card-title" style={{ fontSize: '0.92rem' }}>{formatarPeso(h.peso)}</p>
+                  <p className="card-meta">{h.data_registro.split('-').reverse().join('/')}</p>
                 </div>
               </div>
             ))}

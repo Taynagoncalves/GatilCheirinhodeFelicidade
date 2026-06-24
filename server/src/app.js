@@ -27,6 +27,16 @@ async function initDb() {
   ]) {
     try { await pool.query(sql); } catch (e) { if (e.errno !== 1060) throw e; }
   }
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS historico_peso (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      tipo ENUM('gato','pai') NOT NULL,
+      entidade_id INT NOT NULL,
+      peso DECIMAL(7,1) NOT NULL,
+      data_registro DATE NOT NULL,
+      criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
 }
 initDb().catch((e) => console.error('initDb error:', e));
 

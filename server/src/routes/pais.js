@@ -24,7 +24,16 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   const [rows] = await pool.query(`SELECT id, nome, sexo, raca, cor, DATE_FORMAT(data_nascimento, '%Y-%m-%d') AS data_nascimento, foto_url, observacoes, peso FROM pais WHERE id = ?`, [req.params.id]);
   if (!rows.length) return res.status(404).json({ error: 'Não encontrado' });
-  res.json(rows[0]);
+
+  const [historico_peso] = await pool.query(
+    `SELECT id, peso, DATE_FORMAT(data_registro, '%Y-%m-%d') AS data_registro
+     FROM historico_peso
+     WHERE tipo = 'pai' AND entidade_id = ?
+     ORDER BY data_registro DESC, criado_em DESC`,
+    [req.params.id]
+  );
+
+  res.json({ ...rows[0], historico_peso });
 });
 
 router.post('/', upload.single('foto'), async (req, res) => {
@@ -55,6 +64,10 @@ router.put('/:id', upload.single('foto'), async (req, res) => {
 router.patch('/:id/peso', async (req, res) => {
   const { peso } = req.body;
   await pool.query('UPDATE pais SET peso=? WHERE id=?', [peso, req.params.id]);
+  await pool.query(
+    `INSERT INTO historico_peso (tipo, entidade_id, peso, data_registro) VALUES ('pai', ?, ?, CURDATE())`,
+    [req.params.id, peso]
+  );
   res.json({ ok: true });
 });
 

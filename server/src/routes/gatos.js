@@ -79,7 +79,15 @@ router.get('/:id', async (req, res) => {
     [req.params.id]
   );
 
-  res.json({ ...rows[0], historico });
+  const [historico_peso] = await pool.query(
+    `SELECT id, peso, DATE_FORMAT(data_registro, '%Y-%m-%d') AS data_registro
+     FROM historico_peso
+     WHERE tipo = 'gato' AND entidade_id = ?
+     ORDER BY data_registro DESC, criado_em DESC`,
+    [req.params.id]
+  );
+
+  res.json({ ...rows[0], historico, historico_peso });
 });
 
 router.post('/', upload.single('foto'), async (req, res) => {
@@ -124,6 +132,10 @@ router.patch('/:id/status', async (req, res) => {
 router.patch('/:id/peso', async (req, res) => {
   const { peso } = req.body;
   await pool.query('UPDATE gatos SET peso=? WHERE id=?', [peso, req.params.id]);
+  await pool.query(
+    `INSERT INTO historico_peso (tipo, entidade_id, peso, data_registro) VALUES ('gato', ?, ?, CURDATE())`,
+    [req.params.id, peso]
+  );
   res.json({ ok: true });
 });
 

@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { PawPrint, Weight, X } from 'lucide-react';
+import { PawPrint, Weight, X, Scale } from 'lucide-react';
 import Layout from '../../components/Layout';
+import EmptyState from '../../components/EmptyState';
 import { useToast } from '../../components/Toast';
 import api from '../../api/client';
 import { calcularIdade } from '../../utils/idade';
@@ -63,6 +64,27 @@ export default function PaisPerfil() {
           </button>
         </div>
       </div>
+
+      <section>
+        <h2 className="section-title">Histórico de Peso</h2>
+        {(!pai.historico_peso || pai.historico_peso.length === 0) ? (
+          <EmptyState icon={Scale} title="Nenhum peso registrado" description="Registre o peso para acompanhar a evolução." />
+        ) : (
+          <div className="card">
+            {pai.historico_peso.map((h) => (
+              <div key={h.id} className="list-row" style={{ marginBottom: 8, border: 'none', background: 'var(--color-bg)', display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span className="card-photo-placeholder" style={{ width: 40, height: 40, flexShrink: 0 }}>
+                  <Scale size={18} />
+                </span>
+                <div style={{ flex: 1 }}>
+                  <p className="card-title" style={{ fontSize: '0.92rem' }}>{formatarPeso(h.peso)}</p>
+                  <p className="card-meta">{h.data_registro.split('-').reverse().join('/')}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
 
       {showPesoModal && (
         <div className="modal-overlay" onClick={() => setShowPesoModal(false)}>
