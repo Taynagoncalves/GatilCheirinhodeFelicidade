@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { TrendingUp, TrendingDown, Wallet, Plus, Trash2, X } from 'lucide-react';
+import { TrendingUp, TrendingDown, Wallet, Plus, Trash2, X, PawPrint } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import Layout from '../../components/Layout';
 import EmptyState from '../../components/EmptyState';
 import ConfirmModal from '../../components/ConfirmModal';
@@ -24,6 +25,7 @@ export default function FinanceiroList() {
   const [confirmando, setConfirmando] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ tipo: 'saida', categoria: 'Veterinário', descricao: '', valor: '', data_registro: new Date().toISOString().slice(0, 10) });
+  const navigate = useNavigate();
   const toast = useToast();
 
   const carregar = () => {
@@ -62,7 +64,10 @@ export default function FinanceiroList() {
   const categorias = form.tipo === 'saida' ? CATEGORIAS_SAIDA : CATEGORIAS_ENTRADA;
 
   return (
-    <Layout title="Financeiro" showBack>
+    <Layout title="Financeiro">
+      <button className="btn btn-outline" onClick={() => navigate('/')}>
+        <PawPrint size={16} /> Ir para o Gatil
+      </button>
       <div className="card" style={{ background: 'linear-gradient(135deg, var(--color-primary), #7b5ea7)', color: '#fff', marginBottom: 4 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
           <div>
