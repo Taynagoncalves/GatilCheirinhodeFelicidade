@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Cat, PawPrint, Plus, Syringe, ClipboardList, CalendarClock, X, Users, Bell } from 'lucide-react';
+import { Cat, PawPrint, Plus, Syringe, CalendarClock, X, Users, Bell } from 'lucide-react';
 import Layout from '../components/Layout';
 import EmptyState from '../components/EmptyState';
 import { usePush } from '../hooks/usePush';
@@ -70,7 +70,7 @@ export default function Home() {
                 )}
                 <div>
                   <p className="card-title" style={{ fontSize: '0.95rem' }}>{d.gato_nome || 'Sem nome'}</p>
-                  <p className="card-meta">{d.medicamento_nome} · próxima: {new Date(d.proxima_dose).toLocaleDateString('pt-BR')}</p>
+                  <p className="card-meta">{d.medicamento_nome} · {new Date(d.proxima_dose).toLocaleDateString('pt-BR')}</p>
                 </div>
               </li>
             ))}
@@ -78,29 +78,6 @@ export default function Home() {
         )}
       </section>
 
-      <section>
-        <h2 className="section-title">Últimos registros</h2>
-        {data && data.ultimos_registros.length === 0 && (
-          <EmptyState icon={ClipboardList} title="Nenhum registro ainda" description="Os registros de saúde mais recentes aparecerão aqui." />
-        )}
-        {data?.ultimos_registros.length > 0 && (
-          <ul style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {data.ultimos_registros.map((r) => (
-              <li key={r.id} className="list-row">
-                {r.gato_foto ? (
-                  <img src={r.gato_foto} alt={r.gato_nome} className="card-photo" style={{ width: 48, height: 48 }} />
-                ) : (
-                  <span className="card-photo-placeholder" style={{ width: 48, height: 48 }}><Cat size={20} /></span>
-                )}
-                <div>
-                  <p className="card-title" style={{ fontSize: '0.95rem' }}>{r.gato_nome || 'Sem nome'}</p>
-                  <p className="card-meta">{r.medicamento_nome} · aplicado: {new Date(r.data_aplicada).toLocaleDateString('pt-BR')}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
       {showModal && (
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal-box" onClick={(e) => e.stopPropagation()}>
