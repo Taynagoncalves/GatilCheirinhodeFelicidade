@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Cat, PawPrint, Plus, CalendarClock, X, Users } from 'lucide-react';
+import { Cat, PawPrint, Plus, CalendarClock, X, Users, Wallet } from 'lucide-react';
 import Layout from '../components/Layout';
 import EmptyState from '../components/EmptyState';
 import { usePush } from '../hooks/usePush';
@@ -96,6 +96,9 @@ export default function Home() {
         </button>
         <button className="btn btn-secondary" onClick={() => navigate('/pais')}>
           <Users size={18} /> Ver Pais
+        </button>
+        <button className="btn btn-outline" onClick={() => navigate('/financeiro')}>
+          <Wallet size={16} /> Ir para o Financeiro
         </button>
       </div>
 
