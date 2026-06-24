@@ -33,6 +33,28 @@ router.get('/', async (req, res) => {
   res.json(rows);
 });
 
+router.get('/agenda', async (req, res) => {
+  const [rows] = await pool.query(`
+    SELECT a.gato_id, g.nome AS gato_nome, g.foto_url AS gato_foto,
+           med.nome AS medicamento_nome, a.tipo,
+           DATE_FORMAT(a.proxima_dose, '%Y-%m-%d') AS proxima_dose
+    FROM aplicacoes a
+    INNER JOIN (
+      SELECT gato_id, medicamento_id, MAX(data_aplicada) AS ultima_data
+      FROM aplicacoes
+      WHERE proxima_dose IS NOT NULL
+      GROUP BY gato_id, medicamento_id
+    ) ult ON a.gato_id = ult.gato_id
+          AND a.medicamento_id = ult.medicamento_id
+          AND a.data_aplicada = ult.ultima_data
+    JOIN gatos g ON a.gato_id = g.id
+    JOIN medicamentos med ON a.medicamento_id = med.id
+    WHERE a.proxima_dose IS NOT NULL
+    ORDER BY a.proxima_dose ASC
+  `);
+  res.json(rows);
+});
+
 router.post('/', async (req, res) => {
   const { gato_id, medicamento_id, tipo, data_aplicada, proxima_dose, observacoes } = req.body;
   const [result] = await pool.query(

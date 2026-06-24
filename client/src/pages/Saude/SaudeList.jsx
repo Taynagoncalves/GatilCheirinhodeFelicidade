@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Syringe, Pill, ClipboardList, Settings2, Trash2 } from 'lucide-react';
+import { Syringe, Pill, ClipboardList, Settings2, Trash2, CalendarClock } from 'lucide-react';
 import Layout from '../../components/Layout';
 import EmptyState from '../../components/EmptyState';
 import ConfirmModal from '../../components/ConfirmModal';
@@ -66,6 +66,9 @@ export default function SaudeList() {
       </button>
       <button className="btn btn-secondary" data-tour="saude-medicamentos" onClick={() => navigate('/saude/medicamentos')}>
         <Settings2 size={18} /> Medicamentos Cadastrados
+      </button>
+      <button className="btn btn-secondary" onClick={() => navigate('/saude/agenda')}>
+        <CalendarClock size={18} /> Agenda de Doses
       </button>
 
       <div className="tabs" data-tour="saude-tabs">

@@ -15,6 +15,7 @@ import SaudeList from './pages/Saude/SaudeList';
 import MedicamentosCatalogo from './pages/Saude/MedicamentosCatalogo';
 import MedicamentoForm from './pages/Saude/MedicamentoForm';
 import RegistroForm from './pages/Saude/RegistroForm';
+import AgendaDoses from './pages/Saude/AgendaDoses';
 
 export default function App() {
   return (
@@ -41,6 +42,7 @@ export default function App() {
       <Route path="/saude/registrar" element={<RegistroForm />} />
       <Route path="/saude/medicamentos" element={<MedicamentosCatalogo />} />
       <Route path="/saude/medicamentos/novo" element={<MedicamentoForm />} />
+      <Route path="/saude/agenda" element={<AgendaDoses />} />
     </Routes>
     </TourProvider>
   );
