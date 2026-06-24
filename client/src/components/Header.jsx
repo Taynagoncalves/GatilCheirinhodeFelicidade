@@ -3,14 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import { PawPrint, ChevronLeft, Bell, Trash2, BellRing, X } from 'lucide-react';
 import api from '../api/client';
 
-const STORAGE_KEY = 'notificacoes_limpas';
+const STORAGE_CLEARED = 'notificacoes_limpas';
+const STORAGE_LIDAS = 'notificacoes_lidas';
 
 export default function Header({ title, subtitle, showBack, showNotification }) {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [doses, setDoses] = useState([]);
   const [cleared, setCleared] = useState(() => {
-    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch { return []; }
+    try { return JSON.parse(localStorage.getItem(STORAGE_CLEARED) || '[]'); } catch { return []; }
+  });
+  const [lidas, setLidas] = useState(() => {
+    try { return JSON.parse(localStorage.getItem(STORAGE_LIDAS) || '[]'); } catch { return []; }
   });
   const [testando, setTestando] = useState(false);
   const panelRef = useRef(null);
@@ -29,13 +33,19 @@ export default function Header({ title, subtitle, showBack, showNotification }) 
   }, [open]);
 
   const visiveis = doses.filter((d) => !cleared.includes(d.id));
-  const temNovos = visiveis.length > 0;
+  const temNaoLidas = visiveis.some((d) => !lidas.includes(d.id));
+
+  function marcarLida(id) {
+    const novas = [...new Set([...lidas, id])];
+    setLidas(novas);
+    localStorage.setItem(STORAGE_LIDAS, JSON.stringify(novas));
+  }
 
   function limpar() {
     const ids = doses.map((d) => d.id);
     const novoCleared = [...new Set([...cleared, ...ids])];
     setCleared(novoCleared);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(novoCleared));
+    localStorage.setItem(STORAGE_CLEARED, JSON.stringify(novoCleared));
   }
 
   async function testar() {
@@ -70,7 +80,7 @@ export default function Header({ title, subtitle, showBack, showNotification }) 
             onClick={() => setOpen((v) => !v)}
           >
             <Bell size={20} />
-            {temNovos && <span className="notification-dot" />}
+            {temNaoLidas && <span className="notification-dot" />}
           </button>
 
           {open && (
@@ -87,15 +97,28 @@ export default function Header({ title, subtitle, showBack, showNotification }) 
                     <p>Nenhuma notificação</p>
                   </div>
                 ) : (
-                  visiveis.map((d) => (
-                    <div key={d.id} className="notif-item" style={{ cursor: 'pointer' }} onClick={() => { navigate(`/gatos/${d.gato_id}`); setOpen(false); }}>
-                      <div className="notif-dot-blue" />
-                      <div>
-                        <p className="notif-item-title">{d.gato_nome}</p>
-                        <p className="notif-item-sub">{d.medicamento_nome} · próxima: {d.proxima_dose.split('-').reverse().join('/')}</p>
+                  visiveis.map((d) => {
+                    const lida = lidas.includes(d.id);
+                    return (
+                      <div
+                        key={d.id}
+                        className={`notif-item${lida ? '' : ' notif-item-nova'}`}
+                        style={{ cursor: 'pointer' }}
+                        onClick={() => {
+                          marcarLida(d.id);
+                          navigate(`/gatos/${d.gato_id}`);
+                          setOpen(false);
+                        }}
+                      >
+                        <div className={`notif-dot-blue${lida ? ' notif-dot-lida' : ''}`} />
+                        <div style={{ flex: 1 }}>
+                          <p className="notif-item-title">{d.gato_nome}</p>
+                          <p className="notif-item-sub">{d.medicamento_nome} · próxima: {d.proxima_dose.split('-').reverse().join('/')}</p>
+                        </div>
+                        {!lida && <span className="notif-badge-nova">Nova</span>}
                       </div>
-                    </div>
-                  ))
+                    );
+                  })
                 )}
               </div>
 

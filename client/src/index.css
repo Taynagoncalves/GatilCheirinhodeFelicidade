@@ -228,10 +228,15 @@ h1, h2, h3, p {
   gap: 10px;
   padding: 12px 16px;
   border-bottom: 1px solid var(--color-border);
+  transition: background 0.2s;
 }
 
 .notif-item:last-child {
   border-bottom: none;
+}
+
+.notif-item-nova {
+  background: var(--color-primary-light);
 }
 
 .notif-dot-blue {
@@ -241,6 +246,21 @@ h1, h2, h3, p {
   background: var(--color-primary);
   flex-shrink: 0;
   margin-top: 5px;
+}
+
+.notif-dot-lida {
+  background: var(--color-border);
+}
+
+.notif-badge-nova {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  background: var(--color-accent);
+  border-radius: 20px;
+  padding: 2px 8px;
+  align-self: center;
+  flex-shrink: 0;
 }
 
 .notif-item-title {
