@@ -6,6 +6,7 @@ import EmptyState from '../../components/EmptyState';
 import ConfirmModal from '../../components/ConfirmModal';
 import { useToast } from '../../components/Toast';
 import api from '../../api/client';
+import { calcularIdade } from '../../utils/idade';
 
 const STATUS_OPTIONS = [
   { value: 'disponivel', label: 'Disponível', cls: 'status-disponivel' },
@@ -76,7 +77,7 @@ export default function GatosList() {
             <div style={{ flex: 1, minWidth: 0 }}>
               <p className="card-title">{g.nome || 'Sem nome'}</p>
               <p className="card-meta">
-                {g.data_nascimento ? `Nasc: ${g.data_nascimento.split('-').reverse().join('/')}` : ''}
+                {g.data_nascimento ? `${g.data_nascimento.split('-').reverse().join('/')} · ${calcularIdade(g.data_nascimento)}` : ''}
                 {g.mae_nome && <><br />Mãe: {g.mae_nome}</>}
                 {g.pai_nome && <><br />Pai: {g.pai_nome}</>}
                 {g.ninhada_nome && <><br />Ninhada: {g.ninhada_nome}</>}

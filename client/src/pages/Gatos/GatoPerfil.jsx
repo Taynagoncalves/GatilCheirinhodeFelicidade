@@ -5,6 +5,7 @@ import Layout from '../../components/Layout';
 import StatusBadge from '../../components/StatusBadge';
 import EmptyState from '../../components/EmptyState';
 import api from '../../api/client';
+import { calcularIdade } from '../../utils/idade';
 
 export default function GatoPerfil() {
   const { id } = useParams();
@@ -36,6 +37,7 @@ export default function GatoPerfil() {
             Cor: {gato.cor || 'Não informado'}<br />
             Sexo: {gato.sexo === 'macho' ? 'Macho' : 'Fêmea'}<br />
             Nascimento: {gato.data_nascimento ? gato.data_nascimento.split('-').reverse().join('/') : 'Não informado'}<br />
+            Idade: {gato.data_nascimento ? calcularIdade(gato.data_nascimento) : 'Não informado'}<br />
             Mãe: {gato.mae_nome || 'Não informado'}<br />
             Pai: {gato.pai_nome || 'Não informado'}<br />
             Ninhada: {gato.ninhada_nome || 'Não informado'}
