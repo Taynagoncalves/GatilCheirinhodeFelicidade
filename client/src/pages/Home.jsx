@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Cat, PawPrint, Plus, Syringe, CalendarClock, X, Users, Bell } from 'lucide-react';
+import { Cat, PawPrint, Plus, Syringe, CalendarClock, X, Users } from 'lucide-react';
 import Layout from '../components/Layout';
 import EmptyState from '../components/EmptyState';
 import { usePush } from '../hooks/usePush';
@@ -15,14 +15,6 @@ export default function Home() {
   useEffect(() => {
     api.get('/dashboard').then((res) => setData(res.data));
   }, []);
-
-  async function testarNotificacao() {
-    try {
-      await api.post('/push/test');
-    } catch {
-      alert('Erro ao enviar notificação de teste.');
-    }
-  }
 
   return (
     <Layout title="Cheirinho de Felicidade" subtitle="Organização e Controle dos Gatos" showNotification>
@@ -48,9 +40,6 @@ export default function Home() {
         </button>
         <button className="btn btn-secondary" onClick={() => navigate('/saude/registrar')}>
           <Syringe size={18} /> Registrar Dose
-        </button>
-        <button className="btn btn-secondary" onClick={testarNotificacao}>
-          <Bell size={18} /> Testar Notificação
         </button>
       </div>
 
