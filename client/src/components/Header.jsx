@@ -88,7 +88,7 @@ export default function Header({ title, subtitle, showBack, showNotification }) 
                   </div>
                 ) : (
                   visiveis.map((d) => (
-                    <div key={d.id} className="notif-item">
+                    <div key={d.id} className="notif-item" style={{ cursor: 'pointer' }} onClick={() => { navigate(`/gatos/${d.gato_id}`); setOpen(false); }}>
                       <div className="notif-dot-blue" />
                       <div>
                         <p className="notif-item-title">{d.gato_nome}</p>
