@@ -13,6 +13,7 @@ app.use('/api/ninhadas', require('./routes/ninhadas'));
 app.use('/api/gatos', require('./routes/gatos'));
 app.use('/api/medicamentos', require('./routes/medicamentos'));
 app.use('/api/aplicacoes', require('./routes/aplicacoes'));
+app.use('/api/push', require('./routes/push'));
 
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 
