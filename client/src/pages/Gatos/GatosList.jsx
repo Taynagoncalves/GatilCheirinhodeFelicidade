@@ -50,7 +50,7 @@ export default function GatosList() {
       )}
 
       {gatos.map((g) => (
-        <div key={g.id} className="card">
+        <div key={g.id} className="card" onClick={() => navigate(`/gatos/${g.id}`)} style={{ cursor: 'pointer' }}>
           <div className="card-row">
             {g.foto_url ? (
               <img src={g.foto_url} alt={g.nome} className="card-photo" />
@@ -66,7 +66,7 @@ export default function GatosList() {
                 {g.ninhada_nome && <><br />Ninhada: {g.ninhada_nome}</>}
               </p>
 
-              <div style={{ marginTop: 8, position: 'relative' }}>
+              <div style={{ marginTop: 8, position: 'relative' }} onClick={(e) => e.stopPropagation()}>
                 <span
                   className={`status-badge status-${g.status}`}
                   style={{ cursor: 'pointer' }}
@@ -99,9 +99,6 @@ export default function GatosList() {
                 )}
               </div>
 
-              <div className="card-actions">
-                <button className="icon-btn" onClick={() => navigate(`/gatos/${g.id}`)}>Ver Perfil</button>
-              </div>
             </div>
           </div>
         </div>
