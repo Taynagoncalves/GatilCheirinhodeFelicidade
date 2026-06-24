@@ -6,6 +6,11 @@ export default function Tour({ steps, passo, onNext, onPrev, onClose }) {
   const step = steps[passo];
 
   useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = ''; };
+  }, []);
+
+  useEffect(() => {
     if (!step?.selector) { setRect(null); return; }
 
     const el = document.querySelector(step.selector);
