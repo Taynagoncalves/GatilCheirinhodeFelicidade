@@ -70,7 +70,7 @@ export default function Home() {
                 )}
                 <div>
                   <p className="card-title" style={{ fontSize: '0.95rem' }}>{d.gato_nome || 'Sem nome'}</p>
-                  <p className="card-meta">{d.medicamento_nome} · {new Date(d.proxima_dose).toLocaleDateString('pt-BR')}</p>
+                  <p className="card-meta">{d.medicamento_nome} · próxima: {new Date(d.proxima_dose).toLocaleDateString('pt-BR')}</p>
                 </div>
               </li>
             ))}
@@ -94,7 +94,7 @@ export default function Home() {
                 )}
                 <div>
                   <p className="card-title" style={{ fontSize: '0.95rem' }}>{r.gato_nome || 'Sem nome'}</p>
-                  <p className="card-meta">{r.medicamento_nome} · {new Date(r.data_aplicada).toLocaleDateString('pt-BR')}</p>
+                  <p className="card-meta">{r.medicamento_nome} · aplicado: {new Date(r.data_aplicada).toLocaleDateString('pt-BR')}</p>
                 </div>
               </li>
             ))}

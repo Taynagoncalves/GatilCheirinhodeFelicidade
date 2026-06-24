@@ -22,7 +22,8 @@ router.get('/', async (req, res) => {
      FROM aplicacoes a
      JOIN gatos g ON a.gato_id = g.id
      JOIN medicamentos med ON a.medicamento_id = med.id
-     ORDER BY a.criado_em DESC
+     WHERE a.data_aplicada <= CURRENT_DATE
+     ORDER BY a.data_aplicada DESC
      LIMIT 5`
   );
 
