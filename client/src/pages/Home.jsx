@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Cat, PawPrint, Plus, Syringe, ClipboardList, CalendarClock } from 'lucide-react';
+import { Cat, PawPrint, Plus, Syringe, ClipboardList, CalendarClock, X, Users } from 'lucide-react';
 import Layout from '../components/Layout';
 import EmptyState from '../components/EmptyState';
 import api from '../api/client';
@@ -8,6 +8,7 @@ import api from '../api/client';
 export default function Home() {
   const navigate = useNavigate();
   const [data, setData] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     api.get('/dashboard').then((res) => setData(res.data));
@@ -29,7 +30,7 @@ export default function Home() {
       </div>
 
       <div className="quick-actions">
-        <button className="btn btn-primary" onClick={() => navigate('/gatos/novo')}>
+        <button className="btn btn-primary" onClick={() => setShowModal(true)}>
           <Plus size={18} /> Cadastrar Gato
         </button>
         <button className="btn btn-secondary" onClick={() => navigate('/ninhadas/nova')}>
@@ -87,6 +88,20 @@ export default function Home() {
           </ul>
         )}
       </section>
+      {showModal && (
+        <div className="modal-overlay" onClick={() => setShowModal(false)}>
+          <div className="modal-box" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => setShowModal(false)}><X size={20} /></button>
+            <p className="modal-title">O que deseja fazer?</p>
+            <button className="btn btn-primary" onClick={() => navigate('/gatos/novo')}>
+              <PawPrint size={18} /> Cadastrar Filhote
+            </button>
+            <button className="btn btn-primary" onClick={() => navigate('/pais')}>
+              <Users size={18} /> Ver Pais
+            </button>
+          </div>
+        </div>
+      )}
     </Layout>
   );
 }
