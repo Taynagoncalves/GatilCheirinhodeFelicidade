@@ -39,6 +39,7 @@ export default function GatoPerfil() {
             Mãe: {gato.mae_nome || 'Não informado'}<br />
             Pai: {gato.pai_nome || 'Não informado'}<br />
             Ninhada: {gato.ninhada_nome || 'Não informado'}
+            {gato.observacoes && <><br />Obs: {gato.observacoes}</>}
           </p>
         </div>
         <button className="btn btn-outline" style={{ marginTop: 12 }} onClick={() => navigate(`/gatos/${id}/editar`)}>

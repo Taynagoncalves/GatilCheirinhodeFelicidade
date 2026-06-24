@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Plus, PawPrint, Trash2, ChevronRight, Calendar, Cat } from 'lucide-react';
+import { Search, Plus, PawPrint, Trash2, Calendar, Cat } from 'lucide-react';
 import Layout from '../../components/Layout';
 import EmptyState from '../../components/EmptyState';
 import ConfirmModal from '../../components/ConfirmModal';
@@ -45,7 +45,7 @@ export default function NinhadasList() {
       )}
 
       {ninhadas.map((n) => (
-        <div key={n.id} className="card">
+        <div key={n.id} className="card" style={{ cursor: 'pointer' }} onClick={() => navigate(`/ninhadas/${n.id}`)}>
           <div className="card-row">
             {n.mae_foto ? (
               <img src={n.mae_foto} alt={n.mae_nome} className="card-photo" />
@@ -66,10 +66,7 @@ export default function NinhadasList() {
                   <PawPrint size={14} /> {n.quantidade_filhotes} filhotes
                 </span>
               </p>
-              <div className="card-actions">
-                <button className="icon-btn" onClick={() => navigate(`/ninhadas/${n.id}`)}>
-                  Ver Detalhes <ChevronRight size={15} />
-                </button>
+              <div className="card-actions" onClick={(e) => e.stopPropagation()}>
                 <button className="icon-btn danger" onClick={() => setConfirmId(n.id)}>
                   <Trash2 size={15} /> Excluir
                 </button>

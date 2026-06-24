@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Cat, Calendar, PawPrint } from 'lucide-react';
+import { Cat, Calendar, PawPrint, Pencil } from 'lucide-react';
 import Layout from '../../components/Layout';
 import EmptyState from '../../components/EmptyState';
 import api from '../../api/client';
@@ -42,6 +42,9 @@ export default function NinhadaDetalhe() {
           </span>
         </p>
         {ninhada.observacoes && <p className="card-meta" style={{ marginTop: 8 }}>{ninhada.observacoes}</p>}
+        <button className="btn btn-outline" style={{ marginTop: 12 }} onClick={() => navigate(`/ninhadas/${id}/editar`)}>
+          <Pencil size={15} /> Editar Ninhada
+        </button>
       </div>
 
       <section>
