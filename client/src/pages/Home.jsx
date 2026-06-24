@@ -67,6 +67,10 @@ export default function Home() {
 
   return (
     <Layout title="Cheirinho de Felicidade" subtitle="Organização e Controle dos Gatos" showNotification>
+      <button className="btn btn-outline" onClick={() => navigate('/financeiro')}>
+        <Wallet size={16} /> Ir para o Financeiro
+      </button>
+
       <div className="stats-grid" data-tour="home-stats">
         <div className="stat-card" data-tour="home-stat-gatos" style={{ cursor: 'pointer' }} onClick={() => navigate('/gatos')}>
           <span className="stat-icon"><Cat size={18} /></span>
@@ -96,9 +100,6 @@ export default function Home() {
         </button>
         <button className="btn btn-secondary" onClick={() => navigate('/pais')}>
           <Users size={18} /> Ver Pais
-        </button>
-        <button className="btn btn-outline" onClick={() => navigate('/financeiro')}>
-          <Wallet size={16} /> Ir para o Financeiro
         </button>
       </div>
 
