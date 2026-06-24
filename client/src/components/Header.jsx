@@ -23,7 +23,7 @@ export default function Header({ title, subtitle, showBack, showNotification }) 
       </div>
 
       {showNotification && (
-        <button className="notification-button" aria-label="Notificações">
+        <button className="notification-button" aria-label="Notificações" onClick={() => navigate('/saude')}>
           <Bell size={20} />
           <span className="notification-dot" />
         </button>
