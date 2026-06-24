@@ -4,21 +4,60 @@ import { Cat, PawPrint, Plus, CalendarClock, X, Users } from 'lucide-react';
 import Layout from '../components/Layout';
 import EmptyState from '../components/EmptyState';
 import { usePush } from '../hooks/usePush';
+import { useTour } from '../contexts/TourContext';
 import api from '../api/client';
+
+const TOUR = [
+  {
+    titulo: 'Bem-vinda ao Início! 🐾',
+    texto: 'Esta é a tela principal do seu gatil. Aqui você tem um resumo completo de tudo. Toque em "Próximo" para descobrir cada recurso.',
+  },
+  {
+    selector: '[data-tour="home-stats"]',
+    titulo: 'Resumo do Gatil',
+    texto: 'Estes cards mostram o total de gatos, ninhadas, reservados e vendidos — sempre atualizados em tempo real.',
+  },
+  {
+    selector: '[data-tour="home-reservados"]',
+    titulo: 'Gatos Reservados',
+    texto: 'Toque neste card para listar apenas os gatos com status "Reservado".',
+  },
+  {
+    selector: '[data-tour="home-vendidos"]',
+    titulo: 'Gatos Vendidos',
+    texto: 'Toque aqui para ver rapidamente todos os gatos que já foram vendidos.',
+  },
+  {
+    selector: '[data-tour="home-btn-cadastrar"]',
+    titulo: 'Cadastrar Gato',
+    texto: 'Use este botão para adicionar um novo filhote ao gatil ou acessar a lista de pais reprodutores.',
+  },
+  {
+    selector: '[data-tour="home-proximas-doses"]',
+    titulo: 'Próximas Doses',
+    texto: 'Aqui aparecem os gatos com vacinas ou medicamentos agendados nos próximos dias. Nunca perca uma dose!',
+  },
+];
 
 export default function Home() {
   const navigate = useNavigate();
   const [data, setData] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const { setSteps } = useTour();
   usePush();
 
   useEffect(() => {
     api.get('/dashboard').then((res) => setData(res.data));
   }, []);
 
+  useEffect(() => {
+    setSteps(TOUR);
+    return () => setSteps([]);
+  }, []);
+
   return (
     <Layout title="Cheirinho de Felicidade" subtitle="Organização e Controle dos Gatos" showNotification>
-      <div className="stats-grid">
+      <div className="stats-grid" data-tour="home-stats">
         <div className="stat-card">
           <span className="stat-icon"><Cat size={18} /></span>
           <span className="stat-value">{data?.total_gatos ?? '—'}</span>
@@ -29,12 +68,12 @@ export default function Home() {
           <span className="stat-value">{data?.total_ninhadas ?? '—'}</span>
           <span className="stat-label">Ninhadas</span>
         </div>
-        <div className="stat-card" style={{ cursor: 'pointer' }} onClick={() => navigate('/gatos?status=reservado')}>
+        <div className="stat-card" data-tour="home-reservados" style={{ cursor: 'pointer' }} onClick={() => navigate('/gatos?status=reservado')}>
           <span className="stat-icon"><Users size={18} /></span>
           <span className="stat-value">{data?.total_reservados ?? '—'}</span>
           <span className="stat-label">Reservados</span>
         </div>
-        <div className="stat-card" style={{ cursor: 'pointer' }} onClick={() => navigate('/gatos?status=vendido')}>
+        <div className="stat-card" data-tour="home-vendidos" style={{ cursor: 'pointer' }} onClick={() => navigate('/gatos?status=vendido')}>
           <span className="stat-icon"><PawPrint size={18} /></span>
           <span className="stat-value">{data?.total_vendidos ?? '—'}</span>
           <span className="stat-label">Vendidos</span>
@@ -42,7 +81,7 @@ export default function Home() {
       </div>
 
       <div className="quick-actions">
-        <button className="btn btn-primary" onClick={() => setShowModal(true)}>
+        <button className="btn btn-primary" data-tour="home-btn-cadastrar" onClick={() => setShowModal(true)}>
           <Plus size={18} /> Cadastrar Gato
         </button>
         <button className="btn btn-secondary" onClick={() => navigate('/pais')}>
@@ -50,7 +89,7 @@ export default function Home() {
         </button>
       </div>
 
-      <section>
+      <section data-tour="home-proximas-doses">
         <h2 className="section-title">Próximas doses</h2>
         {data && data.proximas_doses.length === 0 && (
           <EmptyState icon={CalendarClock} title="Nenhuma dose agendada" description="As próximas doses cadastradas aparecerão aqui." />

@@ -6,8 +6,37 @@ import StatusBadge from '../../components/StatusBadge';
 import EmptyState from '../../components/EmptyState';
 import ConfirmModal from '../../components/ConfirmModal';
 import { useToast } from '../../components/Toast';
+import { useTour } from '../../contexts/TourContext';
 import api from '../../api/client';
 import { calcularIdade } from '../../utils/idade';
+
+const TOUR = [
+  {
+    selector: '[data-tour="perfil-info"]',
+    titulo: 'Informações do Gato',
+    texto: 'Aqui estão todos os dados cadastrados: cor, sexo, data de nascimento, idade calculada automaticamente, pais e ninhada.',
+  },
+  {
+    selector: '[data-tour="perfil-editar"]',
+    titulo: 'Editar Gato',
+    texto: 'Toque em "Editar Gato" para alterar qualquer informação do cadastro, incluindo a foto.',
+  },
+  {
+    selector: '[data-tour="perfil-registrar"]',
+    titulo: 'Registrar Dose',
+    texto: 'Registre uma nova dose de vacina ou medicamento diretamente para este gato. A data de aplicação e a próxima dose são registradas aqui.',
+  },
+  {
+    selector: '[data-tour="perfil-historico"]',
+    titulo: 'Histórico de Saúde',
+    texto: 'Todas as doses registradas aparecem aqui em ordem cronológica. Use a lixeira para remover um registro incorreto.',
+  },
+  {
+    selector: '[data-tour="perfil-ativos"]',
+    titulo: 'Medicamentos Ativos',
+    texto: 'Exibe os medicamentos com próxima dose agendada para este gato, facilitando o controle sem precisar procurar no histórico.',
+  },
+];
 
 export default function GatoPerfil() {
   const { id } = useParams();
@@ -15,10 +44,16 @@ export default function GatoPerfil() {
   const [gato, setGato] = useState(null);
   const [confirmando, setConfirmando] = useState(null);
   const toast = useToast();
+  const { setSteps } = useTour();
 
   const carregarGato = () => api.get(`/gatos/${id}`).then((res) => setGato(res.data));
 
   useEffect(() => { carregarGato(); }, [id]);
+
+  useEffect(() => {
+    setSteps(TOUR);
+    return () => setSteps([]);
+  }, []);
 
   const excluirRegistro = async (regId) => {
     await api.delete(`/aplicacoes/${regId}`);
@@ -33,7 +68,7 @@ export default function GatoPerfil() {
 
   return (
     <Layout title="Perfil do Gato" showBack>
-      <div className="card">
+      <div className="card" data-tour="perfil-info">
         {gato.foto_url ? (
           <img src={gato.foto_url} alt={gato.nome} style={{ width: '100%', height: 220, objectFit: 'cover', borderRadius: 'var(--radius-md)' }} />
         ) : (
@@ -55,16 +90,16 @@ export default function GatoPerfil() {
             {gato.observacoes && <><br />Obs: {gato.observacoes}</>}
           </p>
         </div>
-        <button className="btn btn-outline" style={{ marginTop: 12 }} onClick={() => navigate(`/gatos/${id}/editar`)}>
+        <button className="btn btn-outline" data-tour="perfil-editar" style={{ marginTop: 12 }} onClick={() => navigate(`/gatos/${id}/editar`)}>
           Editar Gato
         </button>
       </div>
 
-      <button className="btn btn-primary" onClick={() => navigate(`/saude/registrar?gato_id=${id}`)}>
+      <button className="btn btn-primary" data-tour="perfil-registrar" onClick={() => navigate(`/saude/registrar?gato_id=${id}`)}>
         <Plus size={18} /> Registrar Dose
       </button>
 
-      <section>
+      <section data-tour="perfil-historico">
         <h2 className="section-title">Histórico de Saúde</h2>
         {gato.historico.length === 0 ? (
           <EmptyState icon={Pill} title="Nenhum registro de saúde" description="Os registros de vacinas e medicamentos aparecerão aqui." />
@@ -92,7 +127,7 @@ export default function GatoPerfil() {
         )}
       </section>
 
-      <section>
+      <section data-tour="perfil-ativos">
         <h2 className="section-title">Medicamentos Ativos</h2>
         {medicamentosAtivos.length === 0 ? (
           <EmptyState icon={Syringe} title="Nenhuma dose futura agendada" />

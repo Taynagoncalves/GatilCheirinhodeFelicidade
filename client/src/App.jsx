@@ -1,4 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
+import { TourProvider } from './contexts/TourContext';
 import Home from './pages/Home';
 import GatosList from './pages/Gatos/GatosList';
 import GatoForm from './pages/Gatos/GatoForm';
@@ -16,6 +17,7 @@ import RegistroForm from './pages/Saude/RegistroForm';
 
 export default function App() {
   return (
+    <TourProvider>
     <Routes>
       <Route path="/" element={<Home />} />
 
@@ -38,5 +40,6 @@ export default function App() {
       <Route path="/saude/medicamentos" element={<MedicamentosCatalogo />} />
       <Route path="/saude/medicamentos/novo" element={<MedicamentoForm />} />
     </Routes>
+    </TourProvider>
   );
 }

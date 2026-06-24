@@ -100,6 +100,116 @@
   40%            { transform: scale(1.4); opacity: 1;   }
 }
 
+/* ── Tour / Tutorial ────────────────────────────────── */
+.tour-card {
+  background: #fff;
+  border-radius: var(--radius-lg);
+  padding: 18px 18px 16px;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.30), 0 4px 16px rgba(0,0,0,0.10);
+  position: relative;
+  animation: tourCardIn 0.26s ease;
+}
+
+@keyframes tourCardIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+.tour-close {
+  position: absolute;
+  top: 11px; right: 11px;
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; padding: 0;
+}
+
+.tour-counter {
+  font-size: 0.70rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  margin: 0 0 5px;
+}
+
+.tour-title {
+  font-size: 1.08rem;
+  font-weight: 800;
+  color: var(--color-text);
+  margin: 0 26px 8px 0;
+  line-height: 1.2;
+}
+
+.tour-desc {
+  font-size: 0.90rem;
+  color: var(--color-text-muted);
+  line-height: 1.62;
+  margin: 0 0 14px;
+}
+
+.tour-dots {
+  display: flex; gap: 5px; justify-content: center;
+  margin-bottom: 13px;
+}
+
+.tour-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--color-border);
+  transition: width .25s ease, background .25s ease, border-radius .25s ease;
+}
+
+.tour-dot-on {
+  width: 22px; border-radius: 3px;
+  background: var(--color-primary);
+}
+
+.tour-nav {
+  display: flex; gap: 8px; align-items: center; justify-content: space-between;
+}
+
+.tour-prev {
+  display: flex; align-items: center; gap: 2px;
+  background: none;
+  border: 1.5px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: 0.86rem; font-weight: 500;
+  padding: 9px 13px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.tour-next {
+  flex: 1;
+  background: var(--color-primary);
+  color: #fff; border: none;
+  font-size: 0.90rem; font-weight: 700;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: opacity .15s;
+}
+.tour-next:active { opacity: 0.84; }
+
+/* Botão ? no header */
+.tour-help-btn {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--color-primary-light);
+  border: 1.5px solid var(--color-accent);
+  color: var(--color-primary);
+  font-size: 0.95rem; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background .15s;
+}
+.tour-help-btn:hover { background: var(--color-accent); }
+/* ─────────────────────────────────────────────────── */
+
 /* ── Onboarding ─────────────────────────────────────── */
 .ob-overlay {
   position: fixed;

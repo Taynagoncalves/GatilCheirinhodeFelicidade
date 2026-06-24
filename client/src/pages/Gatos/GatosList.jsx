@@ -5,8 +5,45 @@ import Layout from '../../components/Layout';
 import EmptyState from '../../components/EmptyState';
 import ConfirmModal from '../../components/ConfirmModal';
 import { useToast } from '../../components/Toast';
+import { useTour } from '../../contexts/TourContext';
 import api from '../../api/client';
 import { calcularIdade } from '../../utils/idade';
+
+const TOUR = [
+  {
+    selector: '[data-tour="gatos-cadastrar"]',
+    titulo: 'Cadastrar Gato',
+    texto: 'Toque aqui para adicionar um novo filhote ao gatil ou cadastrar um pai reprodutor.',
+  },
+  {
+    selector: '[data-tour="gatos-tabs-sexo"]',
+    titulo: 'Filtro por Sexo',
+    texto: 'Alterne entre Todos, Machos e Fêmeas para organizar a visualização dos gatos.',
+  },
+  {
+    selector: '[data-tour="gatos-tabs-status"]',
+    titulo: 'Filtro por Status',
+    texto: 'Filtre por disponibilidade: Todos, Disponível, Reservado ou Vendido.',
+  },
+  {
+    selector: '[data-tour="gatos-busca"]',
+    titulo: 'Busca Rápida',
+    texto: 'Digite o nome do gato para encontrá-lo rapidamente entre todos os cadastrados.',
+  },
+  {
+    selector: '[data-tour="gatos-lista"]',
+    titulo: 'Cards dos Gatos',
+    texto: 'Toque em um card para ver o perfil completo. Os badges coloridos indicam dose urgente: vermelho = atrasada, laranja = hoje, azul = amanhã.',
+  },
+  {
+    titulo: 'Alterar Status Rápido',
+    texto: 'Dentro de cada card, toque no badge de status (ex: "Disponível ▾") para alterar rapidamente sem abrir o perfil completo.',
+  },
+  {
+    titulo: 'Excluir Gato',
+    texto: 'O ícone de lixeira no lado direito de cada card exclui o gato e todo o seu histórico de saúde permanentemente.',
+  },
+];
 
 function alerteDose(proxima_dose_min, proxima_medicamento_nome) {
   if (!proxima_dose_min) return null;
@@ -39,6 +76,12 @@ export default function GatosList() {
   const [statusOpen, setStatusOpen] = useState(null);
   const [confirmando, setConfirmando] = useState(null);
   const toast = useToast();
+  const { setSteps } = useTour();
+
+  useEffect(() => {
+    setSteps(TOUR);
+    return () => setSteps([]);
+  }, []);
 
   const excluir = async (id) => {
     await api.delete(`/gatos/${id}`);
@@ -62,24 +105,24 @@ export default function GatosList() {
 
   return (
     <Layout title="Gatos" showBack>
-      <button className="btn btn-primary" onClick={() => setShowModal(true)}>
+      <button className="btn btn-primary" data-tour="gatos-cadastrar" onClick={() => setShowModal(true)}>
         <Plus size={18} /> Cadastrar Gato
       </button>
 
-      <div className="tabs">
+      <div className="tabs" data-tour="gatos-tabs-sexo">
         <button className={`tab${sexo === '' ? ' active' : ''}`} onClick={() => setSexo('')}>Todos</button>
         <button className={`tab${sexo === 'macho' ? ' active' : ''}`} onClick={() => setSexo('macho')}>Machos</button>
         <button className={`tab${sexo === 'femea' ? ' active' : ''}`} onClick={() => setSexo('femea')}>Fêmeas</button>
       </div>
 
-      <div className="tabs">
+      <div className="tabs" data-tour="gatos-tabs-status">
         <button className={`tab${statusFiltro === '' ? ' active' : ''}`} onClick={() => setStatusFiltro('')}>Todos</button>
         <button className={`tab${statusFiltro === 'disponivel' ? ' active' : ''}`} onClick={() => setStatusFiltro('disponivel')}>Disponível</button>
         <button className={`tab${statusFiltro === 'reservado' ? ' active' : ''}`} onClick={() => setStatusFiltro('reservado')}>Reservado</button>
         <button className={`tab${statusFiltro === 'vendido' ? ' active' : ''}`} onClick={() => setStatusFiltro('vendido')}>Vendido</button>
       </div>
 
-      <div className="search-input">
+      <div className="search-input" data-tour="gatos-busca">
         <Search size={18} />
         <input placeholder="Buscar gato..." value={busca} onChange={(e) => setBusca(e.target.value)} />
       </div>
@@ -88,6 +131,7 @@ export default function GatosList() {
         <EmptyState icon={Cat} title="Nenhum gato cadastrado" description="Cadastre o primeiro gato do gatil." />
       )}
 
+      <div data-tour="gatos-lista">
       {gatos.map((g) => {
         const alerta = alerteDose(g.proxima_dose_min, g.proxima_medicamento_nome);
         return (
@@ -161,6 +205,8 @@ export default function GatosList() {
         </div>
         );
       })}
+
+      </div>
 
       {confirmando && (
         <ConfirmModal

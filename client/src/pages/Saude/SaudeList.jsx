@@ -5,7 +5,35 @@ import Layout from '../../components/Layout';
 import EmptyState from '../../components/EmptyState';
 import ConfirmModal from '../../components/ConfirmModal';
 import { useToast } from '../../components/Toast';
+import { useTour } from '../../contexts/TourContext';
 import api from '../../api/client';
+
+const TOUR = [
+  {
+    selector: '[data-tour="saude-registrar"]',
+    titulo: 'Registrar Dose',
+    texto: 'Toque aqui para registrar uma nova dose de vacina ou medicamento para qualquer gato do gatil.',
+  },
+  {
+    selector: '[data-tour="saude-medicamentos"]',
+    titulo: 'Medicamentos Cadastrados',
+    texto: 'Acesse o catálogo de todos os medicamentos e vacinas. Você pode adicionar novos ou editar os existentes.',
+  },
+  {
+    selector: '[data-tour="saude-tabs"]',
+    titulo: 'Filtro por Tipo',
+    texto: 'Alterne entre "Medicamentos" e "Vacinas" para filtrar e visualizar apenas o que precisa.',
+  },
+  {
+    selector: '[data-tour="saude-lista"]',
+    titulo: 'Histórico de Doses',
+    texto: 'Cada card mostra o gato, o medicamento, a data da última aplicação e a próxima dose agendada.',
+  },
+  {
+    titulo: 'Excluir Registro',
+    texto: 'O ícone de lixeira em cada card exclui aquele registro. Use com cuidado — a exclusão não pode ser desfeita.',
+  },
+];
 
 export default function SaudeList() {
   const navigate = useNavigate();
@@ -13,6 +41,12 @@ export default function SaudeList() {
   const [registros, setRegistros] = useState([]);
   const [confirmando, setConfirmando] = useState(null);
   const toast = useToast();
+  const { setSteps } = useTour();
+
+  useEffect(() => {
+    setSteps(TOUR);
+    return () => setSteps([]);
+  }, []);
 
   useEffect(() => {
     api.get('/aplicacoes', { params: { tipo } }).then((res) => setRegistros(res.data));
@@ -27,14 +61,14 @@ export default function SaudeList() {
 
   return (
     <Layout title="Saúde" showBack>
-      <button className="btn btn-primary" onClick={() => navigate('/saude/registrar')}>
+      <button className="btn btn-primary" data-tour="saude-registrar" onClick={() => navigate('/saude/registrar')}>
         <Syringe size={18} /> Registrar Dose
       </button>
-      <button className="btn btn-secondary" onClick={() => navigate('/saude/medicamentos')}>
+      <button className="btn btn-secondary" data-tour="saude-medicamentos" onClick={() => navigate('/saude/medicamentos')}>
         <Settings2 size={18} /> Medicamentos Cadastrados
       </button>
 
-      <div className="tabs">
+      <div className="tabs" data-tour="saude-tabs">
         <button className={`tab${tipo === 'medicamento' ? ' active' : ''}`} onClick={() => setTipo('medicamento')}>Medicamentos</button>
         <button className={`tab${tipo === 'vacina' ? ' active' : ''}`} onClick={() => setTipo('vacina')}>Vacinas</button>
       </div>
@@ -43,6 +77,7 @@ export default function SaudeList() {
         <EmptyState icon={ClipboardList} title="Nenhum registro encontrado" description="Registre uma dose para começar o histórico de saúde." />
       )}
 
+      <div data-tour="saude-lista">
       {registros.map((r) => (
         <div key={r.id} className="card">
           <div className="card-row">
@@ -70,6 +105,8 @@ export default function SaudeList() {
           </div>
         </div>
       ))}
+
+      </div>
 
       {confirmando && (
         <ConfirmModal

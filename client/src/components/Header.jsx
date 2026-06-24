@@ -2,11 +2,14 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PawPrint, ChevronLeft, Bell, Trash2, BellRing, X } from 'lucide-react';
 import api from '../api/client';
+import { useTour } from '../contexts/TourContext';
 
 const STORAGE_LIDAS = 'notificacoes_lidas';
 
 export default function Header({ title, subtitle, showBack, showNotification }) {
   const navigate = useNavigate();
+  const { steps, iniciar } = useTour();
+  const temTour = steps.length > 0;
   const [open, setOpen] = useState(false);
   const [notifs, setNotifs] = useState([]);
   const [lidas, setLidas] = useState(() => {
@@ -76,13 +79,16 @@ export default function Header({ title, subtitle, showBack, showNotification }) 
         </div>
       </div>
 
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        {temTour && (
+          <button className="tour-help-btn" onClick={iniciar} aria-label="Tutorial desta tela" title="Tutorial">
+            ?
+          </button>
+        )}
+
       {showNotification && (
         <div style={{ position: 'relative' }} ref={panelRef}>
-          <button
-            className="notification-button"
-            aria-label="Notificações"
-            onClick={() => setOpen((v) => !v)}
-          >
+          <button className="notification-button" aria-label="Notificações" onClick={() => setOpen((v) => !v)}>
             <Bell size={20} />
             {temNaoLidas && <span className="notification-dot" />}
           </button>
@@ -135,6 +141,7 @@ export default function Header({ title, subtitle, showBack, showNotification }) 
           )}
         </div>
       )}
+      </div>
     </header>
   );
 }

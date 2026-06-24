@@ -5,7 +5,30 @@ import Layout from '../../components/Layout';
 import EmptyState from '../../components/EmptyState';
 import ConfirmModal from '../../components/ConfirmModal';
 import { useToast } from '../../components/Toast';
+import { useTour } from '../../contexts/TourContext';
 import api from '../../api/client';
+
+const TOUR = [
+  {
+    selector: '[data-tour="ninhadas-nova"]',
+    titulo: 'Nova Ninhada',
+    texto: 'Toque para registrar uma nova ninhada: informe o pai, a mãe, a data de nascimento e os filhotes.',
+  },
+  {
+    selector: '[data-tour="ninhadas-busca"]',
+    titulo: 'Busca',
+    texto: 'Pesquise pelo nome da ninhada para encontrá-la rapidamente.',
+  },
+  {
+    selector: '[data-tour="ninhadas-lista"]',
+    titulo: 'Cards de Ninhadas',
+    texto: 'Toque em um card para abrir os detalhes completos da ninhada, incluindo todos os filhotes registrados.',
+  },
+  {
+    titulo: 'Editar Ninhada',
+    texto: 'Dentro dos detalhes de uma ninhada, você encontra o botão "Editar Ninhada" para alterar qualquer informação.',
+  },
+];
 
 export default function NinhadasList() {
   const navigate = useNavigate();
@@ -13,6 +36,12 @@ export default function NinhadasList() {
   const [ninhadas, setNinhadas] = useState([]);
   const toast = useToast();
   const [confirmId, setConfirmId] = useState(null);
+  const { setSteps } = useTour();
+
+  useEffect(() => {
+    setSteps(TOUR);
+    return () => setSteps([]);
+  }, []);
 
   const load = () => {
     api.get('/ninhadas', { params: { busca: busca || undefined } }).then((res) => setNinhadas(res.data));
@@ -31,11 +60,11 @@ export default function NinhadasList() {
 
   return (
     <Layout title="Ninhadas" showBack>
-      <button className="btn btn-primary" onClick={() => navigate('/ninhadas/nova')}>
+      <button className="btn btn-primary" data-tour="ninhadas-nova" onClick={() => navigate('/ninhadas/nova')}>
         <Plus size={18} /> Nova Ninhada
       </button>
 
-      <div className="search-input">
+      <div className="search-input" data-tour="ninhadas-busca">
         <Search size={18} />
         <input placeholder="Buscar ninhada..." value={busca} onChange={(e) => setBusca(e.target.value)} />
       </div>
@@ -44,6 +73,7 @@ export default function NinhadasList() {
         <EmptyState icon={PawPrint} title="Nenhuma ninhada cadastrada" description="Cadastre a primeira ninhada do gatil." />
       )}
 
+      <div data-tour="ninhadas-lista">
       {ninhadas.map((n) => (
         <div key={n.id} className="card" style={{ cursor: 'pointer' }} onClick={() => navigate(`/ninhadas/${n.id}`)}>
           <div className="card-row">
@@ -75,6 +105,7 @@ export default function NinhadasList() {
           </div>
         </div>
       ))}
+      </div>
       {confirmId && (
         <ConfirmModal
           message="Deseja remover esta ninhada?"
