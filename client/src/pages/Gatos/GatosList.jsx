@@ -55,7 +55,7 @@ function alerteDose(proxima_dose_min, proxima_medicamento_nome) {
   if (diff < 0) return { label: `Dose atrasada${med}`, cor: '#c0524a' };
   if (diff === 0) return { label: `Dose hoje!${med}`, cor: '#b8863a' };
   if (diff === 1) return { label: `Dose amanhã${med}`, cor: '#2f6690' };
-  return null;
+  return { label: `Dose em dia${med}`, cor: '#3f8c5a' };
 }
 
 const STATUS_OPTIONS = [
