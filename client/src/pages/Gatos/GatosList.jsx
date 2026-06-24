@@ -77,7 +77,8 @@ export default function GatosList() {
             <div style={{ flex: 1, minWidth: 0 }}>
               <p className="card-title">{g.nome || 'Sem nome'}</p>
               <p className="card-meta">
-                {g.data_nascimento ? `${g.data_nascimento.split('-').reverse().join('/')} · ${calcularIdade(g.data_nascimento)}` : ''}
+                {g.data_nascimento ? `${g.data_nascimento.split('-').reverse().join('/')}` : ''}
+                {g.data_nascimento && <><br />Idade: {calcularIdade(g.data_nascimento)}</>}
                 {g.mae_nome && <><br />Mãe: {g.mae_nome}</>}
                 {g.pai_nome && <><br />Pai: {g.pai_nome}</>}
                 {g.ninhada_nome && <><br />Ninhada: {g.ninhada_nome}</>}
