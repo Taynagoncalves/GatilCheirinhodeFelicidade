@@ -7,6 +7,7 @@ router.get('/', async (req, res) => {
   const [[{ total_gatos }]] = await pool.query('SELECT COUNT(*) AS total_gatos FROM gatos');
   const [[{ total_ninhadas }]] = await pool.query('SELECT COUNT(*) AS total_ninhadas FROM ninhadas');
   const [[{ total_reservados }]] = await pool.query("SELECT COUNT(*) AS total_reservados FROM gatos WHERE status = 'reservado'");
+  const [[{ total_vendidos }]] = await pool.query("SELECT COUNT(*) AS total_vendidos FROM gatos WHERE status = 'vendido'");
 
   const [proximas_doses] = await pool.query(
     `SELECT a.id, a.gato_id, DATE_FORMAT(a.proxima_dose, '%Y-%m-%d') AS proxima_dose, g.nome AS gato_nome, g.foto_url AS gato_foto, med.nome AS medicamento_nome
@@ -32,6 +33,7 @@ router.get('/', async (req, res) => {
     total_gatos: Number(total_gatos),
     total_ninhadas: Number(total_ninhadas),
     total_reservados: Number(total_reservados),
+    total_vendidos: Number(total_vendidos),
     proximas_doses,
     ultimos_registros,
   });
