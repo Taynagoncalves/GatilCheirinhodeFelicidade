@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Search, Plus, PawPrint, Pencil, Trash2 } from 'lucide-react';
 import Layout from '../../components/Layout';
 import EmptyState from '../../components/EmptyState';
+import { useToast } from '../../components/Toast';
 import api from '../../api/client';
 
 export default function PaisList() {
@@ -10,6 +11,7 @@ export default function PaisList() {
   const [sexo, setSexo] = useState('macho');
   const [busca, setBusca] = useState('');
   const [pais, setPais] = useState([]);
+  const toast = useToast();
 
   const load = () => {
     api.get('/pais', { params: { sexo, busca: busca || undefined } }).then((res) => setPais(res.data));
@@ -22,6 +24,7 @@ export default function PaisList() {
   const remove = async (id) => {
     if (!confirm('Deseja remover este registro?')) return;
     await api.delete(`/pais/${id}`);
+    toast('Registro excluído!', 'error');
     load();
   };
 

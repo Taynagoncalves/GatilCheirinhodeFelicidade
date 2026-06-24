@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Search, Plus, Cat, X, PawPrint, Users } from 'lucide-react';
 import Layout from '../../components/Layout';
 import EmptyState from '../../components/EmptyState';
+import { useToast } from '../../components/Toast';
 import api from '../../api/client';
 
 const STATUS_OPTIONS = [
@@ -18,6 +19,7 @@ export default function GatosList() {
   const [gatos, setGatos] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [statusOpen, setStatusOpen] = useState(null);
+  const toast = useToast();
 
   const load = () => {
     api.get('/gatos', { params: { busca: busca || undefined } }).then((res) => setGatos(res.data));
@@ -29,6 +31,7 @@ export default function GatosList() {
     await api.patch(`/gatos/${id}/status`, { status });
     setGatos((prev) => prev.map((g) => g.id === id ? { ...g, status } : g));
     setStatusOpen(null);
+    toast('Status atualizado!');
   };
 
   return (

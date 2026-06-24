@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../../components/Layout';
+import { useToast } from '../../components/Toast';
 import api from '../../api/client';
 
 const categorias = [
@@ -15,10 +16,12 @@ export default function MedicamentoForm() {
   const navigate = useNavigate();
   const [nome, setNome] = useState('');
   const [categoria, setCategoria] = useState('outro');
+  const toast = useToast();
 
   const submit = async (e) => {
     e.preventDefault();
     await api.post('/medicamentos', { nome, categoria });
+    toast('Medicamento cadastrado com sucesso!');
     navigate('/saude/medicamentos');
   };
 

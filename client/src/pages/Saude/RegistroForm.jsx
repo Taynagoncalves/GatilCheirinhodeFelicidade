@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import Layout from '../../components/Layout';
+import { useToast } from '../../components/Toast';
 import api from '../../api/client';
 
 export default function RegistroForm() {
@@ -9,6 +10,7 @@ export default function RegistroForm() {
   const [gatos, setGatos] = useState([]);
   const [medicamentos, setMedicamentos] = useState([]);
 
+  const toast = useToast();
   const [form, setForm] = useState({
     tipo: 'medicamento',
     gato_id: searchParams.get('gato_id') || '',
@@ -26,6 +28,7 @@ export default function RegistroForm() {
   const submit = async (e) => {
     e.preventDefault();
     await api.post('/aplicacoes', form);
+    toast('Registro salvo com sucesso!');
     navigate('/saude');
   };
 

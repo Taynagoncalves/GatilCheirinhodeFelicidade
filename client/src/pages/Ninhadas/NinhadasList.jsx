@@ -3,12 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { Search, Plus, PawPrint, Trash2, ChevronRight, Calendar, Cat } from 'lucide-react';
 import Layout from '../../components/Layout';
 import EmptyState from '../../components/EmptyState';
+import { useToast } from '../../components/Toast';
 import api from '../../api/client';
 
 export default function NinhadasList() {
   const navigate = useNavigate();
   const [busca, setBusca] = useState('');
   const [ninhadas, setNinhadas] = useState([]);
+  const toast = useToast();
 
   const load = () => {
     api.get('/ninhadas', { params: { busca: busca || undefined } }).then((res) => setNinhadas(res.data));
@@ -21,6 +23,7 @@ export default function NinhadasList() {
   const remove = async (id) => {
     if (!confirm('Deseja remover esta ninhada?')) return;
     await api.delete(`/ninhadas/${id}`);
+    toast('Ninhada excluída!', 'error');
     load();
   };
 

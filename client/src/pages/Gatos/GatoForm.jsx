@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Syringe } from 'lucide-react';
 import Layout from '../../components/Layout';
 import PhotoUpload from '../../components/PhotoUpload';
+import { useToast } from '../../components/Toast';
 import api from '../../api/client';
 
 const statusOptions = [
@@ -22,6 +23,7 @@ export default function GatoForm() {
   const [paisList, setPaisList] = useState([]);
   const [foto, setFoto] = useState(null);
   const [preview, setPreview] = useState(null);
+  const toast = useToast();
 
   const [form, setForm] = useState({
     nome: '',
@@ -71,8 +73,10 @@ export default function GatoForm() {
 
     if (isEdit) {
       await api.put(`/gatos/${id}`, data);
+      toast('Gato atualizado com sucesso!');
     } else {
       await api.post('/gatos', data);
+      toast('Gato cadastrado com sucesso!');
     }
     navigate('/gatos');
   };

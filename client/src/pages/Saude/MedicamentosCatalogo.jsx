@@ -3,12 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { Search, Plus, Pill, Syringe, Trash2 } from 'lucide-react';
 import Layout from '../../components/Layout';
 import EmptyState from '../../components/EmptyState';
+import { useToast } from '../../components/Toast';
 import api from '../../api/client';
 
 export default function MedicamentosCatalogo() {
   const navigate = useNavigate();
   const [busca, setBusca] = useState('');
   const [medicamentos, setMedicamentos] = useState([]);
+  const toast = useToast();
 
   const load = () => {
     api.get('/medicamentos', { params: { busca: busca || undefined } }).then((res) => setMedicamentos(res.data));
@@ -21,6 +23,7 @@ export default function MedicamentosCatalogo() {
   const remove = async (id) => {
     if (!confirm('Deseja remover este medicamento?')) return;
     await api.delete(`/medicamentos/${id}`);
+    toast('Medicamento excluído!', 'error');
     load();
   };
 

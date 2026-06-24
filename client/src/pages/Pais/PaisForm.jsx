@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Layout from '../../components/Layout';
 import PhotoUpload from '../../components/PhotoUpload';
+import { useToast } from '../../components/Toast';
 import api from '../../api/client';
 
 export default function PaisForm() {
@@ -19,6 +20,7 @@ export default function PaisForm() {
   });
   const [foto, setFoto] = useState(null);
   const [preview, setPreview] = useState(null);
+  const toast = useToast();
 
   useEffect(() => {
     if (isEdit) {
@@ -49,8 +51,10 @@ export default function PaisForm() {
 
     if (isEdit) {
       await api.put(`/pais/${id}`, data);
+      toast('Registro atualizado com sucesso!');
     } else {
       await api.post('/pais', data);
+      toast('Pai/Mãe cadastrado com sucesso!');
     }
     navigate('/pais');
   };

@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../../components/Layout';
+import { useToast } from '../../components/Toast';
 import api from '../../api/client';
 
 export default function NinhadaForm() {
   const navigate = useNavigate();
   const [maes, setMaes] = useState([]);
   const [paisList, setPaisList] = useState([]);
+  const toast = useToast();
   const [form, setForm] = useState({
     nome: '',
     mae_id: '',
@@ -24,6 +26,7 @@ export default function NinhadaForm() {
   const submit = async (e) => {
     e.preventDefault();
     await api.post('/ninhadas', form);
+    toast('Ninhada cadastrada com sucesso!');
     navigate('/ninhadas');
   };
 
