@@ -18,7 +18,18 @@ router.get('/', async (req, res) => {
               WHERE gato_id = g.id
               GROUP BY medicamento_id
             ) ult ON a.medicamento_id = ult.medicamento_id AND a.data_aplicada = ult.ultima_data
-            WHERE a.gato_id = g.id AND a.proxima_dose IS NOT NULL) AS proxima_dose_min
+            WHERE a.gato_id = g.id AND a.proxima_dose IS NOT NULL) AS proxima_dose_min,
+           (SELECT med.nome
+            FROM aplicacoes a
+            INNER JOIN (
+              SELECT medicamento_id, MAX(data_aplicada) AS ultima_data
+              FROM aplicacoes
+              WHERE gato_id = g.id
+              GROUP BY medicamento_id
+            ) ult ON a.medicamento_id = ult.medicamento_id AND a.data_aplicada = ult.ultima_data
+            JOIN medicamentos med ON a.medicamento_id = med.id
+            WHERE a.gato_id = g.id AND a.proxima_dose IS NOT NULL
+            ORDER BY a.proxima_dose ASC LIMIT 1) AS proxima_medicamento_nome
     FROM gatos g
     LEFT JOIN pais m ON g.mae_id = m.id
     LEFT JOIN pais p ON g.pai_id = p.id

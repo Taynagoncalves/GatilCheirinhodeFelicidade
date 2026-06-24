@@ -8,15 +8,16 @@ import { useToast } from '../../components/Toast';
 import api from '../../api/client';
 import { calcularIdade } from '../../utils/idade';
 
-function alerteDose(proxima_dose_min) {
+function alerteDose(proxima_dose_min, proxima_medicamento_nome) {
   if (!proxima_dose_min) return null;
   const hoje = new Date();
   hoje.setHours(0, 0, 0, 0);
   const dose = new Date(proxima_dose_min + 'T00:00:00');
   const diff = Math.round((dose - hoje) / (1000 * 60 * 60 * 24));
-  if (diff < 0) return { label: 'Dose atrasada', cor: '#c0524a' };
-  if (diff === 0) return { label: 'Dose hoje!', cor: '#b8863a' };
-  if (diff === 1) return { label: 'Dose amanhã', cor: '#2f6690' };
+  const med = proxima_medicamento_nome ? ` · ${proxima_medicamento_nome}` : '';
+  if (diff < 0) return { label: `Dose atrasada${med}`, cor: '#c0524a' };
+  if (diff === 0) return { label: `Dose hoje!${med}`, cor: '#b8863a' };
+  if (diff === 1) return { label: `Dose amanhã${med}`, cor: '#2f6690' };
   return null;
 }
 
@@ -88,7 +89,7 @@ export default function GatosList() {
       )}
 
       {gatos.map((g) => {
-        const alerta = alerteDose(g.proxima_dose_min);
+        const alerta = alerteDose(g.proxima_dose_min, g.proxima_medicamento_nome);
         return (
         <div key={g.id} className="card" onClick={() => navigate(`/gatos/${g.id}`)} style={{ cursor: 'pointer' }}>
           <div className="card-row">
