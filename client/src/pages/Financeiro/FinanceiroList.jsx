@@ -240,10 +240,10 @@ function TabLancamentos({ mes, onMes }) {
       <SeletorMes mes={mes} onChange={onMes} />
 
       <div style={{ display: 'flex', gap: 8 }}>
-        <button className="btn btn-primary" style={{ flex: 1 }} onClick={() => abrirNovo('entrada')}>
+        <button className="btn btn-outline" style={{ flex: 1 }} onClick={() => abrirNovo('entrada')}>
           <TrendingUp size={16} /> Registrar Entrada
         </button>
-        <button className="btn btn-secondary" style={{ flex: 1 }} onClick={() => abrirNovo('saida')}>
+        <button className="btn btn-outline" style={{ flex: 1 }} onClick={() => abrirNovo('saida')}>
           <TrendingDown size={16} /> Registrar Gasto
         </button>
       </div>
