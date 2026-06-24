@@ -7,7 +7,9 @@ const router = express.Router();
 router.get('/', async (req, res) => {
   const { busca, status } = req.query;
   let sql = `
-    SELECT g.*, m.nome AS mae_nome, p.nome AS pai_nome, n.nome AS ninhada_nome
+    SELECT g.id, g.nome, g.cor, g.sexo, DATE_FORMAT(g.data_nascimento, '%Y-%m-%d') AS data_nascimento,
+           g.ninhada_id, g.mae_id, g.pai_id, g.status, g.foto_url, g.observacoes,
+           m.nome AS mae_nome, p.nome AS pai_nome, n.nome AS ninhada_nome
     FROM gatos g
     LEFT JOIN pais m ON g.mae_id = m.id
     LEFT JOIN pais p ON g.pai_id = p.id
@@ -29,7 +31,9 @@ router.get('/', async (req, res) => {
 
 router.get('/:id', async (req, res) => {
   const [rows] = await pool.query(
-    `SELECT g.*, m.nome AS mae_nome, m.foto_url AS mae_foto, p.nome AS pai_nome, p.foto_url AS pai_foto, n.nome AS ninhada_nome
+    `SELECT g.id, g.nome, g.cor, g.sexo, DATE_FORMAT(g.data_nascimento, '%Y-%m-%d') AS data_nascimento,
+            g.ninhada_id, g.mae_id, g.pai_id, g.status, g.foto_url, g.observacoes,
+            m.nome AS mae_nome, m.foto_url AS mae_foto, p.nome AS pai_nome, p.foto_url AS pai_foto, n.nome AS ninhada_nome
      FROM gatos g
      LEFT JOIN pais m ON g.mae_id = m.id
      LEFT JOIN pais p ON g.pai_id = p.id
@@ -40,7 +44,10 @@ router.get('/:id', async (req, res) => {
   if (!rows.length) return res.status(404).json({ error: 'Não encontrado' });
 
   const [historico] = await pool.query(
-    `SELECT a.*, med.nome AS medicamento_nome, med.categoria
+    `SELECT a.id, a.tipo, a.observacoes,
+            DATE_FORMAT(a.data_aplicada, '%Y-%m-%d') AS data_aplicada,
+            DATE_FORMAT(a.proxima_dose, '%Y-%m-%d') AS proxima_dose,
+            med.nome AS medicamento_nome, med.categoria
      FROM aplicacoes a
      JOIN medicamentos med ON a.medicamento_id = med.id
      WHERE a.gato_id = ?

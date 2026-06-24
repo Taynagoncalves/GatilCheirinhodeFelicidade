@@ -35,7 +35,7 @@ export default function NinhadaDetalhe() {
         </div>
         <p className="card-meta" style={{ display: 'flex', gap: 14, marginTop: 12 }}>
           <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            <Calendar size={14} /> {ninhada.data_nascimento ? new Date(ninhada.data_nascimento).toLocaleDateString('pt-BR') : '—'}
+            <Calendar size={14} /> {ninhada.data_nascimento ? ninhada.data_nascimento.split('-').reverse().join('/') : '—'}
           </span>
           <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
             <PawPrint size={14} /> {ninhada.quantidade_filhotes} filhotes

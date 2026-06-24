@@ -44,8 +44,8 @@ export default function SaudeList() {
               <p className="card-title">{r.gato_nome || 'Sem nome'}</p>
               <p className="card-meta">
                 {r.medicamento_nome}<br />
-                Última aplicação: {new Date(r.data_aplicada).toLocaleDateString('pt-BR')}<br />
-                {r.proxima_dose && <>Próxima dose: {new Date(r.proxima_dose).toLocaleDateString('pt-BR')}<br /></>}
+                Última aplicação: {r.data_aplicada.split('-').reverse().join('/')}<br />
+                {r.proxima_dose && <>Próxima dose: {r.proxima_dose.split('-').reverse().join('/')}<br /></>}
                 {r.observacoes && <>Obs: {r.observacoes}</>}
               </p>
             </div>

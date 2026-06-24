@@ -6,7 +6,9 @@ const router = express.Router();
 router.get('/', async (req, res) => {
   const { busca } = req.query;
   let sql = `
-    SELECT n.*, m.nome AS mae_nome, m.foto_url AS mae_foto, p.nome AS pai_nome
+    SELECT n.id, n.nome, n.mae_id, n.pai_id, DATE_FORMAT(n.data_nascimento, '%Y-%m-%d') AS data_nascimento,
+           n.quantidade_filhotes, n.observacoes,
+           m.nome AS mae_nome, m.foto_url AS mae_foto, p.nome AS pai_nome
     FROM ninhadas n
     LEFT JOIN pais m ON n.mae_id = m.id
     LEFT JOIN pais p ON n.pai_id = p.id
@@ -23,7 +25,9 @@ router.get('/', async (req, res) => {
 
 router.get('/:id', async (req, res) => {
   const [rows] = await pool.query(
-    `SELECT n.*, m.nome AS mae_nome, m.foto_url AS mae_foto, p.nome AS pai_nome, p.foto_url AS pai_foto
+    `SELECT n.id, n.nome, n.mae_id, n.pai_id, DATE_FORMAT(n.data_nascimento, '%Y-%m-%d') AS data_nascimento,
+            n.quantidade_filhotes, n.observacoes,
+            m.nome AS mae_nome, m.foto_url AS mae_foto, p.nome AS pai_nome, p.foto_url AS pai_foto
      FROM ninhadas n
      LEFT JOIN pais m ON n.mae_id = m.id
      LEFT JOIN pais p ON n.pai_id = p.id

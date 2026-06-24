@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.get('/', async (req, res) => {
   const { sexo, busca } = req.query;
-  let sql = 'SELECT * FROM pais WHERE 1=1';
+  let sql = `SELECT id, nome, sexo, raca, cor, DATE_FORMAT(data_nascimento, '%Y-%m-%d') AS data_nascimento, foto_url, observacoes FROM pais WHERE 1=1`;
   const params = [];
   if (sexo) {
     params.push(sexo);
@@ -22,7 +22,7 @@ router.get('/', async (req, res) => {
 });
 
 router.get('/:id', async (req, res) => {
-  const [rows] = await pool.query('SELECT * FROM pais WHERE id = ?', [req.params.id]);
+  const [rows] = await pool.query(`SELECT id, nome, sexo, raca, cor, DATE_FORMAT(data_nascimento, '%Y-%m-%d') AS data_nascimento, foto_url, observacoes FROM pais WHERE id = ?`, [req.params.id]);
   if (!rows.length) return res.status(404).json({ error: 'Não encontrado' });
   res.json(rows[0]);
 });

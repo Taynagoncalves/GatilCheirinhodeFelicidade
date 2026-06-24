@@ -60,7 +60,7 @@ export default function GatosList() {
             <div style={{ flex: 1, minWidth: 0 }}>
               <p className="card-title">{g.nome || 'Sem nome'}</p>
               <p className="card-meta">
-                {g.data_nascimento ? `Nasc: ${new Date(g.data_nascimento).toLocaleDateString('pt-BR')}` : ''}
+                {g.data_nascimento ? `Nasc: ${g.data_nascimento.split('-').reverse().join('/')}` : ''}
                 {g.mae_nome && <><br />Mãe: {g.mae_nome}</>}
                 {g.pai_nome && <><br />Pai: {g.pai_nome}</>}
                 {g.ninhada_nome && <><br />Ninhada: {g.ninhada_nome}</>}

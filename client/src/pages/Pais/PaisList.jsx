@@ -62,7 +62,7 @@ export default function PaisList() {
               <p className="card-title">{p.nome}</p>
               <p className="card-meta">
                 Raça: {p.raca || 'Não informado'}<br />
-                Nascimento: {p.data_nascimento ? new Date(p.data_nascimento).toLocaleDateString('pt-BR') : 'Não informado'}
+                Nascimento: {p.data_nascimento ? p.data_nascimento.split('-').reverse().join('/') : 'Não informado'}
               </p>
               <div className="card-actions">
                 <button className="icon-btn" onClick={() => navigate(`/pais/${p.id}/editar`)}>

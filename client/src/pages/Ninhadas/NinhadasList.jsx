@@ -60,7 +60,7 @@ export default function NinhadasList() {
               </p>
               <p className="card-meta" style={{ display: 'flex', gap: 14, marginTop: 6 }}>
                 <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                  <Calendar size={14} /> {n.data_nascimento ? new Date(n.data_nascimento).toLocaleDateString('pt-BR') : '—'}
+                  <Calendar size={14} /> {n.data_nascimento ? n.data_nascimento.split('-').reverse().join('/') : '—'}
                 </span>
                 <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                   <PawPrint size={14} /> {n.quantidade_filhotes} filhotes

@@ -35,7 +35,7 @@ export default function GatoPerfil() {
           <p className="card-meta">
             Cor: {gato.cor || 'Não informado'}<br />
             Sexo: {gato.sexo === 'macho' ? 'Macho' : 'Fêmea'}<br />
-            Nascimento: {gato.data_nascimento ? new Date(gato.data_nascimento).toLocaleDateString('pt-BR') : 'Não informado'}<br />
+            Nascimento: {gato.data_nascimento ? gato.data_nascimento.split('-').reverse().join('/') : 'Não informado'}<br />
             Mãe: {gato.mae_nome || 'Não informado'}<br />
             Pai: {gato.pai_nome || 'Não informado'}<br />
             Ninhada: {gato.ninhada_nome || 'Não informado'}
@@ -59,7 +59,7 @@ export default function GatoPerfil() {
                 </span>
                 <div>
                   <p className="card-title" style={{ fontSize: '0.92rem' }}>{h.medicamento_nome}</p>
-                  <p className="card-meta">{new Date(h.data_aplicada).toLocaleDateString('pt-BR')}</p>
+                  <p className="card-meta">{h.data_aplicada.split('-').reverse().join('/')}</p>
                 </div>
               </div>
             ))}
@@ -77,7 +77,7 @@ export default function GatoPerfil() {
               <div key={m.id} className="list-row" style={{ marginBottom: 8, border: 'none', background: 'var(--color-bg)' }}>
                 <div style={{ flex: 1 }}>
                   <p className="card-title" style={{ fontSize: '0.92rem' }}>{m.medicamento_nome}</p>
-                  <p className="card-meta">Próxima dose: {new Date(m.proxima_dose).toLocaleDateString('pt-BR')}</p>
+                  <p className="card-meta">Próxima dose: {m.proxima_dose.split('-').reverse().join('/')}</p>
                 </div>
               </div>
             ))}
