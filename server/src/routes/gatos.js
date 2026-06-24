@@ -10,7 +10,15 @@ router.get('/', async (req, res) => {
     SELECT g.id, g.nome, g.cor, g.sexo, DATE_FORMAT(g.data_nascimento, '%Y-%m-%d') AS data_nascimento,
            g.ninhada_id, g.mae_id, g.pai_id, g.status, g.foto_url, g.observacoes,
            m.nome AS mae_nome, p.nome AS pai_nome, n.nome AS ninhada_nome,
-           (SELECT DATE_FORMAT(MIN(a.proxima_dose), '%Y-%m-%d') FROM aplicacoes a WHERE a.gato_id = g.id AND a.proxima_dose IS NOT NULL) AS proxima_dose_min
+           (SELECT DATE_FORMAT(MIN(a.proxima_dose), '%Y-%m-%d')
+            FROM aplicacoes a
+            INNER JOIN (
+              SELECT medicamento_id, MAX(data_aplicada) AS ultima_data
+              FROM aplicacoes
+              WHERE gato_id = g.id
+              GROUP BY medicamento_id
+            ) ult ON a.medicamento_id = ult.medicamento_id AND a.data_aplicada = ult.ultima_data
+            WHERE a.gato_id = g.id AND a.proxima_dose IS NOT NULL) AS proxima_dose_min
     FROM gatos g
     LEFT JOIN pais m ON g.mae_id = m.id
     LEFT JOIN pais p ON g.pai_id = p.id
