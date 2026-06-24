@@ -8,6 +8,18 @@ import { useToast } from '../../components/Toast';
 import api from '../../api/client';
 import { calcularIdade } from '../../utils/idade';
 
+function alerteDose(proxima_dose_min) {
+  if (!proxima_dose_min) return null;
+  const hoje = new Date();
+  hoje.setHours(0, 0, 0, 0);
+  const dose = new Date(proxima_dose_min + 'T00:00:00');
+  const diff = Math.round((dose - hoje) / (1000 * 60 * 60 * 24));
+  if (diff < 0) return { label: 'Dose atrasada', cor: '#c0524a' };
+  if (diff === 0) return { label: 'Dose hoje!', cor: '#b8863a' };
+  if (diff === 1) return { label: 'Dose amanhã', cor: '#2f6690' };
+  return null;
+}
+
 const STATUS_OPTIONS = [
   { value: 'disponivel', label: 'Disponível', cls: 'status-disponivel' },
   { value: 'reservado', label: 'Reservado', cls: 'status-reservado' },
@@ -75,7 +87,9 @@ export default function GatosList() {
         <EmptyState icon={Cat} title="Nenhum gato cadastrado" description="Cadastre o primeiro gato do gatil." />
       )}
 
-      {gatos.map((g) => (
+      {gatos.map((g) => {
+        const alerta = alerteDose(g.proxima_dose_min);
+        return (
         <div key={g.id} className="card" onClick={() => navigate(`/gatos/${g.id}`)} style={{ cursor: 'pointer' }}>
           <div className="card-row">
             {g.foto_url ? (
@@ -84,7 +98,15 @@ export default function GatosList() {
               <span className="card-photo-placeholder"><Cat size={26} /></span>
             )}
             <div style={{ flex: 1, minWidth: 0 }}>
-              <p className="card-title">{g.nome || 'Sem nome'}</p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                <p className="card-title" style={{ margin: 0 }}>{g.nome || 'Sem nome'}</p>
+                {alerta && (
+                  <span style={{
+                    fontSize: '0.72rem', fontWeight: 700, color: '#fff',
+                    background: alerta.cor, borderRadius: 20, padding: '2px 8px', whiteSpace: 'nowrap',
+                  }}>{alerta.label}</span>
+                )}
+              </div>
               <p className="card-meta">
                 {g.data_nascimento ? `${g.data_nascimento.split('-').reverse().join('/')}` : ''}
                 {g.data_nascimento && <><br />Idade: {calcularIdade(g.data_nascimento)}</>}
@@ -136,7 +158,8 @@ export default function GatosList() {
             </button>
           </div>
         </div>
-      ))}
+        );
+      })}
 
       {confirmando && (
         <ConfirmModal
