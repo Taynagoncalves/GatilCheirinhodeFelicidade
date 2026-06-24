@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Cat, Syringe, Pill, Plus } from 'lucide-react';
+import { Cat, Syringe, Pill, Plus, Trash2 } from 'lucide-react';
 import Layout from '../../components/Layout';
 import StatusBadge from '../../components/StatusBadge';
 import EmptyState from '../../components/EmptyState';
+import ConfirmModal from '../../components/ConfirmModal';
+import { useToast } from '../../components/Toast';
 import api from '../../api/client';
 import { calcularIdade } from '../../utils/idade';
 
@@ -11,10 +13,19 @@ export default function GatoPerfil() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [gato, setGato] = useState(null);
+  const [confirmando, setConfirmando] = useState(null);
+  const toast = useToast();
 
-  useEffect(() => {
-    api.get(`/gatos/${id}`).then((res) => setGato(res.data));
-  }, [id]);
+  const carregarGato = () => api.get(`/gatos/${id}`).then((res) => setGato(res.data));
+
+  useEffect(() => { carregarGato(); }, [id]);
+
+  const excluirRegistro = async (regId) => {
+    await api.delete(`/aplicacoes/${regId}`);
+    setConfirmando(null);
+    toast('Registro excluído!');
+    carregarGato();
+  };
 
   if (!gato) return null;
 
@@ -60,14 +71,21 @@ export default function GatoPerfil() {
         ) : (
           <div className="card">
             {gato.historico.map((h) => (
-              <div key={h.id} className="list-row" style={{ marginBottom: 8, border: 'none', background: 'var(--color-bg)' }}>
-                <span className="card-photo-placeholder" style={{ width: 40, height: 40 }}>
+              <div key={h.id} className="list-row" style={{ marginBottom: 8, border: 'none', background: 'var(--color-bg)', display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span className="card-photo-placeholder" style={{ width: 40, height: 40, flexShrink: 0 }}>
                   {h.tipo === 'vacina' ? <Syringe size={18} /> : <Pill size={18} />}
                 </span>
-                <div>
+                <div style={{ flex: 1 }}>
                   <p className="card-title" style={{ fontSize: '0.92rem' }}>{h.medicamento_nome}</p>
                   <p className="card-meta">{h.data_aplicada.split('-').reverse().join('/')}</p>
                 </div>
+                <button
+                  className="icon-btn"
+                  style={{ color: 'var(--color-danger)', flexShrink: 0 }}
+                  onClick={() => setConfirmando(h)}
+                >
+                  <Trash2 size={16} />
+                </button>
               </div>
             ))}
           </div>
@@ -105,6 +123,13 @@ export default function GatoPerfil() {
         </section>
       )}
 
+      {confirmando && (
+        <ConfirmModal
+          message={`Excluir registro de ${confirmando.medicamento_nome}?`}
+          onConfirm={() => excluirRegistro(confirmando.id)}
+          onCancel={() => setConfirmando(null)}
+        />
+      )}
     </Layout>
   );
 }

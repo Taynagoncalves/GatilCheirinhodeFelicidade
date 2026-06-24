@@ -1,18 +1,29 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Syringe, Pill, ClipboardList, Settings2 } from 'lucide-react';
+import { Syringe, Pill, ClipboardList, Settings2, Trash2 } from 'lucide-react';
 import Layout from '../../components/Layout';
 import EmptyState from '../../components/EmptyState';
+import ConfirmModal from '../../components/ConfirmModal';
+import { useToast } from '../../components/Toast';
 import api from '../../api/client';
 
 export default function SaudeList() {
   const navigate = useNavigate();
   const [tipo, setTipo] = useState('medicamento');
   const [registros, setRegistros] = useState([]);
+  const [confirmando, setConfirmando] = useState(null);
+  const toast = useToast();
 
   useEffect(() => {
     api.get('/aplicacoes', { params: { tipo } }).then((res) => setRegistros(res.data));
   }, [tipo]);
+
+  const excluir = async (id) => {
+    await api.delete(`/aplicacoes/${id}`);
+    setRegistros((prev) => prev.filter((r) => r.id !== id));
+    setConfirmando(null);
+    toast('Registro excluído!');
+  };
 
   return (
     <Layout title="Saúde" showBack>
@@ -49,9 +60,24 @@ export default function SaudeList() {
                 {r.observacoes && <>Obs: {r.observacoes}</>}
               </p>
             </div>
+            <button
+              className="icon-btn"
+              style={{ color: 'var(--color-danger)', alignSelf: 'center', flexShrink: 0 }}
+              onClick={() => setConfirmando(r)}
+            >
+              <Trash2 size={18} />
+            </button>
           </div>
         </div>
       ))}
+
+      {confirmando && (
+        <ConfirmModal
+          message={`Excluir registro de ${confirmando.medicamento_nome} de ${confirmando.gato_nome}?`}
+          onConfirm={() => excluir(confirmando.id)}
+          onCancel={() => setConfirmando(null)}
+        />
+      )}
     </Layout>
   );
 }
