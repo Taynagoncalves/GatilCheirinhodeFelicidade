@@ -2,6 +2,20 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 
+const pool = require('./db/pool');
+
+async function initDb() {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS push_subscriptions (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      endpoint VARCHAR(500) NOT NULL UNIQUE,
+      subscription JSON NOT NULL,
+      criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+}
+initDb().catch((e) => console.error('initDb error:', e));
+
 const app = express();
 
 app.use(cors());
