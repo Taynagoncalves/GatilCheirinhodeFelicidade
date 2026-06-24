@@ -14,18 +14,28 @@ const TOUR = [
   },
   {
     selector: '[data-tour="home-stats"]',
-    titulo: 'Resumo do Gatil',
-    texto: 'Estes cards mostram o total de gatos, ninhadas, reservados e vendidos — sempre atualizados em tempo real.',
+    titulo: 'Cards de Resumo',
+    texto: 'Todos os cards são clicáveis! Toque em qualquer um para ir direto à tela correspondente — gatos, ninhadas, reservados ou vendidos.',
+  },
+  {
+    selector: '[data-tour="home-stat-gatos"]',
+    titulo: 'Gatos Cadastrados',
+    texto: 'Toque aqui para ir à lista completa de todos os gatos do gatil.',
+  },
+  {
+    selector: '[data-tour="home-stat-ninhadas"]',
+    titulo: 'Ninhadas',
+    texto: 'Toque aqui para acessar a lista de ninhadas registradas.',
   },
   {
     selector: '[data-tour="home-reservados"]',
     titulo: 'Gatos Reservados',
-    texto: 'Toque neste card para listar apenas os gatos com status "Reservado".',
+    texto: 'Toque para listar apenas os gatos com status "Reservado".',
   },
   {
     selector: '[data-tour="home-vendidos"]',
     titulo: 'Gatos Vendidos',
-    texto: 'Toque aqui para ver rapidamente todos os gatos que já foram vendidos.',
+    texto: 'Toque para ver todos os gatos que já foram vendidos.',
   },
   {
     selector: '[data-tour="home-btn-cadastrar"]',
@@ -58,12 +68,12 @@ export default function Home() {
   return (
     <Layout title="Cheirinho de Felicidade" subtitle="Organização e Controle dos Gatos" showNotification>
       <div className="stats-grid" data-tour="home-stats">
-        <div className="stat-card">
+        <div className="stat-card" data-tour="home-stat-gatos" style={{ cursor: 'pointer' }} onClick={() => navigate('/gatos')}>
           <span className="stat-icon"><Cat size={18} /></span>
           <span className="stat-value">{data?.total_gatos ?? '—'}</span>
           <span className="stat-label">Gatos cadastrados</span>
         </div>
-        <div className="stat-card">
+        <div className="stat-card" data-tour="home-stat-ninhadas" style={{ cursor: 'pointer' }} onClick={() => navigate('/ninhadas')}>
           <span className="stat-icon"><PawPrint size={18} /></span>
           <span className="stat-value">{data?.total_ninhadas ?? '—'}</span>
           <span className="stat-label">Ninhadas</span>
