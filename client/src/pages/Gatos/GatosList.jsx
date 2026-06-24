@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Search, Plus, Cat, X, PawPrint, Users, Trash2 } from 'lucide-react';
 import Layout from '../../components/Layout';
 import EmptyState from '../../components/EmptyState';
@@ -17,8 +17,10 @@ const STATUS_OPTIONS = [
 
 export default function GatosList() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [busca, setBusca] = useState('');
   const [sexo, setSexo] = useState('');
+  const [statusFiltro, setStatusFiltro] = useState(searchParams.get('status') || '');
   const [gatos, setGatos] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [statusOpen, setStatusOpen] = useState(null);
@@ -33,10 +35,10 @@ export default function GatosList() {
   };
 
   const load = () => {
-    api.get('/gatos', { params: { busca: busca || undefined, sexo: sexo || undefined } }).then((res) => setGatos(res.data));
+    api.get('/gatos', { params: { busca: busca || undefined, sexo: sexo || undefined, status: statusFiltro || undefined } }).then((res) => setGatos(res.data));
   };
 
-  useEffect(() => { load(); }, [busca, sexo]);
+  useEffect(() => { load(); }, [busca, sexo, statusFiltro]);
 
   const changeStatus = async (id, status) => {
     await api.patch(`/gatos/${id}/status`, { status });
@@ -55,6 +57,13 @@ export default function GatosList() {
         <button className={`tab${sexo === '' ? ' active' : ''}`} onClick={() => setSexo('')}>Todos</button>
         <button className={`tab${sexo === 'macho' ? ' active' : ''}`} onClick={() => setSexo('macho')}>Machos</button>
         <button className={`tab${sexo === 'femea' ? ' active' : ''}`} onClick={() => setSexo('femea')}>Fêmeas</button>
+      </div>
+
+      <div className="tabs">
+        <button className={`tab${statusFiltro === '' ? ' active' : ''}`} onClick={() => setStatusFiltro('')}>Todos</button>
+        <button className={`tab${statusFiltro === 'disponivel' ? ' active' : ''}`} onClick={() => setStatusFiltro('disponivel')}>Disponível</button>
+        <button className={`tab${statusFiltro === 'reservado' ? ' active' : ''}`} onClick={() => setStatusFiltro('reservado')}>Reservado</button>
+        <button className={`tab${statusFiltro === 'vendido' ? ' active' : ''}`} onClick={() => setStatusFiltro('vendido')}>Vendido</button>
       </div>
 
       <div className="search-input">

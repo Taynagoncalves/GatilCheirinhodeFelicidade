@@ -29,6 +29,11 @@ export default function Home() {
           <span className="stat-value">{data?.total_ninhadas ?? '—'}</span>
           <span className="stat-label">Ninhadas</span>
         </div>
+        <div className="stat-card" style={{ cursor: 'pointer' }} onClick={() => navigate('/gatos?status=reservado')}>
+          <span className="stat-icon"><Users size={18} /></span>
+          <span className="stat-value">{data?.total_reservados ?? '—'}</span>
+          <span className="stat-label">Reservados</span>
+        </div>
       </div>
 
       <div className="quick-actions">
