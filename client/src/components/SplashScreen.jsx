@@ -23,7 +23,7 @@ export default function SplashScreen({ onDone }) {
           </svg>
         </div>
         <h1 className="splash-titulo">Cheirinho de Felicidade</h1>
-        <p className="splash-sub">Gestão do seu Gatil</p>
+        <p className="splash-sub">Olá, Lidia!</p>
         <div className="splash-dots">
           <span /><span /><span />
         </div>
