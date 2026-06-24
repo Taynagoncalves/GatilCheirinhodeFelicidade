@@ -24,8 +24,10 @@ async function initDb() {
   for (const sql of [
     `ALTER TABLE gatos ADD COLUMN peso DECIMAL(7,1) NULL`,
     `ALTER TABLE pais  ADD COLUMN peso DECIMAL(7,1) NULL`,
+    `ALTER TABLE aplicacoes ADD COLUMN pai_id INT NULL`,
+    `ALTER TABLE aplicacoes MODIFY COLUMN gato_id INT NULL`,
   ]) {
-    try { await pool.query(sql); } catch (e) { if (e.errno !== 1060) throw e; }
+    try { await pool.query(sql); } catch (e) { if (e.errno !== 1060 && e.errno !== 1054) throw e; }
   }
   await pool.query(`
     CREATE TABLE IF NOT EXISTS financeiro (

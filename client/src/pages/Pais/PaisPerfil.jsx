@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { PawPrint, Weight, X, Scale } from 'lucide-react';
+import { PawPrint, Weight, X, Scale, Syringe, Pill, Plus, Trash2 } from 'lucide-react';
 import Layout from '../../components/Layout';
 import EmptyState from '../../components/EmptyState';
+import ConfirmModal from '../../components/ConfirmModal';
 import { useToast } from '../../components/Toast';
 import api from '../../api/client';
 import { calcularIdade } from '../../utils/idade';
@@ -15,11 +16,19 @@ export default function PaisPerfil() {
   const [showPesoModal, setShowPesoModal] = useState(false);
   const [pesoValor, setPesoValor] = useState('');
   const [pesoUnidade, setPesoUnidade] = useState('kg');
+  const [confirmando, setConfirmando] = useState(null);
   const toast = useToast();
 
   const carregar = () => api.get(`/pais/${id}`).then((res) => setPai(res.data));
 
   useEffect(() => { carregar(); }, [id]);
+
+  const excluirRegistro = async (regId) => {
+    await api.delete(`/aplicacoes/${regId}`);
+    setConfirmando(null);
+    toast('Registro excluído!');
+    carregar();
+  };
 
   const salvarPeso = async () => {
     if (!pesoValor) return;
@@ -65,6 +74,37 @@ export default function PaisPerfil() {
         </div>
       </div>
 
+      <button className="btn btn-primary" onClick={() => navigate(`/saude/registrar?pai_id=${id}`)}>
+        <Plus size={18} /> Registrar Dose
+      </button>
+
+      <section>
+        <h2 className="section-title">Histórico de Saúde</h2>
+        {(!pai.historico || pai.historico.length === 0) ? (
+          <EmptyState icon={Pill} title="Nenhum registro de saúde" description="Os registros de vacinas e medicamentos aparecerão aqui." />
+        ) : (
+          <div className="card">
+            {pai.historico.map((h) => (
+              <div key={h.id} className="list-row" style={{ marginBottom: 8, border: 'none', background: 'var(--color-bg)', display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span className="card-photo-placeholder" style={{ width: 40, height: 40, flexShrink: 0 }}>
+                  {h.tipo === 'vacina' ? <Syringe size={18} /> : <Pill size={18} />}
+                </span>
+                <div style={{ flex: 1 }}>
+                  <p className="card-title" style={{ fontSize: '0.92rem' }}>{h.medicamento_nome}</p>
+                  <p className="card-meta">
+                    Data aplicada: {h.data_aplicada.split('-').reverse().join('/')}
+                    {h.proxima_dose && <><br />Próxima dose: {h.proxima_dose.split('-').reverse().join('/')}</>}
+                  </p>
+                </div>
+                <button className="icon-btn" style={{ color: 'var(--color-danger)', flexShrink: 0 }} onClick={() => setConfirmando(h)}>
+                  <Trash2 size={16} />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
       <section>
         <h2 className="section-title">Histórico de Peso</h2>
         {(!pai.historico_peso || pai.historico_peso.length === 0) ? (
@@ -85,6 +125,14 @@ export default function PaisPerfil() {
           </div>
         )}
       </section>
+
+      {confirmando && (
+        <ConfirmModal
+          message={`Excluir registro de ${confirmando.medicamento_nome}?`}
+          onConfirm={() => excluirRegistro(confirmando.id)}
+          onCancel={() => setConfirmando(null)}
+        />
+      )}
 
       {showPesoModal && (
         <div className="modal-overlay" onClick={() => setShowPesoModal(false)}>

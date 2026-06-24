@@ -7,13 +7,19 @@ import api from '../../api/client';
 export default function RegistroForm() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [gatos, setGatos] = useState([]);
-  const [medicamentos, setMedicamentos] = useState([]);
+  const preGatoId = searchParams.get('gato_id') || '';
+  const prePaiId = searchParams.get('pai_id') || '';
 
+  const [gatos, setGatos] = useState([]);
+  const [pais, setPais] = useState([]);
+  const [medicamentos, setMedicamentos] = useState([]);
+  const [para, setPara] = useState(prePaiId ? 'pai' : 'gato');
   const toast = useToast();
+
   const [form, setForm] = useState({
     tipo: 'medicamento',
-    gato_id: searchParams.get('gato_id') || '',
+    gato_id: preGatoId,
+    pai_id: prePaiId,
     medicamento_id: '',
     data_aplicada: '',
     proxima_dose: '',
@@ -22,14 +28,27 @@ export default function RegistroForm() {
 
   useEffect(() => {
     api.get('/gatos').then((res) => setGatos(res.data));
+    api.get('/pais').then((res) => setPais(res.data));
     api.get('/medicamentos').then((res) => setMedicamentos(res.data));
   }, []);
 
   const submit = async (e) => {
     e.preventDefault();
-    await api.post('/aplicacoes', form);
+    const payload = {
+      tipo: form.tipo,
+      medicamento_id: form.medicamento_id,
+      data_aplicada: form.data_aplicada,
+      proxima_dose: form.proxima_dose,
+      observacoes: form.observacoes,
+    };
+    if (para === 'gato') payload.gato_id = form.gato_id;
+    else payload.pai_id = form.pai_id;
+
+    await api.post('/aplicacoes', payload);
     toast('Registro salvo com sucesso!');
-    navigate('/saude');
+    if (prePaiId) navigate(`/pais/${prePaiId}`);
+    else if (preGatoId) navigate(`/gatos/${preGatoId}`);
+    else navigate('/saude');
   };
 
   return (
@@ -43,15 +62,37 @@ export default function RegistroForm() {
           </select>
         </div>
 
-        <div className="field">
-          <label>Gato</label>
-          <select value={form.gato_id} onChange={(e) => setForm({ ...form, gato_id: e.target.value })} required>
-            <option value="">Selecionar gato</option>
-            {gatos.map((g) => (
-              <option key={g.id} value={g.id}>{g.nome || 'Sem nome'}</option>
-            ))}
-          </select>
-        </div>
+        {!preGatoId && !prePaiId && (
+          <div className="field">
+            <label>Para</label>
+            <div className="tabs" style={{ marginTop: 0 }}>
+              <button type="button" className={`tab${para === 'gato' ? ' active' : ''}`} onClick={() => setPara('gato')}>Gato</button>
+              <button type="button" className={`tab${para === 'pai' ? ' active' : ''}`} onClick={() => setPara('pai')}>Pai / Mãe</button>
+            </div>
+          </div>
+        )}
+
+        {para === 'gato' ? (
+          <div className="field">
+            <label>Gato</label>
+            <select value={form.gato_id} onChange={(e) => setForm({ ...form, gato_id: e.target.value })} required>
+              <option value="">Selecionar gato</option>
+              {gatos.map((g) => (
+                <option key={g.id} value={g.id}>{g.nome || 'Sem nome'}</option>
+              ))}
+            </select>
+          </div>
+        ) : (
+          <div className="field">
+            <label>Pai / Mãe</label>
+            <select value={form.pai_id} onChange={(e) => setForm({ ...form, pai_id: e.target.value })} required>
+              <option value="">Selecionar pai ou mãe</option>
+              {pais.map((p) => (
+                <option key={p.id} value={p.id}>{p.nome}</option>
+              ))}
+            </select>
+          </div>
+        )}
 
         <div className="field">
           <label>Medicamento Cadastrado</label>

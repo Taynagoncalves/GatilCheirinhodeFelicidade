@@ -1,6 +1,18 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Plus, PawPrint, Pencil, Trash2 } from 'lucide-react';
+
+function alerteDose(proxima_dose_min, proxima_medicamento_nome) {
+  if (!proxima_dose_min) return null;
+  const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+  const dose = new Date(proxima_dose_min + 'T00:00:00');
+  const diff = Math.round((dose - hoje) / (1000 * 60 * 60 * 24));
+  const med = proxima_medicamento_nome ? ` · ${proxima_medicamento_nome}` : '';
+  if (diff < 0) return { label: `Dose atrasada${med}`, cor: '#c0524a' };
+  if (diff === 0) return { label: `Dose hoje!${med}`, cor: '#b8863a' };
+  if (diff === 1) return { label: `Dose amanhã${med}`, cor: '#2f6690' };
+  return { label: `Dose em dia${med}`, cor: '#3f8c5a' };
+}
 import Layout from '../../components/Layout';
 import EmptyState from '../../components/EmptyState';
 import ConfirmModal from '../../components/ConfirmModal';
@@ -50,7 +62,9 @@ export default function PaisList() {
         <EmptyState icon={PawPrint} title="Nenhum registro encontrado" description="Cadastre o primeiro pai ou mãe do gatil." />
       )}
 
-      {pais.map((p) => (
+      {pais.map((p) => {
+        const alerta = alerteDose(p.proxima_dose_min, p.proxima_medicamento_nome);
+        return (
         <div key={p.id} className="card" style={{ cursor: 'pointer' }} onClick={() => navigate(`/pais/${p.id}`)}>
           <div className="card-row">
             {p.foto_url ? (
@@ -59,7 +73,14 @@ export default function PaisList() {
               <span className="card-photo-placeholder"><PawPrint size={26} /></span>
             )}
             <div style={{ flex: 1 }}>
-              <p className="card-title">{p.nome}</p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                <p className="card-title" style={{ margin: 0 }}>{p.nome}</p>
+                {alerta && (
+                  <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#fff', background: alerta.cor, borderRadius: 20, padding: '2px 8px', whiteSpace: 'nowrap' }}>
+                    {alerta.label}
+                  </span>
+                )}
+              </div>
               <p className="card-meta">
                 Raça: {p.raca || 'Não informado'}<br />
                 Nascimento: {p.data_nascimento ? p.data_nascimento.split('-').reverse().join('/') : 'Não informado'}
@@ -75,7 +96,8 @@ export default function PaisList() {
             </div>
           </div>
         </div>
-      ))}
+        );
+      })}
       {confirmId && (
         <ConfirmModal
           message="Deseja remover este registro?"

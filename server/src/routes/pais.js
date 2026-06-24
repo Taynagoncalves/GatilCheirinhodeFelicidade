@@ -6,17 +6,31 @@ const router = express.Router();
 
 router.get('/', async (req, res) => {
   const { sexo, busca } = req.query;
-  let sql = `SELECT id, nome, sexo, raca, cor, DATE_FORMAT(data_nascimento, '%Y-%m-%d') AS data_nascimento, foto_url, observacoes, peso FROM pais WHERE 1=1`;
+  let sql = `
+    SELECT p.id, p.nome, p.sexo, p.raca, p.cor,
+           DATE_FORMAT(p.data_nascimento, '%Y-%m-%d') AS data_nascimento,
+           p.foto_url, p.observacoes, p.peso,
+           (SELECT DATE_FORMAT(MIN(a.proxima_dose), '%Y-%m-%d')
+            FROM aplicacoes a
+            INNER JOIN (
+              SELECT medicamento_id, MAX(data_aplicada) AS ultima_data
+              FROM aplicacoes WHERE pai_id = p.id GROUP BY medicamento_id
+            ) ult ON a.medicamento_id = ult.medicamento_id AND a.data_aplicada = ult.ultima_data
+            WHERE a.pai_id = p.id AND a.proxima_dose IS NOT NULL) AS proxima_dose_min,
+           (SELECT med.nome
+            FROM aplicacoes a
+            INNER JOIN (
+              SELECT medicamento_id, MAX(data_aplicada) AS ultima_data
+              FROM aplicacoes WHERE pai_id = p.id GROUP BY medicamento_id
+            ) ult ON a.medicamento_id = ult.medicamento_id AND a.data_aplicada = ult.ultima_data
+            JOIN medicamentos med ON a.medicamento_id = med.id
+            WHERE a.pai_id = p.id AND a.proxima_dose IS NOT NULL
+            ORDER BY a.proxima_dose ASC LIMIT 1) AS proxima_medicamento_nome
+    FROM pais p WHERE 1=1`;
   const params = [];
-  if (sexo) {
-    params.push(sexo);
-    sql += ' AND sexo = ?';
-  }
-  if (busca) {
-    params.push(`%${busca}%`);
-    sql += ' AND nome LIKE ?';
-  }
-  sql += ' ORDER BY nome ASC';
+  if (sexo) { sql += ' AND p.sexo = ?'; params.push(sexo); }
+  if (busca) { sql += ' AND p.nome LIKE ?'; params.push(`%${busca}%`); }
+  sql += ' ORDER BY p.nome ASC';
   const [rows] = await pool.query(sql, params);
   res.json(rows);
 });
@@ -33,7 +47,19 @@ router.get('/:id', async (req, res) => {
     [req.params.id]
   );
 
-  res.json({ ...rows[0], historico_peso });
+  const [historico] = await pool.query(
+    `SELECT a.id, a.tipo, a.observacoes,
+            DATE_FORMAT(a.data_aplicada, '%Y-%m-%d') AS data_aplicada,
+            DATE_FORMAT(a.proxima_dose, '%Y-%m-%d') AS proxima_dose,
+            med.nome AS medicamento_nome, med.categoria
+     FROM aplicacoes a
+     JOIN medicamentos med ON a.medicamento_id = med.id
+     WHERE a.pai_id = ?
+     ORDER BY a.data_aplicada DESC`,
+    [req.params.id]
+  );
+
+  res.json({ ...rows[0], historico_peso, historico });
 });
 
 router.post('/', upload.single('foto'), async (req, res) => {
