@@ -51,7 +51,7 @@ export default function GatoPerfil() {
   useEffect(() => { carregarGato(); }, [id]);
 
   useEffect(() => {
-    setSteps(TOUR);
+    setSteps(TOUR, 'perfil');
     return () => setSteps([]);
   }, []);
 

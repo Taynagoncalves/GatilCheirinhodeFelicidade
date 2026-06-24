@@ -39,7 +39,7 @@ export default function NinhadasList() {
   const { setSteps } = useTour();
 
   useEffect(() => {
-    setSteps(TOUR);
+    setSteps(TOUR, 'ninhadas');
     return () => setSteps([]);
   }, []);
 

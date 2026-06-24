@@ -79,7 +79,7 @@ export default function GatosList() {
   const { setSteps } = useTour();
 
   useEffect(() => {
-    setSteps(TOUR);
+    setSteps(TOUR, 'gatos');
     return () => setSteps([]);
   }, []);
 

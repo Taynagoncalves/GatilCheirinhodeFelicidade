@@ -44,7 +44,7 @@ export default function SaudeList() {
   const { setSteps } = useTour();
 
   useEffect(() => {
-    setSteps(TOUR);
+    setSteps(TOUR, 'saude');
     return () => setSteps([]);
   }, []);
 

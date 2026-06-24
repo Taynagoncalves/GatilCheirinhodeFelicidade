@@ -51,7 +51,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    setSteps(TOUR);
+    setSteps(TOUR, 'home');
     return () => setSteps([]);
   }, []);
 
