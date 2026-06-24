@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Cat, Syringe, Pill } from 'lucide-react';
+import { Cat, Syringe, Pill, Plus } from 'lucide-react';
 import Layout from '../../components/Layout';
 import StatusBadge from '../../components/StatusBadge';
 import EmptyState from '../../components/EmptyState';
@@ -45,6 +45,10 @@ export default function GatoPerfil() {
           Editar Gato
         </button>
       </div>
+
+      <button className="btn btn-primary" onClick={() => navigate(`/saude/registrar?gato_id=${id}`)}>
+        <Plus size={18} /> Registrar Dose
+      </button>
 
       <section>
         <h2 className="section-title">Histórico de Saúde</h2>
