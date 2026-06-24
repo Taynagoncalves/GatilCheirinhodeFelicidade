@@ -64,7 +64,7 @@ export default function FinanceiroList() {
   const categorias = form.tipo === 'saida' ? CATEGORIAS_SAIDA : CATEGORIAS_ENTRADA;
 
   return (
-    <Layout title="Financeiro">
+    <Layout title="Financeiro" hideNav>
       <button className="btn btn-outline" onClick={() => navigate('/')}>
         <PawPrint size={16} /> Ir para o Gatil
       </button>
