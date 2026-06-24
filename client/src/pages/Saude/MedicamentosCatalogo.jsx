@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Search, Plus, Pill, Syringe, Trash2 } from 'lucide-react';
 import Layout from '../../components/Layout';
 import EmptyState from '../../components/EmptyState';
+import ConfirmModal from '../../components/ConfirmModal';
 import { useToast } from '../../components/Toast';
 import api from '../../api/client';
 
@@ -11,6 +12,7 @@ export default function MedicamentosCatalogo() {
   const [busca, setBusca] = useState('');
   const [medicamentos, setMedicamentos] = useState([]);
   const toast = useToast();
+  const [confirmId, setConfirmId] = useState(null);
 
   const load = () => {
     api.get('/medicamentos', { params: { busca: busca || undefined } }).then((res) => setMedicamentos(res.data));
@@ -20,10 +22,10 @@ export default function MedicamentosCatalogo() {
     load();
   }, [busca]);
 
-  const remove = async (id) => {
-    if (!confirm('Deseja remover este medicamento?')) return;
-    await api.delete(`/medicamentos/${id}`);
+  const remove = async () => {
+    await api.delete(`/medicamentos/${confirmId}`);
     toast('Medicamento excluído!', 'error');
+    setConfirmId(null);
     load();
   };
 
@@ -50,11 +52,18 @@ export default function MedicamentosCatalogo() {
             {m.categoria === 'vacina' ? <Syringe size={18} /> : <Pill size={18} />}
           </span>
           <p className="card-title" style={{ fontSize: '0.95rem', flex: 1 }}>{m.nome}</p>
-          <button className="icon-btn danger" onClick={() => remove(m.id)}>
+          <button className="icon-btn danger" onClick={() => setConfirmId(m.id)}>
             <Trash2 size={16} />
           </button>
         </div>
       ))}
+      {confirmId && (
+        <ConfirmModal
+          message="Deseja remover este medicamento?"
+          onConfirm={remove}
+          onCancel={() => setConfirmId(null)}
+        />
+      )}
     </Layout>
   );
 }

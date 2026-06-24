@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Search, Plus, PawPrint, Pencil, Trash2 } from 'lucide-react';
 import Layout from '../../components/Layout';
 import EmptyState from '../../components/EmptyState';
+import ConfirmModal from '../../components/ConfirmModal';
 import { useToast } from '../../components/Toast';
 import api from '../../api/client';
 
@@ -12,6 +13,7 @@ export default function PaisList() {
   const [busca, setBusca] = useState('');
   const [pais, setPais] = useState([]);
   const toast = useToast();
+  const [confirmId, setConfirmId] = useState(null);
 
   const load = () => {
     api.get('/pais', { params: { sexo, busca: busca || undefined } }).then((res) => setPais(res.data));
@@ -21,10 +23,10 @@ export default function PaisList() {
     load();
   }, [sexo, busca]);
 
-  const remove = async (id) => {
-    if (!confirm('Deseja remover este registro?')) return;
-    await api.delete(`/pais/${id}`);
+  const remove = async () => {
+    await api.delete(`/pais/${confirmId}`);
     toast('Registro excluído!', 'error');
+    setConfirmId(null);
     load();
   };
 
@@ -66,7 +68,7 @@ export default function PaisList() {
                 <button className="icon-btn" onClick={() => navigate(`/pais/${p.id}/editar`)}>
                   <Pencil size={15} /> Editar
                 </button>
-                <button className="icon-btn danger" onClick={() => remove(p.id)}>
+                <button className="icon-btn danger" onClick={() => setConfirmId(p.id)}>
                   <Trash2 size={15} /> Excluir
                 </button>
               </div>
@@ -74,6 +76,13 @@ export default function PaisList() {
           </div>
         </div>
       ))}
+      {confirmId && (
+        <ConfirmModal
+          message="Deseja remover este registro?"
+          onConfirm={remove}
+          onCancel={() => setConfirmId(null)}
+        />
+      )}
     </Layout>
   );
 }

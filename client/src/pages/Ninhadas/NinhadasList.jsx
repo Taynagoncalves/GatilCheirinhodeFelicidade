@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Search, Plus, PawPrint, Trash2, ChevronRight, Calendar, Cat } from 'lucide-react';
 import Layout from '../../components/Layout';
 import EmptyState from '../../components/EmptyState';
+import ConfirmModal from '../../components/ConfirmModal';
 import { useToast } from '../../components/Toast';
 import api from '../../api/client';
 
@@ -11,6 +12,7 @@ export default function NinhadasList() {
   const [busca, setBusca] = useState('');
   const [ninhadas, setNinhadas] = useState([]);
   const toast = useToast();
+  const [confirmId, setConfirmId] = useState(null);
 
   const load = () => {
     api.get('/ninhadas', { params: { busca: busca || undefined } }).then((res) => setNinhadas(res.data));
@@ -20,10 +22,10 @@ export default function NinhadasList() {
     load();
   }, [busca]);
 
-  const remove = async (id) => {
-    if (!confirm('Deseja remover esta ninhada?')) return;
-    await api.delete(`/ninhadas/${id}`);
+  const remove = async () => {
+    await api.delete(`/ninhadas/${confirmId}`);
     toast('Ninhada excluída!', 'error');
+    setConfirmId(null);
     load();
   };
 
@@ -68,7 +70,7 @@ export default function NinhadasList() {
                 <button className="icon-btn" onClick={() => navigate(`/ninhadas/${n.id}`)}>
                   Ver Detalhes <ChevronRight size={15} />
                 </button>
-                <button className="icon-btn danger" onClick={() => remove(n.id)}>
+                <button className="icon-btn danger" onClick={() => setConfirmId(n.id)}>
                   <Trash2 size={15} /> Excluir
                 </button>
               </div>
@@ -76,6 +78,13 @@ export default function NinhadasList() {
           </div>
         </div>
       ))}
+      {confirmId && (
+        <ConfirmModal
+          message="Deseja remover esta ninhada?"
+          onConfirm={remove}
+          onCancel={() => setConfirmId(null)}
+        />
+      )}
     </Layout>
   );
 }
