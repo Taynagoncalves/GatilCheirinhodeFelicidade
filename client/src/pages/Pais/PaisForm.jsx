@@ -17,7 +17,9 @@ export default function PaisForm() {
     cor: '',
     sexo: 'macho',
     observacoes: '',
+    peso: '',
   });
+  const [pesoUnidade, setPesoUnidade] = useState('kg');
   const [foto, setFoto] = useState(null);
   const [preview, setPreview] = useState(null);
   const toast = useToast();
@@ -25,6 +27,9 @@ export default function PaisForm() {
   useEffect(() => {
     if (isEdit) {
       api.get(`/pais/${id}`).then((res) => {
+        const pesoG = res.data.peso;
+        const usaKg = pesoG && pesoG >= 1000;
+        setPesoUnidade(usaKg ? 'kg' : 'g');
         setForm({
           nome: res.data.nome || '',
           data_nascimento: res.data.data_nascimento?.slice(0, 10) || '',
@@ -32,6 +37,7 @@ export default function PaisForm() {
           cor: res.data.cor || '',
           sexo: res.data.sexo,
           observacoes: res.data.observacoes || '',
+          peso: pesoG ? (usaKg ? (pesoG / 1000).toString() : pesoG.toString()) : '',
         });
         setPreview(res.data.foto_url);
       });
@@ -45,8 +51,9 @@ export default function PaisForm() {
 
   const submit = async (e) => {
     e.preventDefault();
+    const pesoEmGramas = form.peso ? (pesoUnidade === 'kg' ? parseFloat(form.peso) * 1000 : parseFloat(form.peso)) : '';
     const data = new FormData();
-    Object.entries(form).forEach(([k, v]) => data.append(k, v));
+    Object.entries({ ...form, peso: pesoEmGramas || '' }).forEach(([k, v]) => data.append(k, v));
     if (foto) data.append('foto', foto);
 
     if (isEdit) {
@@ -100,6 +107,23 @@ export default function PaisForm() {
             >
               Macho
             </span>
+          </div>
+        </div>
+
+        <div className="field">
+          <label>Peso (opcional)</label>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <input
+              type="number" step="0.1" min="0"
+              placeholder={pesoUnidade === 'g' ? 'Ex: 350' : 'Ex: 4.5'}
+              value={form.peso}
+              onChange={(e) => setForm({ ...form, peso: e.target.value })}
+              style={{ flex: 1 }}
+            />
+            <select value={pesoUnidade} onChange={(e) => setPesoUnidade(e.target.value)} style={{ width: 64 }}>
+              <option value="g">g</option>
+              <option value="kg">kg</option>
+            </select>
           </div>
         </div>
 

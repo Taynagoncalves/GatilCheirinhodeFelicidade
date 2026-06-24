@@ -6,6 +6,7 @@ import GatoForm from './pages/Gatos/GatoForm';
 import GatoPerfil from './pages/Gatos/GatoPerfil';
 import PaisList from './pages/Pais/PaisList';
 import PaisForm from './pages/Pais/PaisForm';
+import PaisPerfil from './pages/Pais/PaisPerfil';
 import NinhadasList from './pages/Ninhadas/NinhadasList';
 import NinhadaForm from './pages/Ninhadas/NinhadaForm';
 import NinhadaDetalhe from './pages/Ninhadas/NinhadaDetalhe';
@@ -28,6 +29,7 @@ export default function App() {
 
       <Route path="/pais" element={<PaisList />} />
       <Route path="/pais/novo" element={<PaisForm />} />
+      <Route path="/pais/:id" element={<PaisPerfil />} />
       <Route path="/pais/:id/editar" element={<PaisForm />} />
 
       <Route path="/ninhadas" element={<NinhadasList />} />

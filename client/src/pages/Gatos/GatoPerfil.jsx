@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Cat, Syringe, Pill, Plus, Trash2 } from 'lucide-react';
+import { Cat, Syringe, Pill, Plus, Trash2, Weight, X } from 'lucide-react';
+import { formatarPeso } from '../../utils/peso';
 import Layout from '../../components/Layout';
 import StatusBadge from '../../components/StatusBadge';
 import EmptyState from '../../components/EmptyState';
@@ -43,6 +44,9 @@ export default function GatoPerfil() {
   const navigate = useNavigate();
   const [gato, setGato] = useState(null);
   const [confirmando, setConfirmando] = useState(null);
+  const [showPesoModal, setShowPesoModal] = useState(false);
+  const [pesoValor, setPesoValor] = useState('');
+  const [pesoUnidade, setPesoUnidade] = useState('g');
   const toast = useToast();
   const { setSteps } = useTour();
 
@@ -54,6 +58,16 @@ export default function GatoPerfil() {
     setSteps(TOUR, 'perfil');
     return () => setSteps([]);
   }, []);
+
+  const salvarPeso = async () => {
+    if (!pesoValor) return;
+    const pesoG = pesoUnidade === 'kg' ? parseFloat(pesoValor) * 1000 : parseFloat(pesoValor);
+    await api.patch(`/gatos/${id}/peso`, { peso: pesoG });
+    setShowPesoModal(false);
+    setPesoValor('');
+    toast('Peso registrado!');
+    carregarGato();
+  };
 
   const excluirRegistro = async (regId) => {
     await api.delete(`/aplicacoes/${regId}`);
@@ -84,6 +98,7 @@ export default function GatoPerfil() {
             Sexo: {gato.sexo === 'macho' ? 'Macho' : 'Fêmea'}<br />
             Nascimento: {gato.data_nascimento ? gato.data_nascimento.split('-').reverse().join('/') : 'Não informado'}<br />
             Idade: {gato.data_nascimento ? calcularIdade(gato.data_nascimento) : 'Não informado'}<br />
+            Peso: {formatarPeso(gato.peso) || 'Não informado'}<br />
             Mãe: {gato.mae_nome || 'Não informado'}<br />
             Pai: {gato.pai_nome || 'Não informado'}<br />
             Ninhada: {gato.ninhada_nome || 'Não informado'}
@@ -94,6 +109,10 @@ export default function GatoPerfil() {
           Editar Gato
         </button>
       </div>
+
+      <button className="btn btn-secondary" onClick={() => { setPesoValor(''); setPesoUnidade('g'); setShowPesoModal(true); }}>
+        <Weight size={18} /> Registrar Peso
+      </button>
 
       <button className="btn btn-primary" data-tour="perfil-registrar" onClick={() => navigate(`/saude/registrar?gato_id=${id}`)}>
         <Plus size={18} /> Registrar Dose
@@ -156,6 +175,38 @@ export default function GatoPerfil() {
             </div>
           </div>
         </section>
+      )}
+
+      {showPesoModal && (
+        <div className="modal-overlay" onClick={() => setShowPesoModal(false)}>
+          <div className="modal-box" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => setShowPesoModal(false)}><X size={20} /></button>
+            <p className="modal-title">Registrar Peso</p>
+            <p className="card-meta" style={{ marginBottom: 16 }}>
+              Peso atual: <strong>{formatarPeso(gato.peso) || 'não informado'}</strong>
+            </p>
+            <div className="field">
+              <label>Novo peso</label>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <input
+                  type="number" step="0.1" min="0"
+                  placeholder={pesoUnidade === 'g' ? 'Ex: 350' : 'Ex: 3.5'}
+                  value={pesoValor}
+                  onChange={(e) => setPesoValor(e.target.value)}
+                  style={{ flex: 1 }}
+                  autoFocus
+                />
+                <select value={pesoUnidade} onChange={(e) => setPesoUnidade(e.target.value)} style={{ width: 64 }}>
+                  <option value="g">g</option>
+                  <option value="kg">kg</option>
+                </select>
+              </div>
+            </div>
+            <button className="btn btn-primary" onClick={salvarPeso} disabled={!pesoValor}>
+              Salvar
+            </button>
+          </div>
+        </div>
       )}
 
       {confirmando && (

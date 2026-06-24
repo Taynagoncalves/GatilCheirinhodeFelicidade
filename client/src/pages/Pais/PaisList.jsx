@@ -51,7 +51,7 @@ export default function PaisList() {
       )}
 
       {pais.map((p) => (
-        <div key={p.id} className="card">
+        <div key={p.id} className="card" style={{ cursor: 'pointer' }} onClick={() => navigate(`/pais/${p.id}`)}>
           <div className="card-row">
             {p.foto_url ? (
               <img src={p.foto_url} alt={p.nome} className="card-photo" />
@@ -64,7 +64,7 @@ export default function PaisList() {
                 Raça: {p.raca || 'Não informado'}<br />
                 Nascimento: {p.data_nascimento ? p.data_nascimento.split('-').reverse().join('/') : 'Não informado'}
               </p>
-              <div className="card-actions">
+              <div className="card-actions" onClick={(e) => e.stopPropagation()}>
                 <button className="icon-btn" onClick={() => navigate(`/pais/${p.id}/editar`)}>
                   <Pencil size={15} /> Editar
                 </button>

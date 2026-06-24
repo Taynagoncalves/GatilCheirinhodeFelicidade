@@ -8,7 +8,7 @@ router.get('/', async (req, res) => {
   const { busca, status, sexo } = req.query;
   let sql = `
     SELECT g.id, g.nome, g.cor, g.sexo, DATE_FORMAT(g.data_nascimento, '%Y-%m-%d') AS data_nascimento,
-           g.ninhada_id, g.mae_id, g.pai_id, g.status, g.foto_url, g.observacoes,
+           g.ninhada_id, g.mae_id, g.pai_id, g.status, g.foto_url, g.observacoes, g.peso,
            m.nome AS mae_nome, p.nome AS pai_nome, n.nome AS ninhada_nome,
            (SELECT DATE_FORMAT(MIN(a.proxima_dose), '%Y-%m-%d')
             FROM aplicacoes a
@@ -56,7 +56,7 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   const [rows] = await pool.query(
     `SELECT g.id, g.nome, g.cor, g.sexo, DATE_FORMAT(g.data_nascimento, '%Y-%m-%d') AS data_nascimento,
-            g.ninhada_id, g.mae_id, g.pai_id, g.status, g.foto_url, g.observacoes,
+            g.ninhada_id, g.mae_id, g.pai_id, g.status, g.foto_url, g.observacoes, g.peso,
             m.nome AS mae_nome, m.foto_url AS mae_foto, p.nome AS pai_nome, p.foto_url AS pai_foto, n.nome AS ninhada_nome
      FROM gatos g
      LEFT JOIN pais m ON g.mae_id = m.id
@@ -83,41 +83,28 @@ router.get('/:id', async (req, res) => {
 });
 
 router.post('/', upload.single('foto'), async (req, res) => {
-  const { nome, cor, sexo, data_nascimento, ninhada_id, mae_id, pai_id, status, observacoes } = req.body;
+  const { nome, cor, sexo, data_nascimento, ninhada_id, mae_id, pai_id, status, observacoes, peso } = req.body;
   const foto_url = req.file ? req.file.path : null;
   const [result] = await pool.query(
-    `INSERT INTO gatos (nome, cor, sexo, data_nascimento, ninhada_id, mae_id, pai_id, status, foto_url, observacoes)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO gatos (nome, cor, sexo, data_nascimento, ninhada_id, mae_id, pai_id, status, foto_url, observacoes, peso)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
-      nome || null,
-      cor || null,
-      sexo,
-      data_nascimento || null,
-      ninhada_id || null,
-      mae_id || null,
-      pai_id || null,
-      status || 'disponivel',
-      foto_url,
-      observacoes || null,
+      nome || null, cor || null, sexo,
+      data_nascimento || null, ninhada_id || null, mae_id || null, pai_id || null,
+      status || 'disponivel', foto_url, observacoes || null, peso || null,
     ]
   );
   res.status(201).json({ id: result.insertId });
 });
 
 router.put('/:id', upload.single('foto'), async (req, res) => {
-  const { nome, cor, sexo, data_nascimento, ninhada_id, mae_id, pai_id, status, observacoes } = req.body;
+  const { nome, cor, sexo, data_nascimento, ninhada_id, mae_id, pai_id, status, observacoes, peso } = req.body;
   const fields = [
-    nome || null,
-    cor || null,
-    sexo,
-    data_nascimento || null,
-    ninhada_id || null,
-    mae_id || null,
-    pai_id || null,
-    status || 'disponivel',
-    observacoes || null,
+    nome || null, cor || null, sexo,
+    data_nascimento || null, ninhada_id || null, mae_id || null, pai_id || null,
+    status || 'disponivel', observacoes || null, peso || null,
   ];
-  let sql = 'UPDATE gatos SET nome=?, cor=?, sexo=?, data_nascimento=?, ninhada_id=?, mae_id=?, pai_id=?, status=?, observacoes=?';
+  let sql = 'UPDATE gatos SET nome=?, cor=?, sexo=?, data_nascimento=?, ninhada_id=?, mae_id=?, pai_id=?, status=?, observacoes=?, peso=?';
   if (req.file) {
     fields.push(req.file.path);
     sql += ', foto_url=?';
@@ -131,6 +118,12 @@ router.put('/:id', upload.single('foto'), async (req, res) => {
 router.patch('/:id/status', async (req, res) => {
   const { status } = req.body;
   await pool.query('UPDATE gatos SET status=? WHERE id=?', [status, req.params.id]);
+  res.json({ ok: true });
+});
+
+router.patch('/:id/peso', async (req, res) => {
+  const { peso } = req.body;
+  await pool.query('UPDATE gatos SET peso=? WHERE id=?', [peso, req.params.id]);
   res.json({ ok: true });
 });
 
