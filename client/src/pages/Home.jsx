@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Cat, PawPrint, Plus, Syringe, CalendarClock, X, Users } from 'lucide-react';
+import { Cat, PawPrint, Plus, CalendarClock, X, Users } from 'lucide-react';
 import Layout from '../components/Layout';
 import EmptyState from '../components/EmptyState';
 import { usePush } from '../hooks/usePush';
@@ -35,11 +35,8 @@ export default function Home() {
         <button className="btn btn-primary" onClick={() => setShowModal(true)}>
           <Plus size={18} /> Cadastrar Gato
         </button>
-        <button className="btn btn-secondary" onClick={() => navigate('/ninhadas/nova')}>
-          <PawPrint size={18} /> Nova Ninhada
-        </button>
-        <button className="btn btn-secondary" onClick={() => navigate('/saude/registrar')}>
-          <Syringe size={18} /> Registrar Dose
+        <button className="btn btn-secondary" onClick={() => navigate('/pais')}>
+          <Users size={18} /> Ver Pais
         </button>
       </div>
 
