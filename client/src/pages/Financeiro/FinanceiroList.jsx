@@ -138,9 +138,11 @@ function TabResumo({ mes, onMes }) {
         </div>
       </div>
 
-      <button className="btn btn-outline" onClick={compartilhar} style={{ width: '100%' }}>
-        <Share2 size={16} /> Compartilhar resumo
-      </button>
+      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <button onClick={compartilhar} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5, fontSize: '0.8rem', color: 'var(--color-text-muted)', padding: '4px 0' }}>
+          <Share2 size={14} /> Compartilhar resumo
+        </button>
+      </div>
 
       {cats.length > 0 && (
         <>
