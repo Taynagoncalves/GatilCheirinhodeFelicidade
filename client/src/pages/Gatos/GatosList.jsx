@@ -65,17 +65,23 @@ export default function GatosList() {
         <Plus size={18} /> Cadastrar Gato
       </button>
 
-      <div className="tabs">
-        <button className={`tab${sexo === '' ? ' active' : ''}`} onClick={() => setSexo('')}>Todos</button>
-        <button className={`tab${sexo === 'macho' ? ' active' : ''}`} onClick={() => setSexo('macho')}>Machos</button>
-        <button className={`tab${sexo === 'femea' ? ' active' : ''}`} onClick={() => setSexo('femea')}>Fêmeas</button>
-      </div>
-
-      <div className="tabs">
-        <button className={`tab${statusFiltro === '' ? ' active' : ''}`} onClick={() => setStatusFiltro('')}>Todos</button>
-        <button className={`tab${statusFiltro === 'disponivel' ? ' active' : ''}`} onClick={() => setStatusFiltro('disponivel')}>Disponível</button>
-        <button className={`tab${statusFiltro === 'reservado' ? ' active' : ''}`} onClick={() => setStatusFiltro('reservado')}>Reservado</button>
-        <button className={`tab${statusFiltro === 'vendido' ? ' active' : ''}`} onClick={() => setStatusFiltro('vendido')}>Vendido</button>
+      <div className="filtros-row">
+        <div className="filtro-grupo">
+          <label className="filtro-label">Sexo</label>
+          <div className="filtro-pills">
+            {[['', 'Todos'], ['macho', 'Macho'], ['femea', 'Fêmea']].map(([val, label]) => (
+              <button key={val} className={`filtro-pill${sexo === val ? ' ativo' : ''}`} onClick={() => setSexo(val)}>{label}</button>
+            ))}
+          </div>
+        </div>
+        <div className="filtro-grupo">
+          <label className="filtro-label">Status</label>
+          <div className="filtro-pills">
+            {[['', 'Todos'], ['disponivel', 'Disponível'], ['reservado', 'Reservado'], ['vendido', 'Vendido']].map(([val, label]) => (
+              <button key={val} className={`filtro-pill${statusFiltro === val ? ' ativo' : ''}`} onClick={() => setStatusFiltro(val)}>{label}</button>
+            ))}
+          </div>
+        </div>
       </div>
 
       <div className="search-input">
