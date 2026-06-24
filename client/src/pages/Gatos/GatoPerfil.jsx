@@ -1,29 +1,19 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Cat, Syringe, Pill, Plus, Trash2 } from 'lucide-react';
+import { Cat, Syringe, Pill, Plus } from 'lucide-react';
 import Layout from '../../components/Layout';
 import StatusBadge from '../../components/StatusBadge';
 import EmptyState from '../../components/EmptyState';
-import ConfirmModal from '../../components/ConfirmModal';
-import { useToast } from '../../components/Toast';
 import api from '../../api/client';
 
 export default function GatoPerfil() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const toast = useToast();
   const [gato, setGato] = useState(null);
-  const [confirmando, setConfirmando] = useState(false);
 
   useEffect(() => {
     api.get(`/gatos/${id}`).then((res) => setGato(res.data));
   }, [id]);
-
-  async function excluir() {
-    await api.delete(`/gatos/${id}`);
-    toast('Gato excluído com sucesso!');
-    navigate('/gatos');
-  }
 
   if (!gato) return null;
 
@@ -51,14 +41,9 @@ export default function GatoPerfil() {
             Ninhada: {gato.ninhada_nome || 'Não informado'}
           </p>
         </div>
-        <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
-          <button className="btn btn-outline" style={{ flex: 1 }} onClick={() => navigate(`/gatos/${id}/editar`)}>
-            Editar Gato
-          </button>
-          <button className="btn btn-outline" style={{ color: 'var(--color-danger)', borderColor: 'var(--color-danger)' }} onClick={() => setConfirmando(true)}>
-            <Trash2 size={16} />
-          </button>
-        </div>
+        <button className="btn btn-outline" style={{ marginTop: 12 }} onClick={() => navigate(`/gatos/${id}/editar`)}>
+          Editar Gato
+        </button>
       </div>
 
       <button className="btn btn-primary" onClick={() => navigate(`/saude/registrar?gato_id=${id}`)}>
@@ -117,13 +102,6 @@ export default function GatoPerfil() {
         </section>
       )}
 
-      {confirmando && (
-        <ConfirmModal
-          message={`Excluir ${gato.nome || 'este gato'}? Todo o histórico de saúde será removido.`}
-          onConfirm={excluir}
-          onCancel={() => setConfirmando(false)}
-        />
-      )}
     </Layout>
   );
 }
