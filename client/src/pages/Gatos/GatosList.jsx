@@ -8,6 +8,7 @@ import { useToast } from '../../components/Toast';
 import { useTour } from '../../contexts/TourContext';
 import api from '../../api/client';
 import { calcularIdade } from '../../utils/idade';
+import { formatarPeso } from '../../utils/peso';
 
 const TOUR = [
   {
@@ -158,6 +159,7 @@ export default function GatosList() {
                 {g.mae_nome && <><br />Mãe: {g.mae_nome}</>}
                 {g.pai_nome && <><br />Pai: {g.pai_nome}</>}
                 {g.ninhada_nome && <><br />Ninhada: {g.ninhada_nome}</>}
+                {g.peso != null && <><br />Peso: {formatarPeso(g.peso)}</>}
               </p>
 
               <div style={{ marginTop: 8, position: 'relative' }} onClick={(e) => e.stopPropagation()}>
