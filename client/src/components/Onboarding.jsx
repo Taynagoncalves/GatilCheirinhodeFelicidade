@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Cat, Syringe, Heart, BarChart3, CheckCircle } from 'lucide-react';
+import { Cat, Syringe, Heart, BarChart3, CheckCircle, Wallet } from 'lucide-react';
 
 const PataIcon = ({ size = 64, color = '#fff' }) => (
   <svg width={size} height={size} viewBox="0 0 100 100">
@@ -45,6 +45,12 @@ const SLIDES = [
     texto: 'Veja em um só lugar quantos gatos estão disponíveis, reservados ou já vendidos. Tudo organizado e sempre atualizado.',
   },
   {
+    gradient: 'linear-gradient(155deg, #3b1f6b 0%, #6d28d9 65%, #7b5ea7 100%)',
+    renderIcon: () => <Wallet size={74} color="#fff" strokeWidth={1.4} />,
+    titulo: 'Financeiro',
+    texto: 'Registre vendas, gastos com veterinário, ração e muito mais. Acompanhe entradas, saídas e o saldo do mês direto na tela inicial.',
+  },
+  {
     gradient: 'linear-gradient(155deg, #1a4060 0%, #2f6690 65%, #3d85b5 100%)',
     renderIcon: () => <CheckCircle size={74} color="#fff" strokeWidth={1.4} />,
     titulo: 'Tudo Pronto! 🐱',
@@ -79,7 +85,7 @@ export default function Onboarding({ onDone }) {
   };
 
   const terminar = () => {
-    localStorage.setItem('onboarding_visto', '1');
+    localStorage.setItem('onboarding_visto', 'v2');
     onDone();
   };
 

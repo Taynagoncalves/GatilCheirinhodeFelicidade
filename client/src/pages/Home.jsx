@@ -38,6 +38,11 @@ const TOUR = [
     texto: 'Toque para ver todos os gatos que já foram vendidos.',
   },
   {
+    selector: '[data-tour="home-financeiro"]',
+    titulo: 'Financeiro',
+    texto: 'Acompanhe o saldo do mês: entradas de vendas e gastos com veterinário, ração e outros. Toque para ver todos os lançamentos.',
+  },
+  {
     selector: '[data-tour="home-btn-cadastrar"]',
     titulo: 'Cadastrar Gato',
     texto: 'Use este botão para adicionar um novo filhote ao gatil ou acessar a lista de pais reprodutores.',
@@ -92,6 +97,7 @@ export default function Home() {
 
       <div
         className="card"
+        data-tour="home-financeiro"
         style={{ cursor: 'pointer', background: 'linear-gradient(135deg, var(--color-primary), #7b5ea7)', color: '#fff' }}
         onClick={() => navigate('/financeiro')}
       >

@@ -9,7 +9,7 @@ import Onboarding from './components/Onboarding.jsx'
 
 function Root() {
   const [splash, setSplash] = useState(true);
-  const [onboarding, setOnboarding] = useState(!localStorage.getItem('onboarding_visto'));
+  const [onboarding, setOnboarding] = useState(localStorage.getItem('onboarding_visto') !== 'v2');
 
   if (splash) return <SplashScreen onDone={() => setSplash(false)} />;
   if (onboarding) return <Onboarding onDone={() => setOnboarding(false)} />;

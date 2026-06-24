@@ -20,6 +20,11 @@ const TOUR = [
     texto: 'Acesse o catálogo de todos os medicamentos e vacinas. Você pode adicionar novos ou editar os existentes.',
   },
   {
+    selector: '[data-tour="saude-agenda"]',
+    titulo: 'Agenda de Doses',
+    texto: 'Veja todas as próximas doses de todos os gatos e pais organizadas por data — atrasadas, hoje, amanhã e futuras.',
+  },
+  {
     selector: '[data-tour="saude-tabs"]',
     titulo: 'Filtro por Tipo',
     texto: 'Alterne entre "Medicamentos" e "Vacinas" para filtrar e visualizar apenas o que precisa.',
@@ -67,7 +72,7 @@ export default function SaudeList() {
       <button className="btn btn-secondary" data-tour="saude-medicamentos" onClick={() => navigate('/saude/medicamentos')}>
         <Settings2 size={18} /> Medicamentos Cadastrados
       </button>
-      <button className="btn btn-secondary" onClick={() => navigate('/saude/agenda')}>
+      <button className="btn btn-secondary" data-tour="saude-agenda" onClick={() => navigate('/saude/agenda')}>
         <CalendarClock size={18} /> Agenda de Doses
       </button>
 
