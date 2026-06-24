@@ -241,10 +241,10 @@ function TabLancamentos({ mes, onMes }) {
 
       <div style={{ display: 'flex', gap: 8 }}>
         <button className="btn btn-primary" style={{ flex: 1 }} onClick={() => abrirNovo('entrada')}>
-          <TrendingUp size={16} /> Entrada
+          <TrendingUp size={16} /> Registrar Entrada
         </button>
         <button className="btn btn-secondary" style={{ flex: 1 }} onClick={() => abrirNovo('saida')}>
-          <TrendingDown size={16} /> Gasto
+          <TrendingDown size={16} /> Registrar Gasto
         </button>
       </div>
 
