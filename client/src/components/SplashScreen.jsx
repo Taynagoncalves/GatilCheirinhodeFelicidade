@@ -4,8 +4,8 @@ export default function SplashScreen({ onDone }) {
   const [saindo, setSaindo] = useState(false);
 
   useEffect(() => {
-    const t1 = setTimeout(() => setSaindo(true), 2200);
-    const t2 = setTimeout(() => onDone(), 2800);
+    const t1 = setTimeout(() => setSaindo(true), 3800);
+    const t2 = setTimeout(() => onDone(), 4400);
     return () => { clearTimeout(t1); clearTimeout(t2); };
   }, []);
 
