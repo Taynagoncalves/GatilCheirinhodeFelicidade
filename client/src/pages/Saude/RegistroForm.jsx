@@ -65,11 +65,11 @@ export default function RegistroForm() {
 
         <div className="field-row">
           <div className="field">
-            <label>Data Aplicada</label>
+            <label>Data que foi aplicado</label>
             <input type="date" value={form.data_aplicada} onChange={(e) => setForm({ ...form, data_aplicada: e.target.value })} required />
           </div>
           <div className="field">
-            <label>Próxima Dose</label>
+            <label>Data da próxima dose</label>
             <input type="date" value={form.proxima_dose} onChange={(e) => setForm({ ...form, proxima_dose: e.target.value })} />
           </div>
         </div>
