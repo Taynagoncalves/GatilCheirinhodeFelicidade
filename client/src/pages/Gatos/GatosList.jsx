@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Plus, Cat, X, PawPrint, Users } from 'lucide-react';
+import { Search, Plus, Cat, X, PawPrint, Users, Trash2 } from 'lucide-react';
 import Layout from '../../components/Layout';
 import EmptyState from '../../components/EmptyState';
+import ConfirmModal from '../../components/ConfirmModal';
 import { useToast } from '../../components/Toast';
 import api from '../../api/client';
 
@@ -19,7 +20,15 @@ export default function GatosList() {
   const [gatos, setGatos] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [statusOpen, setStatusOpen] = useState(null);
+  const [confirmando, setConfirmando] = useState(null);
   const toast = useToast();
+
+  const excluir = async (id) => {
+    await api.delete(`/gatos/${id}`);
+    setGatos((prev) => prev.filter((g) => g.id !== id));
+    setConfirmando(null);
+    toast('Gato excluído com sucesso!');
+  };
 
   const load = () => {
     api.get('/gatos', { params: { busca: busca || undefined } }).then((res) => setGatos(res.data));
@@ -100,9 +109,24 @@ export default function GatosList() {
               </div>
 
             </div>
+            <button
+              className="icon-btn"
+              style={{ color: 'var(--color-danger)', alignSelf: 'center', flexShrink: 0 }}
+              onClick={(e) => { e.stopPropagation(); setConfirmando(g); }}
+            >
+              <Trash2 size={18} />
+            </button>
           </div>
         </div>
       ))}
+
+      {confirmando && (
+        <ConfirmModal
+          message={`Excluir ${confirmando.nome || 'este gato'}? Todo o histórico de saúde será removido.`}
+          onConfirm={() => excluir(confirmando.id)}
+          onCancel={() => setConfirmando(null)}
+        />
+      )}
 
       {showModal && (
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
