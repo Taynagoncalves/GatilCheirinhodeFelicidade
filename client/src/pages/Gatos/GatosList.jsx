@@ -3,18 +3,33 @@ import { useNavigate } from 'react-router-dom';
 import { Search, Plus, Cat, X, PawPrint, Users } from 'lucide-react';
 import Layout from '../../components/Layout';
 import EmptyState from '../../components/EmptyState';
-import StatusBadge from '../../components/StatusBadge';
 import api from '../../api/client';
+
+const STATUS_OPTIONS = [
+  { value: 'disponivel', label: 'Disponível', cls: 'status-disponivel' },
+  { value: 'reservado', label: 'Reservado', cls: 'status-reservado' },
+  { value: 'vendido', label: 'Vendido', cls: 'status-vendido' },
+  { value: 'mantido', label: 'Mantido no gatil', cls: 'status-mantido' },
+];
 
 export default function GatosList() {
   const navigate = useNavigate();
   const [busca, setBusca] = useState('');
   const [gatos, setGatos] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [statusOpen, setStatusOpen] = useState(null);
 
-  useEffect(() => {
+  const load = () => {
     api.get('/gatos', { params: { busca: busca || undefined } }).then((res) => setGatos(res.data));
-  }, [busca]);
+  };
+
+  useEffect(() => { load(); }, [busca]);
+
+  const changeStatus = async (id, status) => {
+    await api.patch(`/gatos/${id}/status`, { status });
+    setGatos((prev) => prev.map((g) => g.id === id ? { ...g, status } : g));
+    setStatusOpen(null);
+  };
 
   return (
     <Layout title="Gatos" showBack>
@@ -39,14 +54,48 @@ export default function GatosList() {
             ) : (
               <span className="card-photo-placeholder"><Cat size={26} /></span>
             )}
-            <div style={{ flex: 1 }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
               <p className="card-title">{g.nome || 'Sem nome'}</p>
               <p className="card-meta">
-                Nascimento: {g.data_nascimento ? new Date(g.data_nascimento).toLocaleDateString('pt-BR') : 'Não informado'}
+                {g.data_nascimento ? `Nasc: ${new Date(g.data_nascimento).toLocaleDateString('pt-BR')}` : ''}
+                {g.mae_nome && <><br />Mãe: {g.mae_nome}</>}
+                {g.pai_nome && <><br />Pai: {g.pai_nome}</>}
+                {g.ninhada_nome && <><br />Ninhada: {g.ninhada_nome}</>}
               </p>
-              <div style={{ marginTop: 6 }}>
-                <StatusBadge status={g.status} />
+
+              <div style={{ marginTop: 8, position: 'relative' }}>
+                <span
+                  className={`status-badge status-${g.status}`}
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => setStatusOpen(statusOpen === g.id ? null : g.id)}
+                >
+                  {STATUS_OPTIONS.find((s) => s.value === g.status)?.label || g.status} ▾
+                </span>
+
+                {statusOpen === g.id && (
+                  <div style={{
+                    position: 'absolute', top: '110%', left: 0, zIndex: 30,
+                    background: '#fff', border: '1px solid var(--color-border)',
+                    borderRadius: 'var(--radius-sm)', boxShadow: 'var(--shadow-elevated)',
+                    minWidth: 160, overflow: 'hidden',
+                  }}>
+                    {STATUS_OPTIONS.map((s) => (
+                      <div
+                        key={s.value}
+                        onClick={() => changeStatus(g.id, s.value)}
+                        style={{
+                          padding: '10px 14px', cursor: 'pointer', fontSize: '0.9rem',
+                          fontWeight: g.status === s.value ? 700 : 400,
+                          background: g.status === s.value ? 'var(--color-primary-light)' : 'transparent',
+                        }}
+                      >
+                        {s.label}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
+
               <div className="card-actions">
                 <button className="icon-btn" onClick={() => navigate(`/gatos/${g.id}`)}>Ver Perfil</button>
               </div>

@@ -6,17 +6,23 @@ const router = express.Router();
 
 router.get('/', async (req, res) => {
   const { busca, status } = req.query;
-  let sql = 'SELECT * FROM gatos WHERE 1=1';
+  let sql = `
+    SELECT g.*, m.nome AS mae_nome, p.nome AS pai_nome, n.nome AS ninhada_nome
+    FROM gatos g
+    LEFT JOIN pais m ON g.mae_id = m.id
+    LEFT JOIN pais p ON g.pai_id = p.id
+    LEFT JOIN ninhadas n ON g.ninhada_id = n.id
+    WHERE 1=1`;
   const params = [];
   if (busca) {
     params.push(`%${busca}%`);
-    sql += ' AND nome LIKE ?';
+    sql += ' AND g.nome LIKE ?';
   }
   if (status) {
     params.push(status);
-    sql += ' AND status = ?';
+    sql += ' AND g.status = ?';
   }
-  sql += ' ORDER BY criado_em DESC';
+  sql += ' ORDER BY g.criado_em DESC';
   const [rows] = await pool.query(sql, params);
   res.json(rows);
 });
@@ -88,6 +94,12 @@ router.put('/:id', upload.single('foto'), async (req, res) => {
   fields.push(req.params.id);
   sql += ' WHERE id=?';
   await pool.query(sql, fields);
+  res.json({ ok: true });
+});
+
+router.patch('/:id/status', async (req, res) => {
+  const { status } = req.body;
+  await pool.query('UPDATE gatos SET status=? WHERE id=?', [status, req.params.id]);
   res.json({ ok: true });
 });
 
