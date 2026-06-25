@@ -64,24 +64,26 @@ const STATUS_OPTIONS = [
 const SEXO_OPTS   = [{ v: '', l: 'Todos' }, { v: 'macho', l: '♂ Machos' }, { v: 'femea', l: '♀ Fêmeas' }];
 const STATUS_OPTS = [{ v: '', l: 'Todos' }, { v: 'disponivel', l: 'Disponível' }, { v: 'reservado', l: 'Reservado' }, { v: 'vendido', l: 'Vendido' }];
 
-function ChipBar({ opts, value, onChange, 'data-tour': dt }) {
+function ChipRow({ label, opts, value, onChange }) {
   return (
-    <div data-tour={dt} style={{
-      display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 2,
-      scrollbarWidth: 'none', msOverflowStyle: 'none',
-    }}>
-      {opts.map((o) => {
-        const ativo = value === o.v;
-        return (
-          <button key={o.v} onClick={() => onChange(o.v)} style={{
-            flexShrink: 0, border: 'none', borderRadius: 20, cursor: 'pointer',
-            padding: '6px 14px', fontSize: '0.78rem', fontWeight: ativo ? 700 : 500,
-            background: ativo ? 'var(--color-primary)' : '#f1f5f9',
-            color: ativo ? '#fff' : '#4a5568',
-            transition: 'all 0.15s',
-          }}>{o.l}</button>
-        );
-      })}
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 0.6, flexShrink: 0, minWidth: 34 }}>{label}</span>
+      <div style={{ display: 'flex', gap: 5, overflowX: 'auto', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+        {opts.map((o) => {
+          const ativo = value === o.v;
+          return (
+            <button key={o.v} onClick={() => onChange(o.v)} style={{
+              flexShrink: 0, cursor: 'pointer',
+              padding: '5px 13px', fontSize: '0.76rem', fontWeight: ativo ? 700 : 500,
+              borderRadius: 20, transition: 'all 0.15s',
+              border: ativo ? 'none' : '1.5px solid #e2e8f0',
+              background: ativo ? 'var(--color-primary)' : '#fff',
+              color: ativo ? '#fff' : '#64748b',
+              boxShadow: ativo ? '0 2px 8px rgba(26,77,124,0.22)' : 'none',
+            }}>{o.l}</button>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -131,10 +133,15 @@ export default function GatosList() {
         <Plus size={18} /> Cadastrar Gato
       </button>
 
-      {/* Filtros unificados em chip bars */}
-      <div data-tour="gatos-filtros" style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-        <ChipBar opts={SEXO_OPTS}   value={sexo}         onChange={setSexo} />
-        <ChipBar opts={STATUS_OPTS} value={statusFiltro} onChange={setStatusFiltro} />
+      {/* Filtros */}
+      <div data-tour="gatos-filtros" style={{
+        background: '#fff', borderRadius: 14, padding: '10px 12px',
+        display: 'flex', flexDirection: 'column', gap: 10,
+        boxShadow: '0 1px 6px rgba(0,0,0,0.06)',
+      }}>
+        <ChipRow label="Sexo"   opts={SEXO_OPTS}   value={sexo}         onChange={setSexo} />
+        <div style={{ height: 1, background: '#f1f5f9' }} />
+        <ChipRow label="Status" opts={STATUS_OPTS} value={statusFiltro} onChange={setStatusFiltro} />
       </div>
 
       <div className="search-input" data-tour="gatos-busca">
