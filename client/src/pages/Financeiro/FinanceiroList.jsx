@@ -513,10 +513,7 @@ function TabClientes() {
                   <Cat size={16} /> Ver Gato
                 </button>
               )}
-              <button onClick={() => navigate('/financeiro')} style={{ flex: 1, border: 'none', background: 'none', cursor: 'pointer', padding: '10px 4px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, color: '#7c3aed', fontSize: '0.65rem', fontWeight: 700, borderLeft: '1px solid #f1f5f9' }}>
-                <Wallet size={16} /> Financeiro
-              </button>
-              <button onClick={() => setConfirmando(c)} style={{ flex: 1, border: 'none', background: 'none', cursor: 'pointer', padding: '10px 4px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, color: '#dc2626', fontSize: '0.65rem', fontWeight: 700, borderLeft: '1px solid #f1f5f9' }}>
+<button onClick={() => setConfirmando(c)} style={{ flex: 1, border: 'none', background: 'none', cursor: 'pointer', padding: '10px 4px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, color: '#dc2626', fontSize: '0.65rem', fontWeight: 700, borderLeft: '1px solid #f1f5f9' }}>
                 <Trash2 size={16} /> Excluir
               </button>
             </div>
