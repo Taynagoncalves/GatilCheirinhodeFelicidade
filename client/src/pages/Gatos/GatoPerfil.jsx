@@ -235,18 +235,6 @@ export default function GatoPerfil() {
         )}
       </section>
 
-      {gato.ninhada_nome && (
-        <section>
-          <h2 className="section-title">Dados da Ninhada</h2>
-          <div className="card">
-            <p className="card-title" style={{ fontSize: '0.95rem' }}>{gato.ninhada_nome}</p>
-            <div className="card-row" style={{ marginTop: 10 }}>
-              {gato.mae_foto ? <img src={gato.mae_foto} className="card-photo" alt="Mãe" /> : <span className="card-photo-placeholder"><Cat size={22} /></span>}
-              {gato.pai_foto ? <img src={gato.pai_foto} className="card-photo" alt="Pai" /> : <span className="card-photo-placeholder"><Cat size={22} /></span>}
-            </div>
-          </div>
-        </section>
-      )}
 
       {showPesoModal && (
         <div className="modal-overlay" onClick={() => setShowPesoModal(false)}>
