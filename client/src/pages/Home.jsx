@@ -45,7 +45,7 @@ const TOUR = [
   {
     selector: '[data-tour="home-proximas-doses"]',
     titulo: 'Próximas Doses',
-    texto: 'Aqui aparecem os gatos com vacinas ou medicamentos agendados nos próximos dias. Nunca perca uma dose!',
+    texto: 'Aqui aparecem as doses de gatos e pais reprodutores. Cada item mostra se a dose está no prazo, é para hoje, amanhã ou está atrasada. Toque para ir direto ao perfil.',
   },
 ];
 

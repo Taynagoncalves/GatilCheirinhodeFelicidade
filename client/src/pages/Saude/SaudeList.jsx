@@ -19,7 +19,7 @@ const TOUR = [
   {
     selector: '[data-tour="saude-calendario"]',
     titulo: 'Calendário de Doses',
-    texto: 'Veja as doses de cada mês no calendário. Os pontos coloridos indicam dias com doses — toque em um dia para ver os detalhes.',
+    texto: 'Veja todas as doses de gatos e pais no calendário. Pontos coloridos marcam os dias — vermelho para atrasada, laranja para hoje e verde para agendada. Toque em qualquer dia para ver os detalhes.',
   },
 ];
 
