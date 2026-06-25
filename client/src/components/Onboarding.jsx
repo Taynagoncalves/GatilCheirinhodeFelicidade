@@ -37,12 +37,13 @@ function useLoop(delays) {
 // ─── frame de celular premium ─────────────────────────────────────────────────
 function Phone({ headerBg = '#1a4d7c', title, icon, children }) {
   return (
-    <div style={{ filter: 'drop-shadow(0 22px 55px rgba(0,0,0,0.52))' }}>
+    <div style={{ transform: 'scale(1.28)', transformOrigin: 'center center' }}>
       <div style={{
         width: 188, height: 278,
         background: '#f0f4f8',
         borderRadius: 22, overflow: 'hidden',
         border: '2.5px solid rgba(255,255,255,0.55)',
+        boxShadow: '0 10px 40px rgba(0,0,0,0.45)',
         display: 'flex', flexDirection: 'column',
         position: 'relative',
       }}>
@@ -530,7 +531,14 @@ export default function Onboarding({ onDone }) {
 
   const avancar  = () => atual < SLIDES.length - 1 ? ir(atual + 1) : terminar();
   const voltar   = () => atual > 0 && ir(atual - 1);
-  const terminar = () => { localStorage.setItem('onboarding_visto', 'v2'); onDone(); };
+  const terminar = () => {
+    localStorage.setItem('onboarding_visto', 'v2');
+    // Impede tours automáticos em todas as telas — o onboarding já ensinou o app
+    ['home','saude','ninhadas','gatos','perfil'].forEach(k => {
+      if (!localStorage.getItem(`tour_${k}`)) localStorage.setItem(`tour_${k}`, '1');
+    });
+    onDone();
+  };
 
   const slide  = SLIDES[atual];
   const isFirst = atual === 0;
