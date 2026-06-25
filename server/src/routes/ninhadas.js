@@ -1,5 +1,6 @@
 const express = require('express');
 const pool = require('../db/pool');
+const { upload } = require('../config/cloudinary');
 
 const router = express.Router();
 
@@ -7,7 +8,7 @@ router.get('/', async (req, res) => {
   const { busca } = req.query;
   let sql = `
     SELECT n.id, n.nome, n.mae_id, n.pai_id, DATE_FORMAT(n.data_nascimento, '%Y-%m-%d') AS data_nascimento,
-           n.quantidade_filhotes, n.observacoes,
+           n.quantidade_filhotes, n.observacoes, n.foto_url,
            m.nome AS mae_nome, m.foto_url AS mae_foto, p.nome AS pai_nome
     FROM ninhadas n
     LEFT JOIN pais m ON n.mae_id = m.id
@@ -26,7 +27,7 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   const [rows] = await pool.query(
     `SELECT n.id, n.nome, n.mae_id, n.pai_id, DATE_FORMAT(n.data_nascimento, '%Y-%m-%d') AS data_nascimento,
-            n.quantidade_filhotes, n.observacoes,
+            n.quantidade_filhotes, n.observacoes, n.foto_url,
             m.nome AS mae_nome, m.foto_url AS mae_foto, p.nome AS pai_nome, p.foto_url AS pai_foto
      FROM ninhadas n
      LEFT JOIN pais m ON n.mae_id = m.id
@@ -39,22 +40,28 @@ router.get('/:id', async (req, res) => {
   res.json({ ...rows[0], filhotes });
 });
 
-router.post('/', async (req, res) => {
+router.post('/', upload.single('foto'), async (req, res) => {
   const { nome, mae_id, pai_id, data_nascimento, quantidade_filhotes, observacoes } = req.body;
+  const foto_url = req.file ? req.file.path : null;
   const [result] = await pool.query(
-    `INSERT INTO ninhadas (nome, mae_id, pai_id, data_nascimento, quantidade_filhotes, observacoes)
-     VALUES (?, ?, ?, ?, ?, ?)`,
-    [nome, mae_id || null, pai_id || null, data_nascimento || null, quantidade_filhotes || 0, observacoes || null]
+    `INSERT INTO ninhadas (nome, mae_id, pai_id, data_nascimento, quantidade_filhotes, observacoes, foto_url)
+     VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    [nome, mae_id || null, pai_id || null, data_nascimento || null, quantidade_filhotes || 0, observacoes || null, foto_url]
   );
   res.status(201).json({ id: result.insertId });
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', upload.single('foto'), async (req, res) => {
   const { nome, mae_id, pai_id, data_nascimento, quantidade_filhotes, observacoes } = req.body;
-  await pool.query(
-    'UPDATE ninhadas SET nome=?, mae_id=?, pai_id=?, data_nascimento=?, quantidade_filhotes=?, observacoes=? WHERE id=?',
-    [nome, mae_id || null, pai_id || null, data_nascimento || null, quantidade_filhotes || 0, observacoes || null, req.params.id]
-  );
+  const fields = [nome, mae_id || null, pai_id || null, data_nascimento || null, quantidade_filhotes || 0, observacoes || null];
+  let sql = 'UPDATE ninhadas SET nome=?, mae_id=?, pai_id=?, data_nascimento=?, quantidade_filhotes=?, observacoes=?';
+  if (req.file) {
+    fields.push(req.file.path);
+    sql += ', foto_url=?';
+  }
+  fields.push(req.params.id);
+  sql += ' WHERE id=?';
+  await pool.query(sql, fields);
   res.json({ ok: true });
 });
 

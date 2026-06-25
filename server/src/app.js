@@ -26,6 +26,7 @@ async function initDb() {
     `ALTER TABLE pais  ADD COLUMN peso DECIMAL(7,1) NULL`,
     `ALTER TABLE aplicacoes ADD COLUMN pai_id INT NULL`,
     `ALTER TABLE aplicacoes MODIFY COLUMN gato_id INT NULL`,
+    `ALTER TABLE ninhadas ADD COLUMN foto_url VARCHAR(500) NULL`,
   ]) {
     try { await pool.query(sql); } catch (e) { if (e.errno !== 1060 && e.errno !== 1054) throw e; }
   }
