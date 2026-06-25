@@ -9,7 +9,7 @@ router.get('/', async (req, res) => {
   let sql = `
     SELECT g.id, g.nome, g.cor, g.sexo, DATE_FORMAT(g.data_nascimento, '%Y-%m-%d') AS data_nascimento,
            g.ninhada_id, g.mae_id, g.pai_id, g.status, g.foto_url, g.observacoes, g.peso,
-           m.nome AS mae_nome, p.nome AS pai_nome, n.nome AS ninhada_nome,
+           m.nome AS mae_nome, m.foto_url AS mae_foto, p.nome AS pai_nome, p.foto_url AS pai_foto, n.nome AS ninhada_nome,
            (SELECT DATE_FORMAT(a.proxima_dose, '%Y-%m-%d')
             FROM aplicacoes a
             WHERE a.gato_id = g.id AND a.proxima_dose IS NOT NULL

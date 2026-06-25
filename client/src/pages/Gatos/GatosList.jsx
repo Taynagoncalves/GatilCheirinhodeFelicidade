@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Search, Plus, Cat, X, PawPrint, Users, Trash2, Cake, Weight, Layers } from 'lucide-react';
+import { Search, Plus, Cat, X, PawPrint, Users, Trash2, Cake, Weight, Layers, Calendar, MoreVertical, CheckCircle2, AlertCircle, Clock } from 'lucide-react';
 import Layout from '../../components/Layout';
 import EmptyState from '../../components/EmptyState';
 import ConfirmModal from '../../components/ConfirmModal';
@@ -156,97 +156,148 @@ export default function GatosList() {
       <div data-tour="gatos-lista" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         {gatos.map((g) => {
           const alerta = alerteDose(g.proxima_dose_min, g.proxima_medicamento_nome);
+          const statusDot = { disponivel: '#16a34a', reservado: '#d97706', vendido: '#dc2626', mantido: '#2563eb' }[g.status] || '#94a3b8';
+          const statusLabel = STATUS_OPTIONS.find((s) => s.value === g.status)?.label || g.status;
+
           return (
             <div key={g.id} onClick={() => navigate(`/gatos/${g.id}`)} style={{
-              background: '#fff', borderRadius: 16, padding: '12px 14px', cursor: 'pointer',
-              boxShadow: '0 2px 10px rgba(0,0,0,0.07)',
-              borderLeft: alerta ? `4px solid ${alerta.cor}` : '4px solid transparent',
+              background: '#fff', borderRadius: 16, padding: '12px', cursor: 'pointer',
+              boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
             }}>
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+              <div style={{ display: 'flex', gap: 12 }}>
 
-                {/* Foto circular */}
+                {/* Foto quadrada arredondada */}
                 {g.foto_url
-                  ? <img src={g.foto_url} alt={g.nome} style={{ width: 60, height: 60, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '2.5px solid #e8f0f8' }} />
-                  : <div style={{ width: 60, height: 60, borderRadius: '50%', background: 'linear-gradient(135deg, #dbeafe, #bfdbfe)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '2px solid #bfdbfe' }}>
-                      <Cat size={26} color="#1d4ed8" />
+                  ? <img src={g.foto_url} alt={g.nome} style={{ width: 76, height: 76, borderRadius: 12, objectFit: 'cover', flexShrink: 0 }} />
+                  : <div style={{ width: 76, height: 76, borderRadius: 12, background: 'linear-gradient(135deg, #dbeafe, #bfdbfe)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <Cat size={30} color="#1d4ed8" />
                     </div>
                 }
 
                 <div style={{ flex: 1, minWidth: 0 }}>
 
-                  {/* Nome + status + lixeira */}
+                  {/* Nome + status + ⋮ */}
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6 }}>
-                    <p style={{ margin: 0, fontWeight: 800, fontSize: '1rem', color: '#2d3748', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <p style={{ margin: 0, fontWeight: 800, fontSize: '1rem', color: '#1e293b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {g.nome || 'Sem nome'}
                     </p>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }} onClick={(e) => e.stopPropagation()}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }} onClick={(e) => e.stopPropagation()}>
                       <div style={{ position: 'relative' }}>
-                        <span
-                          className={`status-badge status-${g.status}`}
-                          style={{ cursor: 'pointer', fontSize: '0.7rem' }}
+                        <div
                           onClick={() => setStatusOpen(statusOpen === g.id ? null : g.id)}
+                          style={{ display: 'flex', alignItems: 'center', gap: 5, cursor: 'pointer', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 20, padding: '3px 10px 3px 8px' }}
                         >
-                          {STATUS_OPTIONS.find((s) => s.value === g.status)?.label || g.status} ▾
-                        </span>
+                          <span style={{ width: 7, height: 7, borderRadius: '50%', background: statusDot, flexShrink: 0 }} />
+                          <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#475569' }}>{statusLabel}</span>
+                        </div>
                         {statusOpen === g.id && (
                           <div style={{
                             position: 'absolute', top: '110%', right: 0, zIndex: 30,
-                            background: '#fff', border: '1px solid var(--color-border)',
-                            borderRadius: 10, boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
-                            minWidth: 148, overflow: 'hidden',
+                            background: '#fff', border: '1px solid #e2e8f0',
+                            borderRadius: 12, boxShadow: '0 4px 20px rgba(0,0,0,0.12)',
+                            minWidth: 152, overflow: 'hidden',
                           }}>
                             {STATUS_OPTIONS.map((s) => (
                               <div key={s.value} onClick={() => changeStatus(g.id, s.value)} style={{
                                 padding: '10px 14px', cursor: 'pointer', fontSize: '0.88rem',
+                                display: 'flex', alignItems: 'center', gap: 8,
                                 fontWeight: g.status === s.value ? 700 : 400,
                                 background: g.status === s.value ? '#f0f4ff' : 'transparent',
                               }}>
+                                <span style={{ width: 8, height: 8, borderRadius: '50%', background: { disponivel: '#16a34a', reservado: '#d97706', vendido: '#dc2626', mantido: '#2563eb' }[s.value], flexShrink: 0 }} />
                                 {s.label}
                               </div>
                             ))}
+                            <div style={{ borderTop: '1px solid #f1f5f9' }}>
+                              <div onClick={() => { setStatusOpen(null); setConfirmando(g); }} style={{ padding: '10px 14px', cursor: 'pointer', fontSize: '0.88rem', color: '#dc2626', display: 'flex', alignItems: 'center', gap: 8 }}>
+                                <Trash2 size={14} /> Excluir
+                              </div>
+                            </div>
                           </div>
                         )}
                       </div>
-                      <button className="icon-btn" style={{ color: 'var(--color-danger)' }}
-                        onClick={() => setConfirmando(g)}>
-                        <Trash2 size={16} />
+                      <button className="icon-btn" style={{ color: '#94a3b8', padding: 2 }}
+                        onClick={() => setStatusOpen(statusOpen === g.id ? null : g.id)}>
+                        <MoreVertical size={18} />
                       </button>
                     </div>
                   </div>
 
-                  {/* Badge de dose */}
-                  {alerta && (
-                    <span style={{
-                      display: 'inline-block', marginTop: 3,
-                      fontSize: '0.7rem', fontWeight: 700, color: alerta.cor,
-                      background: alerta.bg, borderRadius: 20, padding: '2px 8px',
-                      border: `1px solid ${alerta.cor}33`,
-                    }}>{alerta.label}</span>
-                  )}
+                  {/* Meta: data, idade, peso, ninhada */}
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px 12px', marginTop: 5 }}>
+                    {g.data_nascimento && (
+                      <span style={{ fontSize: '0.75rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: 3 }}>
+                        <Calendar size={11} color="#94a3b8" /> {g.data_nascimento.split('-').reverse().join('/')}
+                      </span>
+                    )}
+                    {g.data_nascimento && (
+                      <span style={{ fontSize: '0.75rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: 3 }}>
+                        <Cake size={11} color="#94a3b8" /> {calcularIdade(g.data_nascimento)}
+                      </span>
+                    )}
+                    {g.peso != null && (
+                      <span style={{ fontSize: '0.75rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: 3 }}>
+                        <Weight size={11} color="#94a3b8" /> {formatarPeso(g.peso)}
+                      </span>
+                    )}
+                    {g.ninhada_nome && (
+                      <span style={{ fontSize: '0.75rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: 3 }}>
+                        <Layers size={11} color="#94a3b8" /> {g.ninhada_nome}
+                      </span>
+                    )}
+                  </div>
 
-                  {/* Info compacta numa linha só */}
-                  {(g.data_nascimento || g.peso != null || g.ninhada_nome) && (
-                    <p style={{ margin: '5px 0 0', fontSize: '0.76rem', color: '#94a3b8', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '3px 6px' }}>
-                      {g.data_nascimento && <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}><Cake size={11} />{calcularIdade(g.data_nascimento)}</span>}
-                      {g.data_nascimento && (g.peso != null || g.ninhada_nome) && <span style={{ color: '#cbd5e1' }}>·</span>}
-                      {g.peso != null && <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}><Weight size={11} />{formatarPeso(g.peso)}</span>}
-                      {g.peso != null && g.ninhada_nome && <span style={{ color: '#cbd5e1' }}>·</span>}
-                      {g.ninhada_nome && <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}><Layers size={11} />{g.ninhada_nome}</span>}
-                    </p>
-                  )}
+                  {/* Pais + Dose card */}
+                  {(g.mae_nome || g.pai_nome || alerta) && (
+                    <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 8, marginTop: 8 }}>
 
-                  {/* Pai / Mãe como chips */}
-                  {(g.mae_nome || g.pai_nome) && (
-                    <div style={{ display: 'flex', gap: 5, marginTop: 6, flexWrap: 'wrap' }}>
-                      {g.mae_nome && (
-                        <span style={{ fontSize: '0.7rem', fontWeight: 600, color: '#7c3aed', background: '#f5f0ff', borderRadius: 20, padding: '2px 8px', border: '1px solid #ede9fe' }}>
-                          ♀ {g.mae_nome}
-                        </span>
+                      {/* Pais com foto */}
+                      {(g.mae_nome || g.pai_nome) && (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                          {g.mae_nome && (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                              <span style={{ fontSize: '0.65rem', color: '#94a3b8', fontWeight: 600, minWidth: 22 }}>Mãe</span>
+                              {g.mae_foto
+                                ? <img src={g.mae_foto} style={{ width: 20, height: 20, borderRadius: '50%', objectFit: 'cover', border: '1.5px solid #ede9fe' }} />
+                                : <div style={{ width: 20, height: 20, borderRadius: '50%', background: '#ede9fe', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Cat size={10} color="#7c3aed" /></div>
+                              }
+                              <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#7c3aed' }}>{g.mae_nome}</span>
+                            </div>
+                          )}
+                          {g.pai_nome && (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                              <span style={{ fontSize: '0.65rem', color: '#94a3b8', fontWeight: 600, minWidth: 22 }}>Pai</span>
+                              {g.pai_foto
+                                ? <img src={g.pai_foto} style={{ width: 20, height: 20, borderRadius: '50%', objectFit: 'cover', border: '1.5px solid #dbeafe' }} />
+                                : <div style={{ width: 20, height: 20, borderRadius: '50%', background: '#dbeafe', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Cat size={10} color="#1d4ed8" /></div>
+                              }
+                              <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#1d4ed8' }}>{g.pai_nome}</span>
+                            </div>
+                          )}
+                        </div>
                       )}
-                      {g.pai_nome && (
-                        <span style={{ fontSize: '0.7rem', fontWeight: 600, color: '#1d4ed8', background: '#eff6ff', borderRadius: 20, padding: '2px 8px', border: '1px solid #dbeafe' }}>
-                          ♂ {g.pai_nome}
-                        </span>
+
+                      {/* Mini card de dose */}
+                      {alerta && (
+                        <div style={{
+                          background: alerta.bg, borderRadius: 10, padding: '6px 10px',
+                          border: `1px solid ${alerta.cor}22`, flexShrink: 0, maxWidth: 148,
+                        }}>
+                          <p style={{ margin: 0, fontSize: '0.62rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 0.4 }}>Próx. medicamento</p>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 3 }}>
+                            {alerta.label.startsWith('Em dia') || alerta.label.startsWith('Amanhã')
+                              ? <CheckCircle2 size={12} color={alerta.cor} />
+                              : alerta.label.startsWith('Hoje') ? <Clock size={12} color={alerta.cor} />
+                              : <AlertCircle size={12} color={alerta.cor} />
+                            }
+                            <span style={{ fontSize: '0.72rem', fontWeight: 700, color: alerta.cor }}>
+                              {g.proxima_medicamento_nome || 'Medicamento'}
+                            </span>
+                          </div>
+                          <p style={{ margin: '2px 0 0', fontSize: '0.67rem', color: '#94a3b8' }}>
+                            Próxima: {g.proxima_dose_min?.split('-').reverse().join('/')}
+                          </p>
+                        </div>
                       )}
                     </div>
                   )}
