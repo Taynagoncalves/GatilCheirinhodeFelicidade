@@ -20,8 +20,8 @@ export default function NinhadaDetalhe() {
     <Layout title={ninhada.nome} showBack>
       <div className="card">
         <div className="card-row">
-          {ninhada.mae_foto ? (
-            <img src={ninhada.mae_foto} alt={ninhada.mae_nome} className="card-photo" />
+          {ninhada.foto_url ? (
+            <img src={ninhada.foto_url} alt={ninhada.nome} className="card-photo" />
           ) : (
             <span className="card-photo-placeholder"><Cat size={26} /></span>
           )}

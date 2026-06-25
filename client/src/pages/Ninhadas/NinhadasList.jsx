@@ -77,8 +77,8 @@ export default function NinhadasList() {
       {ninhadas.map((n) => (
         <div key={n.id} className="card" style={{ cursor: 'pointer' }} onClick={() => navigate(`/ninhadas/${n.id}`)}>
           <div className="card-row">
-            {n.mae_foto ? (
-              <img src={n.mae_foto} alt={n.mae_nome} className="card-photo" />
+            {n.foto_url ? (
+              <img src={n.foto_url} alt={n.nome} className="card-photo" />
             ) : (
               <span className="card-photo-placeholder"><Cat size={26} /></span>
             )}
