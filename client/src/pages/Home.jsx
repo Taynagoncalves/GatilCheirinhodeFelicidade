@@ -133,7 +133,7 @@ export default function Home() {
 
       {/* ── Ações rápidas ── */}
       <div data-tour="home-acoes" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-        <div onClick={() => setShowModal(true)} data-tour="home-btn-cadastrar" style={{
+        <div onClick={() => navigate('/gatos/novo')} data-tour="home-btn-cadastrar" style={{
           background: 'linear-gradient(145deg, #1a4d7c, #2f6690)',
           borderRadius: 16, padding: '16px 14px', cursor: 'pointer',
           boxShadow: '0 4px 16px rgba(26,77,124,0.28)',
