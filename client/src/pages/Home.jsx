@@ -84,24 +84,24 @@ export default function Home() {
 
       <div className="stats-grid" data-tour="home-stats">
         <div className="stat-card" data-tour="home-stat-gatos" style={{ cursor: 'pointer' }} onClick={() => navigate('/gatos')}>
-          <span className="stat-icon"><Cat size={18} /></span>
-          <span className="stat-value">{data?.total_gatos ?? '—'}</span>
-          <span className="stat-label">Gatos cadastrados</span>
+          <span className="stat-icon" style={{ background: '#dbeafe', color: '#1d4ed8' }}><Cat size={18} /></span>
+          <span className="stat-value" style={{ color: '#1d4ed8' }}>{data?.total_gatos ?? '—'}</span>
+          <span className="stat-label" style={{ color: '#1d4ed8' }}>Gatos cadastrados</span>
         </div>
         <div className="stat-card" data-tour="home-stat-ninhadas" style={{ cursor: 'pointer' }} onClick={() => navigate('/ninhadas')}>
-          <span className="stat-icon"><PawPrint size={18} /></span>
-          <span className="stat-value">{data?.total_ninhadas ?? '—'}</span>
-          <span className="stat-label">Ninhadas</span>
+          <span className="stat-icon" style={{ background: '#ede9fe', color: '#7c3aed' }}><PawPrint size={18} /></span>
+          <span className="stat-value" style={{ color: '#7c3aed' }}>{data?.total_ninhadas ?? '—'}</span>
+          <span className="stat-label" style={{ color: '#7c3aed' }}>Ninhadas</span>
         </div>
         <div className="stat-card" data-tour="home-reservados" style={{ cursor: 'pointer' }} onClick={() => navigate('/gatos?status=reservado')}>
-          <span className="stat-icon"><Users size={18} /></span>
-          <span className="stat-value">{data?.total_reservados ?? '—'}</span>
-          <span className="stat-label">Reservados</span>
+          <span className="stat-icon" style={{ background: '#fef3c7', color: '#d97706' }}><Users size={18} /></span>
+          <span className="stat-value" style={{ color: '#d97706' }}>{data?.total_reservados ?? '—'}</span>
+          <span className="stat-label" style={{ color: '#d97706' }}>Reservados</span>
         </div>
         <div className="stat-card" data-tour="home-vendidos" style={{ cursor: 'pointer' }} onClick={() => navigate('/gatos?status=vendido')}>
-          <span className="stat-icon"><PawPrint size={18} /></span>
-          <span className="stat-value">{data?.total_vendidos ?? '—'}</span>
-          <span className="stat-label">Vendidos</span>
+          <span className="stat-icon" style={{ background: '#dcfce7', color: '#16a34a' }}><PawPrint size={18} /></span>
+          <span className="stat-value" style={{ color: '#16a34a' }}>{data?.total_vendidos ?? '—'}</span>
+          <span className="stat-label" style={{ color: '#16a34a' }}>Vendidos</span>
         </div>
       </div>
 
