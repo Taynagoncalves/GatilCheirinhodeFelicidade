@@ -575,7 +575,7 @@ export default function FinanceiroList() {
   ];
 
   return (
-    <Layout title="Financeiro" hideNav>
+    <Layout title={ABAS[aba].label} hideNav>
       {/* Atalho voltar ao gatil */}
       <button onClick={() => navigate('/')} style={{
         display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4,
