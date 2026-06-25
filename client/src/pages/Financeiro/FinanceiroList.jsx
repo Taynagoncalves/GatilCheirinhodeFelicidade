@@ -576,6 +576,17 @@ export default function FinanceiroList() {
 
   return (
     <Layout title="Financeiro" hideNav>
+      {/* Atalho voltar ao gatil */}
+      <button onClick={() => navigate('/')} style={{
+        display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4,
+        background: 'linear-gradient(135deg, #f5f0ff, #ede9fe)',
+        border: '1px solid #ddd6fe', borderRadius: 20,
+        padding: '6px 14px', cursor: 'pointer',
+        color: '#7c3aed', fontSize: '0.75rem', fontWeight: 700,
+      }}>
+        <Cat size={14} /> Ir para o Gatil
+      </button>
+
       {aba === 0 && <TabResumo mes={mes} onMes={setMes} />}
       {aba === 1 && <TabLancamentos mes={mes} onMes={setMes} />}
       {aba === 2 && <TabHistorico onIrMes={irMes} />}
