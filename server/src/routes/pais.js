@@ -10,22 +10,15 @@ router.get('/', async (req, res) => {
     SELECT p.id, p.nome, p.sexo, p.raca, p.cor,
            DATE_FORMAT(p.data_nascimento, '%Y-%m-%d') AS data_nascimento,
            p.foto_url, p.observacoes, p.peso,
-           (SELECT DATE_FORMAT(MIN(a.proxima_dose), '%Y-%m-%d')
+           (SELECT DATE_FORMAT(a.proxima_dose, '%Y-%m-%d')
             FROM aplicacoes a
-            INNER JOIN (
-              SELECT medicamento_id, MAX(data_aplicada) AS ultima_data
-              FROM aplicacoes WHERE pai_id = p.id GROUP BY medicamento_id
-            ) ult ON a.medicamento_id = ult.medicamento_id AND a.data_aplicada = ult.ultima_data
-            WHERE a.pai_id = p.id AND a.proxima_dose IS NOT NULL) AS proxima_dose_min,
+            WHERE a.pai_id = p.id AND a.proxima_dose IS NOT NULL
+            ORDER BY a.id DESC LIMIT 1) AS proxima_dose_min,
            (SELECT med.nome
             FROM aplicacoes a
-            INNER JOIN (
-              SELECT medicamento_id, MAX(data_aplicada) AS ultima_data
-              FROM aplicacoes WHERE pai_id = p.id GROUP BY medicamento_id
-            ) ult ON a.medicamento_id = ult.medicamento_id AND a.data_aplicada = ult.ultima_data
             JOIN medicamentos med ON a.medicamento_id = med.id
             WHERE a.pai_id = p.id AND a.proxima_dose IS NOT NULL
-            ORDER BY a.proxima_dose ASC LIMIT 1) AS proxima_medicamento_nome
+            ORDER BY a.id DESC LIMIT 1) AS proxima_medicamento_nome
     FROM pais p WHERE 1=1`;
   const params = [];
   if (sexo) { sql += ' AND p.sexo = ?'; params.push(sexo); }

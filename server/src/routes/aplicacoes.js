@@ -43,15 +43,10 @@ router.get('/agenda', async (req, res) => {
     INNER JOIN (
       SELECT COALESCE(gato_id, pai_id) AS entidade_id,
              CASE WHEN gato_id IS NOT NULL THEN 'gato' ELSE 'pai' END AS entidade_tipo,
-             medicamento_id, MAX(data_aplicada) AS ultima_data
+             medicamento_id, MAX(id) AS ultimo_id
       FROM aplicacoes
       GROUP BY gato_id, pai_id, medicamento_id
-    ) ult ON a.medicamento_id = ult.medicamento_id
-          AND a.data_aplicada = ult.ultima_data
-          AND (
-            (a.gato_id IS NOT NULL AND a.gato_id = ult.entidade_id AND ult.entidade_tipo = 'gato') OR
-            (a.pai_id  IS NOT NULL AND a.pai_id  = ult.entidade_id AND ult.entidade_tipo = 'pai')
-          )
+    ) ult ON a.id = ult.ultimo_id
     LEFT JOIN gatos g ON a.gato_id = g.id
     LEFT JOIN pais p ON a.pai_id = p.id
     JOIN medicamentos med ON a.medicamento_id = med.id

@@ -18,10 +18,10 @@ router.get('/', async (req, res) => {
        JOIN gatos g ON a.gato_id = g.id
        JOIN medicamentos med ON a.medicamento_id = med.id
        JOIN (
-         SELECT gato_id, medicamento_id, MAX(data_aplicada) AS ultima
+         SELECT gato_id, medicamento_id, MAX(id) AS ultimo_id
          FROM aplicacoes WHERE gato_id IS NOT NULL
          GROUP BY gato_id, medicamento_id
-       ) lat ON a.gato_id = lat.gato_id AND a.medicamento_id = lat.medicamento_id AND a.data_aplicada = lat.ultima
+       ) lat ON a.id = lat.ultimo_id
        WHERE a.proxima_dose IS NOT NULL AND a.gato_id IS NOT NULL
        UNION ALL
        SELECT a.id, NULL AS gato_id, a.pai_id,
@@ -31,10 +31,10 @@ router.get('/', async (req, res) => {
        JOIN pais p ON a.pai_id = p.id
        JOIN medicamentos med ON a.medicamento_id = med.id
        JOIN (
-         SELECT pai_id, medicamento_id, MAX(data_aplicada) AS ultima
+         SELECT pai_id, medicamento_id, MAX(id) AS ultimo_id
          FROM aplicacoes WHERE pai_id IS NOT NULL
          GROUP BY pai_id, medicamento_id
-       ) lat ON a.pai_id = lat.pai_id AND a.medicamento_id = lat.medicamento_id AND a.data_aplicada = lat.ultima
+       ) lat ON a.id = lat.ultimo_id
        WHERE a.proxima_dose IS NOT NULL AND a.pai_id IS NOT NULL
      ) t
      ORDER BY proxima_dose ASC
