@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Search, Plus, Cat, X, PawPrint, Users, Trash2 } from 'lucide-react';
+import { Search, Plus, Cat, X, PawPrint, Users, Trash2, Calendar, Cake, Weight, Layers } from 'lucide-react';
 import Layout from '../../components/Layout';
 import EmptyState from '../../components/EmptyState';
 import ConfirmModal from '../../components/ConfirmModal';
@@ -220,23 +220,23 @@ export default function GatosList() {
                   {/* Grade de info: data, idade, peso, ninhada */}
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3px 12px', marginTop: 6 }}>
                     {g.data_nascimento && (
-                      <span style={{ fontSize: '0.78rem', color: '#718096', display: 'flex', alignItems: 'center', gap: 3 }}>
-                        📅 {g.data_nascimento.split('-').reverse().join('/')}
+                      <span style={{ fontSize: '0.78rem', color: '#718096', display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <Calendar size={12} /> {g.data_nascimento.split('-').reverse().join('/')}
                       </span>
                     )}
                     {g.data_nascimento && (
-                      <span style={{ fontSize: '0.78rem', color: '#718096', display: 'flex', alignItems: 'center', gap: 3 }}>
-                        🎂 {calcularIdade(g.data_nascimento)}
+                      <span style={{ fontSize: '0.78rem', color: '#718096', display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <Cake size={12} /> {calcularIdade(g.data_nascimento)}
                       </span>
                     )}
                     {g.peso != null && (
-                      <span style={{ fontSize: '0.78rem', color: '#718096', display: 'flex', alignItems: 'center', gap: 3 }}>
-                        ⚖️ {formatarPeso(g.peso)}
+                      <span style={{ fontSize: '0.78rem', color: '#718096', display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <Weight size={12} /> {formatarPeso(g.peso)}
                       </span>
                     )}
                     {g.ninhada_nome && (
-                      <span style={{ fontSize: '0.78rem', color: '#718096', display: 'flex', alignItems: 'center', gap: 3 }}>
-                        🐣 {g.ninhada_nome}
+                      <span style={{ fontSize: '0.78rem', color: '#718096', display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <Layers size={12} /> {g.ninhada_nome}
                       </span>
                     )}
                   </div>
