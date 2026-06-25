@@ -49,6 +49,15 @@ const TOUR = [
   },
 ];
 
+function statusDose(dataStr) {
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const diff = Math.round((new Date(dataStr + 'T00:00:00') - hoje) / 86400000);
+  if (diff < 0) return { texto: 'Atrasada', cor: '#d9534f', bg: '#fdecea' };
+  if (diff === 0) return { texto: 'Hoje', cor: '#e6900a', bg: '#fef3e2' };
+  if (diff === 1) return { texto: 'Amanhã', cor: '#2f6690', bg: '#eaf3fb' };
+  return { texto: `Em ${diff} dias`, cor: '#3a9e68', bg: '#edf7f1' };
+}
+
 export default function Home() {
   const navigate = useNavigate();
   const [data, setData] = useState(null);
@@ -112,19 +121,28 @@ export default function Home() {
         )}
         {data?.proximas_doses.length > 0 && (
           <ul style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {data.proximas_doses.map((d) => (
-              <li key={d.id} className="list-row">
-                {d.gato_foto ? (
-                  <img src={d.gato_foto} alt={d.gato_nome} className="card-photo" style={{ width: 48, height: 48 }} />
-                ) : (
-                  <span className="card-photo-placeholder" style={{ width: 48, height: 48 }}><Cat size={20} /></span>
-                )}
-                <div>
-                  <p className="card-title" style={{ fontSize: '0.95rem' }}>{d.gato_nome || 'Sem nome'}</p>
-                  <p className="card-meta">{d.medicamento_nome} · próxima: {d.proxima_dose.split('-').reverse().join('/')}</p>
-                </div>
-              </li>
-            ))}
+            {data.proximas_doses.map((d) => {
+              const { texto, cor, bg } = statusDose(d.proxima_dose);
+              return (
+                <li key={`${d.gato_id ?? 'p'}-${d.id}`} className="list-row" style={{ cursor: 'pointer' }}
+                  onClick={() => d.gato_id ? navigate(`/gatos/${d.gato_id}`) : navigate(`/pais/${d.pai_id}`)}>
+                  {d.gato_foto ? (
+                    <img src={d.gato_foto} alt={d.gato_nome} className="card-photo" style={{ width: 48, height: 48 }} />
+                  ) : (
+                    <span className="card-photo-placeholder" style={{ width: 48, height: 48 }}><Cat size={20} /></span>
+                  )}
+                  <div style={{ flex: 1 }}>
+                    <p className="card-title" style={{ fontSize: '0.95rem' }}>{d.gato_nome || 'Sem nome'}</p>
+                    <p className="card-meta">{d.medicamento_nome} · {d.proxima_dose.split('-').reverse().join('/')}</p>
+                  </div>
+                  <span style={{
+                    fontSize: '0.72rem', fontWeight: 700, color: cor,
+                    background: bg, borderRadius: 20, padding: '4px 10px',
+                    whiteSpace: 'nowrap', border: `1px solid ${cor}44`, flexShrink: 0,
+                  }}>{texto}</span>
+                </li>
+              );
+            })}
           </ul>
         )}
       </section>
