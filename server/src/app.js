@@ -51,6 +51,17 @@ async function initDb() {
       criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `);
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS clientes (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      nome VARCHAR(200) NOT NULL,
+      telefone VARCHAR(30),
+      cidade VARCHAR(100),
+      gato_id INT NULL,
+      data_venda DATE,
+      criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
 }
 initDb().catch((e) => console.error('initDb error:', e));
 
@@ -68,6 +79,7 @@ app.use('/api/aplicacoes', require('./routes/aplicacoes'));
 app.use('/api/push', require('./routes/push'));
 app.use('/api/notificacoes', require('./routes/notificacoes'));
 app.use('/api/financeiro', require('./routes/financeiro'));
+app.use('/api/clientes', require('./routes/clientes'));
 
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 
