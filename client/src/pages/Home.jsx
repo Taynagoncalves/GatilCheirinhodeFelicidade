@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Cat, PawPrint, Plus, CalendarClock, X, Users, Wallet, Syringe, TrendingUp, TrendingDown, CalendarDays, ChevronRight, Heart } from 'lucide-react';
+import { Cat, PawPrint, Plus, CalendarClock, X, Users, Wallet, TrendingUp, TrendingDown, CalendarDays, ChevronRight, Heart, ShoppingBag } from 'lucide-react';
 import Layout from '../components/Layout';
 import EmptyState from '../components/EmptyState';
 import { usePush } from '../hooks/usePush';
@@ -110,7 +110,7 @@ export default function Home() {
           { nome: 'Gatos', sub: 'Cadastrados', value: data?.total_gatos, icon: <Cat size={22} />, cor: '#1d4ed8', iconBg: '#dbeafe', tour: 'home-stat-gatos', route: '/gatos' },
           { nome: 'Ninhadas', sub: 'Registradas', value: data?.total_ninhadas, icon: <PawPrint size={22} />, cor: '#7c3aed', iconBg: '#ede9fe', tour: 'home-stat-ninhadas', route: '/ninhadas' },
           { nome: 'Reservados', sub: '', value: data?.total_reservados, icon: <Heart size={22} />, cor: '#d97706', iconBg: '#fef3c7', tour: 'home-reservados', route: '/gatos?status=reservado' },
-          { nome: 'Vendidos', sub: '', value: data?.total_vendidos, icon: <Syringe size={22} />, cor: '#16a34a', iconBg: '#dcfce7', tour: 'home-vendidos', route: '/gatos?status=vendido' },
+          { nome: 'Vendidos', sub: '', value: data?.total_vendidos, icon: <ShoppingBag size={22} />, cor: '#16a34a', iconBg: '#dcfce7', tour: 'home-vendidos', route: '/gatos?status=vendido' },
         ].map((s) => (
           <div key={s.nome} data-tour={s.tour} onClick={() => navigate(s.route)} style={{
             background: '#fff', borderRadius: 16, padding: '14px 12px 12px', cursor: 'pointer',
