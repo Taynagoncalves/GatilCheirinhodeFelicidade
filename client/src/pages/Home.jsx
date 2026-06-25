@@ -163,73 +163,96 @@ export default function Home() {
       </div>
 
       {/* ── Painel Financeiro ── */}
-      <div data-tour="home-saldo" style={{ borderRadius: 20, overflow: 'hidden', boxShadow: '0 4px 20px rgba(26,77,124,0.18)' }}>
-        {/* Cabeçalho gradiente */}
-        <div style={{ background: 'linear-gradient(135deg, #1a4d7c, #2f6690)', padding: '16px 16px 20px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+      <div data-tour="home-saldo" style={{ borderRadius: 22, overflow: 'hidden', boxShadow: '0 8px 32px rgba(17,60,100,0.22)' }}>
+
+        {/* Hero gradiente */}
+        <div style={{ background: 'linear-gradient(145deg, #0f3460 0%, #1a5276 50%, #2980b9 100%)', padding: '20px 18px 0', position: 'relative', overflow: 'hidden' }}>
+          {/* Círculos decorativos de fundo */}
+          <div style={{ position: 'absolute', top: -30, right: -30, width: 120, height: 120, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
+          <div style={{ position: 'absolute', top: 20, right: 30, width: 60, height: 60, borderRadius: '50%', background: 'rgba(255,255,255,0.07)' }} />
+
+          {/* Header: título + botão */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18, position: 'relative' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(255,255,255,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Wallet size={18} color="#fff" />
+              <div style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(255,255,255,0.2)' }}>
+                <Wallet size={20} color="#fff" />
               </div>
               <div>
-                <p style={{ margin: 0, fontSize: '0.88rem', fontWeight: 800, color: '#fff' }}>Painel Financeiro</p>
-                <p style={{ margin: 0, fontSize: '0.68rem', color: 'rgba(255,255,255,0.65)' }}>Este mês</p>
+                <p style={{ margin: 0, fontSize: '0.95rem', fontWeight: 800, color: '#fff', letterSpacing: -0.3 }}>Painel Financeiro</p>
+                <p style={{ margin: 0, fontSize: '0.7rem', color: 'rgba(255,255,255,0.6)' }}>Visão geral do mês</p>
               </div>
             </div>
             <button onClick={() => navigate('/financeiro')} style={{
-              background: 'rgba(255,255,255,0.18)', border: 'none', borderRadius: 20,
-              padding: '5px 12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5,
+              background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)',
+              borderRadius: 20, padding: '6px 14px', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', gap: 4,
               color: '#fff', fontSize: '0.72rem', fontWeight: 700,
+              backdropFilter: 'blur(8px)',
             }}>
-              Ir ao painel <ChevronRight size={14} />
+              Abrir <ChevronRight size={13} />
             </button>
           </div>
-          {/* Saldo */}
+
+          {/* Saldo principal */}
           {data && (
-            <div>
-              <p style={{ margin: '0 0 2px', fontSize: '0.7rem', color: 'rgba(255,255,255,0.6)', fontWeight: 500 }}>Saldo do mês</p>
-              <p style={{ margin: '0 0 12px', fontSize: '2rem', fontWeight: 900, color: '#fff', lineHeight: 1 }}>{fmt(data.fin_saldo)}</p>
-              <div style={{ display: 'flex', gap: 10 }}>
-                <div style={{ flex: 1, background: 'rgba(255,255,255,0.12)', borderRadius: 12, padding: '8px 12px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 2 }}>
-                    <TrendingUp size={13} color="#4ade80" />
-                    <span style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.75)', fontWeight: 600 }}>Entradas</span>
+            <>
+              <div style={{ marginBottom: 18, position: 'relative' }}>
+                <p style={{ margin: '0 0 4px', fontSize: '0.72rem', color: 'rgba(255,255,255,0.55)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.8 }}>Saldo do mês</p>
+                <p style={{ margin: 0, fontSize: '2.2rem', fontWeight: 900, color: '#fff', lineHeight: 1, letterSpacing: -1 }}>{fmt(data.fin_saldo)}</p>
+              </div>
+
+              {/* Cards entradas/saídas — meia lua na base */}
+              <div style={{ display: 'flex', gap: 10, position: 'relative', zIndex: 1 }}>
+                <div style={{ flex: 1, background: 'rgba(74,222,128,0.12)', border: '1px solid rgba(74,222,128,0.25)', borderRadius: '14px 14px 0 0', padding: '10px 14px 16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 4 }}>
+                    <div style={{ width: 22, height: 22, borderRadius: '50%', background: 'rgba(74,222,128,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <TrendingUp size={12} color="#4ade80" />
+                    </div>
+                    <span style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>Entradas</span>
                   </div>
-                  <p style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800, color: '#4ade80' }}>{fmt(data.fin_entradas)}</p>
+                  <p style={{ margin: 0, fontSize: '1rem', fontWeight: 900, color: '#4ade80' }}>{fmt(data.fin_entradas)}</p>
                 </div>
-                <div style={{ flex: 1, background: 'rgba(255,255,255,0.12)', borderRadius: 12, padding: '8px 12px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 2 }}>
-                    <TrendingDown size={13} color="#fca5a5" />
-                    <span style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.75)', fontWeight: 600 }}>Saídas</span>
+                <div style={{ flex: 1, background: 'rgba(252,165,165,0.12)', border: '1px solid rgba(252,165,165,0.25)', borderRadius: '14px 14px 0 0', padding: '10px 14px 16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 4 }}>
+                    <div style={{ width: 22, height: 22, borderRadius: '50%', background: 'rgba(252,165,165,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <TrendingDown size={12} color="#fca5a5" />
+                    </div>
+                    <span style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>Saídas</span>
                   </div>
-                  <p style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800, color: '#fca5a5' }}>{fmt(data.fin_saidas)}</p>
+                  <p style={{ margin: 0, fontSize: '1rem', fontWeight: 900, color: '#fca5a5' }}>{fmt(data.fin_saidas)}</p>
                 </div>
               </div>
-            </div>
+            </>
           )}
         </div>
-        {/* Recursos do painel */}
-        <div style={{ background: '#fff', padding: '14px 16px' }}>
-          <p style={{ margin: '0 0 10px', fontSize: '0.72rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 0.5 }}>O que você pode fazer</p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+
+        {/* Seção de recursos */}
+        <div style={{ background: '#fff' }}>
+          <div style={{ padding: '16px 18px 4px', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ flex: 1, height: 1, background: '#f1f5f9' }} />
+            <span style={{ fontSize: '0.68rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 1, whiteSpace: 'nowrap' }}>Recursos disponíveis</span>
+            <div style={{ flex: 1, height: 1, background: '#f1f5f9' }} />
+          </div>
+
+          <div style={{ padding: '6px 12px 14px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
             {[
-              { icon: <TrendingUp size={15} color="#16a34a" />, bg: '#dcfce7', titulo: 'Registrar entradas', sub: 'Venda de filhotes e outros recebimentos' },
-              { icon: <TrendingDown size={15} color="#dc2626" />, bg: '#fee2e2', titulo: 'Controlar saídas', sub: 'Ração, veterinário, vacinas e mais' },
-              { icon: <BarChart3 size={15} color="#1d4ed8" />, bg: '#dbeafe', titulo: 'Ver relatórios', sub: 'Gráficos e histórico por mês' },
-              { icon: <Users size={15} color="#7c3aed" />, bg: '#f5f0ff', titulo: 'Gerenciar clientes', sub: 'Compradores, reservas e contatos' },
+              { icon: <TrendingUp size={16} color="#16a34a" />, bg: 'linear-gradient(135deg,#f0fdf4,#dcfce7)', border: '#bbf7d0', titulo: 'Entradas', sub: 'Registrar recebimentos' },
+              { icon: <TrendingDown size={16} color="#dc2626" />, bg: 'linear-gradient(135deg,#fff5f5,#fee2e2)', border: '#fecaca', titulo: 'Saídas', sub: 'Ração, vet e mais' },
+              { icon: <BarChart3 size={16} color="#1d4ed8" />, bg: 'linear-gradient(135deg,#eff6ff,#dbeafe)', border: '#bfdbfe', titulo: 'Relatórios', sub: 'Gráficos por mês' },
+              { icon: <Users size={16} color="#7c3aed" />, bg: 'linear-gradient(135deg,#faf5ff,#f3e8ff)', border: '#e9d5ff', titulo: 'Clientes', sub: 'Compradores e reservas' },
             ].map((item) => (
               <div key={item.titulo} onClick={() => navigate('/financeiro')} style={{
-                display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer',
-                padding: '6px 8px', borderRadius: 10,
+                background: item.bg, border: `1px solid ${item.border}`,
+                borderRadius: 14, padding: '12px 12px', cursor: 'pointer',
+                display: 'flex', flexDirection: 'column', gap: 8,
               }}>
-                <div style={{ width: 32, height: 32, borderRadius: 10, background: item.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <div style={{ width: 34, height: 34, borderRadius: 10, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
                   {item.icon}
                 </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ margin: 0, fontSize: '0.8rem', fontWeight: 700, color: '#1e293b' }}>{item.titulo}</p>
-                  <p style={{ margin: 0, fontSize: '0.68rem', color: '#94a3b8' }}>{item.sub}</p>
+                <div>
+                  <p style={{ margin: 0, fontSize: '0.8rem', fontWeight: 800, color: '#1e293b' }}>{item.titulo}</p>
+                  <p style={{ margin: '1px 0 0', fontSize: '0.66rem', color: '#64748b', lineHeight: 1.3 }}>{item.sub}</p>
                 </div>
-                <ChevronRight size={14} color="#cbd5e1" />
               </div>
             ))}
           </div>
