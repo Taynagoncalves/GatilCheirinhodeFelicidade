@@ -21,6 +21,9 @@ router.post('/', async (req, res) => {
     `INSERT INTO clientes (nome, telefone, cidade, gato_id, data_venda) VALUES (?, ?, ?, ?, ?)`,
     [nome, telefone || null, cidade || null, gato_id || null, data_venda || null]
   );
+  if (gato_id) {
+    await pool.query(`UPDATE gatos SET status = 'vendido' WHERE id = ?`, [gato_id]);
+  }
   res.status(201).json({ id: result.insertId });
 });
 
@@ -30,6 +33,9 @@ router.put('/:id', async (req, res) => {
     `UPDATE clientes SET nome=?, telefone=?, cidade=?, gato_id=?, data_venda=? WHERE id=?`,
     [nome, telefone || null, cidade || null, gato_id || null, data_venda || null, req.params.id]
   );
+  if (gato_id) {
+    await pool.query(`UPDATE gatos SET status = 'vendido' WHERE id = ?`, [gato_id]);
+  }
   res.json({ ok: true });
 });
 
