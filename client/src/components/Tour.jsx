@@ -30,13 +30,28 @@ export default function Tour({ steps, passo, onNext, onPrev, onClose }) {
   if (!step) return null;
 
   const wh = window.innerHeight;
-  const elCenter = rect ? rect.top + rect.height / 2 : wh * 0.4;
-  const abaixo   = !rect || elCenter < wh * 0.44;
+  const TOOLTIP_H = 240; // altura estimada do tooltip
+  const GAP = 12;
 
   let pos = {};
-  if (!rect)       pos = { top: '50%', transform: 'translateX(-50%) translateY(-50%)' };
-  else if (abaixo) pos = { top: rect.top + rect.height + 14, transform: 'translateX(-50%)' };
-  else             pos = { bottom: wh - rect.top + 14,       transform: 'translateX(-50%)' };
+  if (!rect) {
+    pos = { top: '50%', transform: 'translateX(-50%) translateY(-50%)' };
+  } else {
+    const topSeAbaixo  = rect.top + rect.height + GAP;
+    const topSeAcima   = rect.top - GAP - TOOLTIP_H;
+    const cabeAbaixo   = topSeAbaixo + TOOLTIP_H < wh - 80; // 80 = bottom nav
+    const cabeAcima    = topSeAcima > 8;
+    const elCenter     = rect.top + rect.height / 2;
+    const prefAbaixo   = elCenter < wh * 0.44;
+
+    if ((prefAbaixo && cabeAbaixo) || !cabeAcima) {
+      // abaixo — clampado para não sair da tela
+      pos = { top: Math.min(topSeAbaixo, wh - TOOLTIP_H - 85), transform: 'translateX(-50%)' };
+    } else {
+      // acima — clampado para não sair pelo topo
+      pos = { top: Math.max(topSeAcima, 8), transform: 'translateX(-50%)' };
+    }
+  }
 
   return (
     <>
