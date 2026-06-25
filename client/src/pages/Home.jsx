@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Cat, PawPrint, Plus, CalendarClock, X, Users, Wallet } from 'lucide-react';
+import { Cat, PawPrint, Plus, CalendarClock, X, Users, Wallet, Syringe, TrendingUp, TrendingDown, CalendarDays } from 'lucide-react';
 import Layout from '../components/Layout';
 import EmptyState from '../components/EmptyState';
 import { usePush } from '../hooks/usePush';
@@ -13,34 +13,24 @@ const TOUR = [
     texto: 'Esta é a tela principal do seu gatil. Aqui você tem um resumo completo de tudo. Toque em "Próximo" para descobrir cada recurso.',
   },
   {
+    selector: '[data-tour="home-saudacao"]',
+    titulo: 'Saudação do Dia',
+    texto: 'Aqui aparece uma saudação personalizada com a data de hoje — para começar o dia com carinho! 🐱',
+  },
+  {
     selector: '[data-tour="home-stats"]',
     titulo: 'Cards de Resumo',
     texto: 'Todos os cards são clicáveis! Toque em qualquer um para ir direto à tela correspondente — gatos, ninhadas, reservados ou vendidos.',
   },
   {
-    selector: '[data-tour="home-stat-gatos"]',
-    titulo: 'Gatos Cadastrados',
-    texto: 'Toque aqui para ir à lista completa de todos os gatos do gatil.',
+    selector: '[data-tour="home-acoes"]',
+    titulo: 'Ações Rápidas',
+    texto: 'Cadastre um novo filhote ou acesse os pais reprodutores com um toque.',
   },
   {
-    selector: '[data-tour="home-stat-ninhadas"]',
-    titulo: 'Ninhadas',
-    texto: 'Toque aqui para acessar a lista de ninhadas registradas.',
-  },
-  {
-    selector: '[data-tour="home-reservados"]',
-    titulo: 'Gatos Reservados',
-    texto: 'Toque para listar apenas os gatos com status "Reservado".',
-  },
-  {
-    selector: '[data-tour="home-vendidos"]',
-    titulo: 'Gatos Vendidos',
-    texto: 'Toque para ver todos os gatos que já foram vendidos.',
-  },
-  {
-    selector: '[data-tour="home-btn-cadastrar"]',
-    titulo: 'Cadastrar Gato',
-    texto: 'Use este botão para adicionar um novo filhote ao gatil ou acessar a lista de pais reprodutores.',
+    selector: '[data-tour="home-saldo"]',
+    titulo: 'Resumo Financeiro',
+    texto: 'Veja o saldo do mês atual rapidamente sem precisar abrir o Financeiro.',
   },
   {
     selector: '[data-tour="home-proximas-doses"]',
@@ -48,6 +38,20 @@ const TOUR = [
     texto: 'Aqui aparecem as doses de gatos e pais reprodutores. Cada item mostra se a dose está no prazo, é para hoje, amanhã ou está atrasada. Toque para ir direto ao perfil.',
   },
 ];
+
+function saudacao() {
+  const h = new Date().getHours();
+  if (h < 12) return { texto: 'Bom dia', emoji: '☀️' };
+  if (h < 18) return { texto: 'Boa tarde', emoji: '🌤️' };
+  return { texto: 'Boa noite', emoji: '🌙' };
+}
+
+function dataHoje() {
+  const d = new Date();
+  const dias = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
+  const meses = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+  return `${dias[d.getDay()]}, ${d.getDate()} de ${meses[d.getMonth()]}`;
+}
 
 function statusDose(dataStr) {
   const hoje = new Date(); hoje.setHours(0,0,0,0);
@@ -57,6 +61,8 @@ function statusDose(dataStr) {
   if (diff === 1) return { texto: 'Amanhã', cor: '#2f6690', bg: '#eaf3fb' };
   return { texto: `Em ${diff} dias`, cor: '#3a9e68', bg: '#edf7f1' };
 }
+
+function fmt(v) { return Number(v).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
 
 export default function Home() {
   const navigate = useNavigate();
@@ -74,14 +80,31 @@ export default function Home() {
     return () => setSteps([]);
   }, []);
 
+  const { texto: saud, emoji } = saudacao();
+
   return (
     <Layout title="Cheirinho de Felicidade" subtitle="Organização e Controle dos Gatos" showNotification>
-      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-        <button onClick={() => navigate('/financeiro')} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5, fontSize: '0.8rem', color: 'var(--color-text-muted)', padding: '4px 0' }}>
-          <Wallet size={14} /> Ir para o Financeiro
-        </button>
+
+      {/* ── Saudação ── */}
+      <div data-tour="home-saudacao" style={{
+        background: 'linear-gradient(135deg, #1a4d7c, #2f6690)',
+        borderRadius: 16, padding: '14px 16px',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      }}>
+        <div>
+          <p style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: '#fff' }}>
+            {saud}, Lidia! {emoji}
+          </p>
+          <p style={{ margin: '3px 0 0', fontSize: '0.78rem', color: 'rgba(255,255,255,0.75)' }}>
+            {dataHoje()}
+          </p>
+        </div>
+        <div style={{ width: 44, height: 44, background: 'rgba(255,255,255,0.15)', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Cat size={22} color="#fff" />
+        </div>
       </div>
 
+      {/* ── Stats ── */}
       <div className="stats-grid" data-tour="home-stats">
         <div className="stat-card" data-tour="home-stat-gatos" style={{ cursor: 'pointer' }} onClick={() => navigate('/gatos')}>
           <span className="stat-icon" style={{ background: '#dbeafe', color: '#1d4ed8' }}><Cat size={18} /></span>
@@ -105,17 +128,84 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="quick-actions">
-        <button className="btn btn-primary" data-tour="home-btn-cadastrar" onClick={() => setShowModal(true)}>
-          <Plus size={18} /> Cadastrar Gato
-        </button>
-        <button className="btn btn-secondary" onClick={() => navigate('/pais')}>
-          <Users size={18} /> Ver Pais
-        </button>
+      {/* ── Ações rápidas (cards visuais) ── */}
+      <div data-tour="home-acoes" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+        <div onClick={() => setShowModal(true)} data-tour="home-btn-cadastrar" style={{
+          background: 'linear-gradient(135deg, #1a4d7c, #2f6690)',
+          borderRadius: 14, padding: '16px 12px', cursor: 'pointer',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
+          boxShadow: '0 4px 14px rgba(26,77,124,0.25)',
+        }}>
+          <div style={{ width: 42, height: 42, background: 'rgba(255,255,255,0.18)', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Plus size={22} color="#fff" />
+          </div>
+          <span style={{ color: '#fff', fontWeight: 700, fontSize: '0.82rem', textAlign: 'center' }}>Cadastrar Gato</span>
+        </div>
+
+        <div onClick={() => navigate('/pais')} style={{
+          background: 'linear-gradient(135deg, #5b21b6, #7c3aed)',
+          borderRadius: 14, padding: '16px 12px', cursor: 'pointer',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
+          boxShadow: '0 4px 14px rgba(124,58,237,0.25)',
+        }}>
+          <div style={{ width: 42, height: 42, background: 'rgba(255,255,255,0.18)', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Users size={22} color="#fff" />
+          </div>
+          <span style={{ color: '#fff', fontWeight: 700, fontSize: '0.82rem', textAlign: 'center' }}>Ver Pais</span>
+        </div>
       </div>
 
+      {/* ── Mini card financeiro ── */}
+      {data && (
+        <div data-tour="home-saldo" onClick={() => navigate('/financeiro')} style={{
+          background: 'linear-gradient(135deg, #4c1d95, #6d28d9)',
+          borderRadius: 16, padding: '14px 16px', cursor: 'pointer',
+          boxShadow: '0 4px 14px rgba(109,40,217,0.25)',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Wallet size={16} color="rgba(255,255,255,0.85)" />
+              <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: '0.78rem', fontWeight: 700 }}>Financeiro · este mês</span>
+            </div>
+            <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.72rem' }}>Ver mais →</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+            <div>
+              <p style={{ margin: 0, fontSize: '0.68rem', color: 'rgba(255,255,255,0.65)' }}>Saldo</p>
+              <p style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: '#fff' }}>{fmt(data.fin_saldo)}</p>
+            </div>
+            <div style={{ display: 'flex', gap: 14 }}>
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 4, justifyContent: 'flex-end' }}>
+                  <TrendingUp size={12} color="#86efac" />
+                  <span style={{ fontSize: '0.65rem', color: '#86efac', fontWeight: 700 }}>Entradas</span>
+                </div>
+                <p style={{ margin: 0, fontSize: '0.82rem', fontWeight: 700, color: '#fff' }}>{fmt(data.fin_entradas)}</p>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 4, justifyContent: 'flex-end' }}>
+                  <TrendingDown size={12} color="#fca5a5" />
+                  <span style={{ fontSize: '0.65rem', color: '#fca5a5', fontWeight: 700 }}>Saídas</span>
+                </div>
+                <p style={{ margin: 0, fontSize: '0.82rem', fontWeight: 700, color: '#fff' }}>{fmt(data.fin_saidas)}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Próximas doses ── */}
       <section data-tour="home-proximas-doses">
-        <h2 className="section-title">Próximas doses</h2>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+          <h2 className="section-title" style={{ margin: 0 }}>Próximas doses</h2>
+          <button onClick={() => navigate('/saude')} style={{
+            background: 'none', border: 'none', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', gap: 4,
+            fontSize: '0.78rem', color: 'var(--color-primary)', fontWeight: 600, padding: 0,
+          }}>
+            <CalendarDays size={14} /> Ver calendário
+          </button>
+        </div>
         {data && data.proximas_doses.length === 0 && (
           <EmptyState icon={CalendarClock} title="Nenhuma dose agendada" description="As próximas doses cadastradas aparecerão aqui." />
         )}
