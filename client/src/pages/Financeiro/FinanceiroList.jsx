@@ -387,52 +387,64 @@ function TabClientes() {
         <EmptyState icon={Users} title="Nenhum cliente cadastrado" description="Cadastre os compradores dos filhotes aqui." />
       )}
 
-      {clientes.map((c) => (
-        <div key={c.id} style={{
-          background: '#fff', borderRadius: 14, marginBottom: 10,
-          boxShadow: '0 2px 10px rgba(0,0,0,0.08)',
-          borderLeft: '4px solid #7c3aed', overflow: 'hidden',
-        }}>
-          <div style={{ padding: '12px 14px', display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-            <div style={{
-              width: 42, height: 42, borderRadius: 12, flexShrink: 0,
-              background: 'linear-gradient(135deg, #5b21b6, #7c3aed)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              <Users size={20} color="#fff" />
-            </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ margin: 0, fontWeight: 700, fontSize: '1rem', color: '#2d3748' }}>{c.nome}</p>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 14px', marginTop: 5 }}>
-                {c.telefone && (
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.8rem', color: '#4a5568' }}>
-                    <Phone size={12} color="#7c3aed" /> {c.telefone}
-                  </span>
-                )}
-                {c.cidade && (
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.8rem', color: '#4a5568' }}>
-                    <MapPin size={12} color="#7c3aed" /> {c.cidade}
-                  </span>
-                )}
-                {c.gato_nome && (
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.8rem', color: '#4a5568' }}>
-                    <Cat size={12} color="#7c3aed" /> {c.gato_nome}
-                  </span>
-                )}
-                {c.data_venda && (
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.8rem', color: '#4a5568' }}>
-                    <CalendarDays size={12} color="#7c3aed" /> {c.data_venda.split('-').reverse().join('/')}
-                  </span>
+      {clientes.map((c) => {
+        const iniciais = c.nome.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase();
+        return (
+          <div key={c.id} style={{
+            background: '#fff', borderRadius: 16, marginBottom: 10,
+            boxShadow: '0 2px 12px rgba(0,0,0,0.07)', padding: '14px',
+          }}>
+            {/* Topo: avatar + nome + ações */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{
+                width: 46, height: 46, borderRadius: '50%', flexShrink: 0,
+                background: 'linear-gradient(135deg, #5b21b6, #7c3aed)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: '#fff', fontWeight: 800, fontSize: '1rem', letterSpacing: 0.5,
+              }}>
+                {iniciais}
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{ margin: 0, fontWeight: 800, fontSize: '0.98rem', color: '#1e293b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.nome}</p>
+                {(c.cidade || c.data_venda) && (
+                  <p style={{ margin: '2px 0 0', fontSize: '0.75rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: 8 }}>
+                    {c.cidade && <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}><MapPin size={11} />{c.cidade}</span>}
+                    {c.data_venda && <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}><CalendarDays size={11} />{c.data_venda.split('-').reverse().join('/')}</span>}
+                  </p>
                 )}
               </div>
+              <div style={{ display: 'flex', gap: 2, flexShrink: 0 }}>
+                <button className="icon-btn" style={{ color: '#94a3b8' }} onClick={() => abrirEditar(c)}><Pencil size={15} /></button>
+                <button className="icon-btn" style={{ color: 'var(--color-danger)' }} onClick={() => setConfirmando(c)}><Trash2 size={15} /></button>
+              </div>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              <button className="icon-btn" style={{ color: 'var(--color-text-muted)' }} onClick={() => abrirEditar(c)}><Pencil size={14} /></button>
-              <button className="icon-btn" style={{ color: 'var(--color-danger)' }} onClick={() => setConfirmando(c)}><Trash2 size={14} /></button>
+
+            {/* Divisor */}
+            {(c.telefone || c.gato_nome) && (
+              <div style={{ borderTop: '1px solid #f1f5f9', margin: '10px 0 8px' }} />
+            )}
+
+            {/* Info: telefone + gato */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 6 }}>
+              {c.telefone && (
+                <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: '0.8rem', color: '#475569', fontWeight: 500 }}>
+                  <Phone size={13} color="#7c3aed" /> {c.telefone}
+                </span>
+              )}
+              {c.gato_nome && (
+                <span style={{
+                  display: 'flex', alignItems: 'center', gap: 5,
+                  background: '#f5f0ff', borderRadius: 20, padding: '3px 10px',
+                  fontSize: '0.75rem', fontWeight: 700, color: '#7c3aed',
+                  border: '1px solid #ede9fe',
+                }}>
+                  <Cat size={12} /> {c.gato_nome}
+                </span>
+              )}
             </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
 
       {confirmando && (
         <ConfirmModal
