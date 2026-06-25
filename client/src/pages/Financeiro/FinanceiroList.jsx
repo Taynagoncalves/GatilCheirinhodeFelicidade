@@ -242,16 +242,22 @@ function TabLancamentos({ mes, onMes }) {
       <SeletorMes mes={mes} onChange={onMes} />
 
       <div style={{ display: 'flex', gap: 8 }}>
-        <button className="btn btn-outline" style={{ flex: 1 }} onClick={() => abrirNovo('entrada')}>
+        <button
+          onClick={() => abrirNovo('entrada')}
+          style={{ flex: 1, padding: '11px 8px', borderRadius: 'var(--radius-md)', border: '1.5px solid #3f8c5a', background: '#f0faf4', color: '#3f8c5a', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+        >
           <TrendingUp size={16} /> Registrar Entrada
         </button>
-        <button className="btn btn-outline" style={{ flex: 1 }} onClick={() => abrirNovo('saida')}>
+        <button
+          onClick={() => abrirNovo('saida')}
+          style={{ flex: 1, padding: '11px 8px', borderRadius: 'var(--radius-md)', border: '1.5px solid #c0524a', background: '#fdf2f2', color: '#c0524a', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+        >
           <TrendingDown size={16} /> Registrar Gasto
         </button>
       </div>
 
       <div className="tabs">
-        <button className={`tab${filtro === '' ? ' active' : ''}`} onClick={() => setFiltro('')}>Todos</button>
+        <button className={`tab${filtro === '' ? ' active' : ''}`} onClick={() => setFiltro('')}>Todos {registros.length > 0 && `(${registros.length})`}</button>
         <button className={`tab${filtro === 'entrada' ? ' active' : ''}`} onClick={() => setFiltro('entrada')}>Entradas</button>
         <button className={`tab${filtro === 'saida' ? ' active' : ''}`} onClick={() => setFiltro('saida')}>Gastos</button>
       </div>
@@ -259,26 +265,25 @@ function TabLancamentos({ mes, onMes }) {
       {registros.length === 0 && <EmptyState icon={Wallet} title="Nenhum lançamento" description="Registre entradas e gastos neste mês." />}
 
       {registros.map((r) => (
-        <div key={r.id} className="card">
-          <div className="card-row" style={{ alignItems: 'center' }}>
-            <span className="card-photo-placeholder" style={{ width: 40, height: 40, flexShrink: 0, background: r.tipo === 'entrada' ? '#e6f4ec' : '#fdecea', color: r.tipo === 'entrada' ? '#3f8c5a' : '#c0524a' }}>
-              {r.tipo === 'entrada' ? <TrendingUp size={18} /> : <TrendingDown size={18} />}
-            </span>
-            <div style={{ flex: 1 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                <p className="card-title" style={{ margin: 0, fontSize: '0.95rem' }}>{r.categoria}</p>
-                <p style={{ margin: 0, fontWeight: 800, fontSize: '1rem', color: r.tipo === 'entrada' ? '#3f8c5a' : '#c0524a' }}>
+        <div key={r.id} style={{ background: '#fff', borderRadius: 'var(--radius-md)', marginBottom: 8, overflow: 'hidden', boxShadow: 'var(--shadow-card)', borderLeft: `4px solid ${r.tipo === 'entrada' ? '#3f8c5a' : '#c0524a'}` }}>
+          <div style={{ display: 'flex', alignItems: 'center', padding: '12px 14px', gap: 12 }}>
+            <div style={{ width: 38, height: 38, borderRadius: 10, flexShrink: 0, background: r.tipo === 'entrada' ? '#e6f4ec' : '#fdecea', display: 'flex', alignItems: 'center', justifyContent: 'center', color: r.tipo === 'entrada' ? '#3f8c5a' : '#c0524a' }}>
+              {r.tipo === 'entrada' ? <TrendingUp size={17} /> : <TrendingDown size={17} />}
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <p style={{ margin: 0, fontWeight: 700, fontSize: '0.92rem', color: 'var(--color-text)' }}>{r.categoria}</p>
+                <p style={{ margin: 0, fontWeight: 800, fontSize: '0.98rem', color: r.tipo === 'entrada' ? '#3f8c5a' : '#c0524a' }}>
                   {r.tipo === 'entrada' ? '+' : '-'}{formatVal(r.valor)}
                 </p>
               </div>
-              <p className="card-meta" style={{ margin: '2px 0 0' }}>
-                {r.descricao && <>{r.descricao} · </>}{formatData(r.data_registro)}
-                {r.gato_nome && <> · 🐱 {r.gato_nome}</>}
+              <p style={{ margin: '3px 0 0', fontSize: '0.78rem', color: 'var(--color-text-muted)' }}>
+                {formatData(r.data_registro)}{r.descricao && ` · ${r.descricao}`}{r.gato_nome && ` · 🐱 ${r.gato_nome}`}
               </p>
             </div>
-            <div style={{ display: 'flex', gap: 4, marginLeft: 8 }}>
-              <button className="icon-btn" onClick={() => abrirEditar(r)}><Pencil size={15} /></button>
-              <button className="icon-btn" style={{ color: 'var(--color-danger)' }} onClick={() => setConfirmando(r)}><Trash2 size={15} /></button>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 2, marginLeft: 8 }}>
+              <button className="icon-btn" style={{ color: 'var(--color-text-muted)' }} onClick={() => abrirEditar(r)}><Pencil size={14} /></button>
+              <button className="icon-btn" style={{ color: 'var(--color-danger)' }} onClick={() => setConfirmando(r)}><Trash2 size={14} /></button>
             </div>
           </div>
         </div>
