@@ -107,25 +107,23 @@ export default function Home() {
       {/* ── Stats ── */}
       <div className="stats-grid" data-tour="home-stats">
         {[
-          { label: 'Gatos', value: data?.total_gatos, icon: <Cat size={20} />, cor: '#1d4ed8', bg: 'linear-gradient(135deg, #eff6ff, #dbeafe)', route: '/gatos', tour: 'home-stat-gatos' },
-          { label: 'Ninhadas', value: data?.total_ninhadas, icon: <PawPrint size={20} />, cor: '#7c3aed', bg: 'linear-gradient(135deg, #f5f3ff, #ede9fe)', route: '/ninhadas', tour: 'home-stat-ninhadas' },
-          { label: 'Reservados', value: data?.total_reservados, icon: <Heart size={20} />, cor: '#d97706', bg: 'linear-gradient(135deg, #fffbeb, #fef3c7)', route: '/gatos?status=reservado', tour: 'home-reservados' },
-          { label: 'Vendidos', value: data?.total_vendidos, icon: <PawPrint size={20} />, cor: '#16a34a', bg: 'linear-gradient(135deg, #f0fdf4, #dcfce7)', route: '/gatos?status=vendido', tour: 'home-vendidos' },
+          { nome: 'Gatos', sub: 'Cadastrados', value: data?.total_gatos, icon: <Cat size={22} />, cor: '#1d4ed8', iconBg: '#dbeafe', tour: 'home-stat-gatos', route: '/gatos' },
+          { nome: 'Ninhadas', sub: 'Registradas', value: data?.total_ninhadas, icon: <PawPrint size={22} />, cor: '#7c3aed', iconBg: '#ede9fe', tour: 'home-stat-ninhadas', route: '/ninhadas' },
+          { nome: 'Reservados', sub: '', value: data?.total_reservados, icon: <Heart size={22} />, cor: '#d97706', iconBg: '#fef3c7', tour: 'home-reservados', route: '/gatos?status=reservado' },
+          { nome: 'Vendidos', sub: '', value: data?.total_vendidos, icon: <Syringe size={22} />, cor: '#16a34a', iconBg: '#dcfce7', tour: 'home-vendidos', route: '/gatos?status=vendido' },
         ].map((s) => (
-          <div key={s.label} data-tour={s.tour} onClick={() => navigate(s.route)} style={{
-            background: s.bg, borderRadius: 16, padding: '14px 14px 12px', cursor: 'pointer',
-            boxShadow: '0 2px 10px rgba(0,0,0,0.06)', border: `1px solid ${s.cor}18`,
-            display: 'flex', flexDirection: 'column', gap: 8,
+          <div key={s.nome} data-tour={s.tour} onClick={() => navigate(s.route)} style={{
+            background: '#fff', borderRadius: 16, padding: '14px 12px 12px', cursor: 'pointer',
+            boxShadow: '0 2px 10px rgba(0,0,0,0.07)',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ width: 38, height: 38, borderRadius: 12, background: `${s.cor}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: s.cor }}>
-                {s.icon}
-              </div>
-              <ChevronRight size={14} color={`${s.cor}88`} />
+            <div style={{ width: 44, height: 44, borderRadius: '50%', background: s.iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', color: s.cor }}>
+              {s.icon}
             </div>
-            <div>
-              <p style={{ margin: 0, fontSize: '1.8rem', fontWeight: 900, color: s.cor, lineHeight: 1 }}>{s.value ?? '—'}</p>
-              <p style={{ margin: '3px 0 0', fontSize: '0.74rem', fontWeight: 600, color: s.cor, opacity: 0.8 }}>{s.label}</p>
+            <div style={{ textAlign: 'center' }}>
+              <p style={{ margin: 0, fontSize: '1.9rem', fontWeight: 900, color: s.cor, lineHeight: 1 }}>{s.value ?? '—'}</p>
+              <p style={{ margin: '3px 0 0', fontSize: '0.74rem', fontWeight: 700, color: s.cor }}>{s.nome}</p>
+              {s.sub && <p style={{ margin: 0, fontSize: '0.68rem', fontWeight: 500, color: s.cor, opacity: 0.65 }}>{s.sub}</p>}
             </div>
           </div>
         ))}
@@ -135,37 +133,31 @@ export default function Home() {
       <div data-tour="home-acoes" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
         <div onClick={() => navigate('/gatos/novo')} data-tour="home-btn-cadastrar" style={{
           background: 'linear-gradient(145deg, #1a4d7c, #2f6690)',
-          borderRadius: 16, padding: '16px 14px', cursor: 'pointer',
+          borderRadius: 16, padding: '14px', cursor: 'pointer',
           boxShadow: '0 4px 16px rgba(26,77,124,0.28)',
-          display: 'flex', flexDirection: 'column', gap: 10,
+          display: 'flex', alignItems: 'center', gap: 12,
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ width: 40, height: 40, background: 'rgba(255,255,255,0.18)', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Plus size={22} color="#fff" />
-            </div>
-            <ChevronRight size={16} color="rgba(255,255,255,0.5)" />
+          <div style={{ width: 44, height: 44, background: 'rgba(255,255,255,0.18)', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <Plus size={24} color="#fff" />
           </div>
           <div>
-            <p style={{ margin: 0, color: '#fff', fontWeight: 800, fontSize: '0.9rem' }}>Cadastrar Gato</p>
-            <p style={{ margin: '2px 0 0', color: 'rgba(255,255,255,0.65)', fontSize: '0.72rem' }}>Novo filhote</p>
+            <p style={{ margin: 0, color: '#fff', fontWeight: 800, fontSize: '0.88rem', lineHeight: 1.2 }}>Cadastrar Gato</p>
+            <p style={{ margin: '3px 0 0', color: 'rgba(255,255,255,0.65)', fontSize: '0.71rem' }}>Novo filhote</p>
           </div>
         </div>
 
         <div onClick={() => navigate('/pais')} style={{
           background: 'linear-gradient(145deg, #5b21b6, #7c3aed)',
-          borderRadius: 16, padding: '16px 14px', cursor: 'pointer',
+          borderRadius: 16, padding: '14px', cursor: 'pointer',
           boxShadow: '0 4px 16px rgba(124,58,237,0.28)',
-          display: 'flex', flexDirection: 'column', gap: 10,
+          display: 'flex', alignItems: 'center', gap: 12,
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ width: 40, height: 40, background: 'rgba(255,255,255,0.18)', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Users size={22} color="#fff" />
-            </div>
-            <ChevronRight size={16} color="rgba(255,255,255,0.5)" />
+          <div style={{ width: 44, height: 44, background: 'rgba(255,255,255,0.18)', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <Users size={24} color="#fff" />
           </div>
           <div>
-            <p style={{ margin: 0, color: '#fff', fontWeight: 800, fontSize: '0.9rem' }}>Ver Pais</p>
-            <p style={{ margin: '2px 0 0', color: 'rgba(255,255,255,0.65)', fontSize: '0.72rem' }}>Reprodutores</p>
+            <p style={{ margin: 0, color: '#fff', fontWeight: 800, fontSize: '0.88rem', lineHeight: 1.2 }}>Ver Pais</p>
+            <p style={{ margin: '3px 0 0', color: 'rgba(255,255,255,0.65)', fontSize: '0.71rem' }}>Reprodutores</p>
           </div>
         </div>
       </div>
@@ -173,36 +165,37 @@ export default function Home() {
       {/* ── Mini card financeiro ── */}
       {data && (
         <div data-tour="home-saldo" onClick={() => navigate('/financeiro')} style={{
-          background: 'linear-gradient(135deg, #4c1d95, #6d28d9)',
-          borderRadius: 16, padding: '14px 16px', cursor: 'pointer',
-          boxShadow: '0 4px 14px rgba(109,40,217,0.25)',
+          background: '#fff', borderRadius: 16, padding: '14px 16px', cursor: 'pointer',
+          boxShadow: '0 2px 10px rgba(0,0,0,0.07)',
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <Wallet size={16} color="rgba(255,255,255,0.85)" />
-              <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: '0.78rem', fontWeight: 700 }}>Financeiro · este mês</span>
-            </div>
-            <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.72rem' }}>Ver mais →</span>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-            <div>
-              <p style={{ margin: 0, fontSize: '0.68rem', color: 'rgba(255,255,255,0.65)' }}>Saldo</p>
-              <p style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: '#fff' }}>{fmt(data.fin_saldo)}</p>
-            </div>
-            <div style={{ display: 'flex', gap: 14 }}>
-              <div style={{ textAlign: 'right' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 4, justifyContent: 'flex-end' }}>
-                  <TrendingUp size={12} color="#86efac" />
-                  <span style={{ fontSize: '0.65rem', color: '#86efac', fontWeight: 700 }}>Entradas</span>
-                </div>
-                <p style={{ margin: 0, fontSize: '0.82rem', fontWeight: 700, color: '#fff' }}>{fmt(data.fin_entradas)}</p>
+              <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#dbeafe', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Wallet size={16} color="#1d4ed8" />
               </div>
-              <div style={{ textAlign: 'right' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 4, justifyContent: 'flex-end' }}>
-                  <TrendingDown size={12} color="#fca5a5" />
-                  <span style={{ fontSize: '0.65rem', color: '#fca5a5', fontWeight: 700 }}>Saídas</span>
+              <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#1e293b' }}>Financeiro <span style={{ color: '#94a3b8', fontWeight: 500 }}>• este mês</span></span>
+            </div>
+            <span style={{ fontSize: '0.75rem', color: '#1d4ed8', fontWeight: 600 }}>Ver mais →</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 0 }}>
+            <div style={{ flex: 1 }}>
+              <p style={{ margin: 0, fontSize: '0.7rem', color: '#94a3b8', fontWeight: 500 }}>Saldo</p>
+              <p style={{ margin: 0, fontSize: '1.3rem', fontWeight: 900, color: '#1e293b' }}>{fmt(data.fin_saldo)}</p>
+            </div>
+            <div style={{ display: 'flex', gap: 16 }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                  <TrendingUp size={12} color="#16a34a" />
+                  <span style={{ fontSize: '0.68rem', color: '#16a34a', fontWeight: 600 }}>Entradas</span>
                 </div>
-                <p style={{ margin: 0, fontSize: '0.82rem', fontWeight: 700, color: '#fff' }}>{fmt(data.fin_saidas)}</p>
+                <p style={{ margin: 0, fontSize: '0.85rem', fontWeight: 700, color: '#1e293b' }}>{fmt(data.fin_entradas)}</p>
+              </div>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                  <TrendingDown size={12} color="#dc2626" />
+                  <span style={{ fontSize: '0.68rem', color: '#dc2626', fontWeight: 600 }}>Saídas</span>
+                </div>
+                <p style={{ margin: 0, fontSize: '0.85rem', fontWeight: 700, color: '#1e293b' }}>{fmt(data.fin_saidas)}</p>
               </div>
             </div>
           </div>
