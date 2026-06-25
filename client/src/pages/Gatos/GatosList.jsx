@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Search, Plus, Cat, X, PawPrint, Users, Trash2, Calendar, Cake, Weight, Layers } from 'lucide-react';
+import { Search, Plus, Cat, X, PawPrint, Users, Trash2, Cake, Weight, Layers } from 'lucide-react';
 import Layout from '../../components/Layout';
 import EmptyState from '../../components/EmptyState';
 import ConfirmModal from '../../components/ConfirmModal';
@@ -217,47 +217,34 @@ export default function GatosList() {
                   {/* Badge de dose */}
                   {alerta && (
                     <span style={{
-                      display: 'inline-block', marginTop: 4,
-                      fontSize: '0.72rem', fontWeight: 700, color: alerta.cor,
+                      display: 'inline-block', marginTop: 3,
+                      fontSize: '0.7rem', fontWeight: 700, color: alerta.cor,
                       background: alerta.bg, borderRadius: 20, padding: '2px 8px',
-                      border: `1px solid ${alerta.cor}44`,
+                      border: `1px solid ${alerta.cor}33`,
                     }}>{alerta.label}</span>
                   )}
 
-                  {/* Grade de info: data, idade, peso, ninhada */}
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3px 12px', marginTop: 6 }}>
-                    {g.data_nascimento && (
-                      <span style={{ fontSize: '0.78rem', color: '#718096', display: 'flex', alignItems: 'center', gap: 4 }}>
-                        <Calendar size={12} /> {g.data_nascimento.split('-').reverse().join('/')}
-                      </span>
-                    )}
-                    {g.data_nascimento && (
-                      <span style={{ fontSize: '0.78rem', color: '#718096', display: 'flex', alignItems: 'center', gap: 4 }}>
-                        <Cake size={12} /> {calcularIdade(g.data_nascimento)}
-                      </span>
-                    )}
-                    {g.peso != null && (
-                      <span style={{ fontSize: '0.78rem', color: '#718096', display: 'flex', alignItems: 'center', gap: 4 }}>
-                        <Weight size={12} /> {formatarPeso(g.peso)}
-                      </span>
-                    )}
-                    {g.ninhada_nome && (
-                      <span style={{ fontSize: '0.78rem', color: '#718096', display: 'flex', alignItems: 'center', gap: 4 }}>
-                        <Layers size={12} /> {g.ninhada_nome}
-                      </span>
-                    )}
-                  </div>
+                  {/* Info compacta numa linha só */}
+                  {(g.data_nascimento || g.peso != null || g.ninhada_nome) && (
+                    <p style={{ margin: '5px 0 0', fontSize: '0.76rem', color: '#94a3b8', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '3px 6px' }}>
+                      {g.data_nascimento && <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}><Cake size={11} />{calcularIdade(g.data_nascimento)}</span>}
+                      {g.data_nascimento && (g.peso != null || g.ninhada_nome) && <span style={{ color: '#cbd5e1' }}>·</span>}
+                      {g.peso != null && <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}><Weight size={11} />{formatarPeso(g.peso)}</span>}
+                      {g.peso != null && g.ninhada_nome && <span style={{ color: '#cbd5e1' }}>·</span>}
+                      {g.ninhada_nome && <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}><Layers size={11} />{g.ninhada_nome}</span>}
+                    </p>
+                  )}
 
                   {/* Pai / Mãe como chips */}
                   {(g.mae_nome || g.pai_nome) && (
-                    <div style={{ display: 'flex', gap: 6, marginTop: 7, flexWrap: 'wrap' }}>
+                    <div style={{ display: 'flex', gap: 5, marginTop: 6, flexWrap: 'wrap' }}>
                       {g.mae_nome && (
-                        <span style={{ fontSize: '0.72rem', fontWeight: 600, color: '#7c3aed', background: '#f5f0ff', borderRadius: 20, padding: '2px 10px', border: '1px solid #ddd6fe' }}>
+                        <span style={{ fontSize: '0.7rem', fontWeight: 600, color: '#7c3aed', background: '#f5f0ff', borderRadius: 20, padding: '2px 8px', border: '1px solid #ede9fe' }}>
                           ♀ {g.mae_nome}
                         </span>
                       )}
                       {g.pai_nome && (
-                        <span style={{ fontSize: '0.72rem', fontWeight: 600, color: '#1d4ed8', background: '#eff6ff', borderRadius: 20, padding: '2px 10px', border: '1px solid #bfdbfe' }}>
+                        <span style={{ fontSize: '0.7rem', fontWeight: 600, color: '#1d4ed8', background: '#eff6ff', borderRadius: 20, padding: '2px 8px', border: '1px solid #dbeafe' }}>
                           ♂ {g.pai_nome}
                         </span>
                       )}
