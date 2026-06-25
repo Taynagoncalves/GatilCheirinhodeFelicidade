@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Syringe, Pill, ClipboardList, Settings2, Trash2, CalendarClock } from 'lucide-react';
+import { Syringe, Pill, ClipboardList, Settings2, Trash2 } from 'lucide-react';
 import Layout from '../../components/Layout';
 import EmptyState from '../../components/EmptyState';
 import ConfirmModal from '../../components/ConfirmModal';
+import CalendarioDoses from '../../components/CalendarioDoses';
 import { useToast } from '../../components/Toast';
 import { useTour } from '../../contexts/TourContext';
 import api from '../../api/client';
@@ -12,7 +13,7 @@ const TOUR = [
   {
     selector: '[data-tour="saude-registrar"]',
     titulo: 'Registrar Dose',
-    texto: 'Toque aqui para registrar uma nova dose de vacina ou medicamento para qualquer gato do gatil.',
+    texto: 'Toque aqui para registrar uma nova dose de vacina ou medicamento para qualquer gato ou pai do gatil.',
   },
   {
     selector: '[data-tour="saude-medicamentos"]',
@@ -20,23 +21,19 @@ const TOUR = [
     texto: 'Acesse o catálogo de todos os medicamentos e vacinas. Você pode adicionar novos ou editar os existentes.',
   },
   {
-    selector: '[data-tour="saude-agenda"]',
-    titulo: 'Agenda de Doses',
-    texto: 'Veja todas as próximas doses de todos os gatos e pais organizadas por data — atrasadas, hoje, amanhã e futuras.',
+    selector: '[data-tour="saude-calendario"]',
+    titulo: 'Calendário de Doses',
+    texto: 'Veja as doses de cada mês no calendário. Os pontos coloridos indicam dias com doses — toque em um dia para ver os detalhes.',
   },
   {
     selector: '[data-tour="saude-tabs"]',
     titulo: 'Filtro por Tipo',
-    texto: 'Alterne entre "Medicamentos" e "Vacinas" para filtrar e visualizar apenas o que precisa.',
+    texto: 'Alterne entre "Medicamentos" e "Vacinas" para filtrar o histórico de aplicações.',
   },
   {
     selector: '[data-tour="saude-lista"]',
     titulo: 'Histórico de Doses',
-    texto: 'Cada card mostra o gato, o medicamento, a data da última aplicação e a próxima dose agendada.',
-  },
-  {
-    titulo: 'Excluir Registro',
-    texto: 'O ícone de lixeira em cada card exclui aquele registro. Use com cuidado — a exclusão não pode ser desfeita.',
+    texto: 'Cada card mostra o gato, o medicamento, a data de aplicação e a próxima dose agendada.',
   },
 ];
 
@@ -72,9 +69,10 @@ export default function SaudeList() {
       <button className="btn btn-secondary" data-tour="saude-medicamentos" onClick={() => navigate('/saude/medicamentos')}>
         <Settings2 size={18} /> Medicamentos Cadastrados
       </button>
-      <button className="btn btn-secondary" data-tour="saude-agenda" onClick={() => navigate('/saude/agenda')}>
-        <CalendarClock size={18} /> Agenda de Doses
-      </button>
+
+      <div data-tour="saude-calendario">
+        <CalendarioDoses />
+      </div>
 
       <div className="tabs" data-tour="saude-tabs">
         <button className={`tab${tipo === 'medicamento' ? ' active' : ''}`} onClick={() => setTipo('medicamento')}>Medicamentos</button>
