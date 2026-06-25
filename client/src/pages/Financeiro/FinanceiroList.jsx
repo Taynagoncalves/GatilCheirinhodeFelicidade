@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   TrendingUp, TrendingDown, Wallet, Plus, Trash2, X,
   PawPrint, Pencil, ChevronLeft, ChevronRight,
-  BarChart3, List, Clock, Share2, Cat, Users, Phone, MapPin, CalendarDays,
+  BarChart3, List, Clock, Share2, Cat, Users, Phone, MapPin, CalendarDays, Search, MessageCircle,
 } from 'lucide-react';
 import Layout from '../../components/Layout';
 import EmptyState from '../../components/EmptyState';
@@ -340,6 +340,7 @@ function TabHistorico({ onIrMes }) {
 function TabClientes() {
   const [clientes, setClientes] = useState([]);
   const [gatos, setGatos] = useState([]);
+  const [busca, setBusca] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [editando, setEditando] = useState(null);
   const [confirmando, setConfirmando] = useState(null);
@@ -351,6 +352,18 @@ function TabClientes() {
     carregar();
     api.get('/gatos').then((r) => setGatos(r.data));
   }, []);
+
+  const filtrados = clientes.filter((c) =>
+    c.nome.toLowerCase().includes(busca.toLowerCase()) ||
+    (c.cidade || '').toLowerCase().includes(busca.toLowerCase()) ||
+    (c.gato_nome || '').toLowerCase().includes(busca.toLowerCase())
+  );
+
+  const abrirWhatsApp = (tel) => {
+    const numero = tel.replace(/\D/g, '');
+    const com55 = numero.startsWith('55') ? numero : `55${numero}`;
+    window.open(`https://wa.me/${com55}`, '_blank');
+  };
 
   const abrirNovo = () => {
     setEditando(null);
@@ -387,7 +400,22 @@ function TabClientes() {
         <EmptyState icon={Users} title="Nenhum cliente cadastrado" description="Cadastre os compradores dos filhotes aqui." />
       )}
 
-      {clientes.map((c) => {
+      {clientes.length > 0 && (
+        <>
+          {/* Busca */}
+          <div className="search-input" style={{ marginBottom: 4 }}>
+            <Search size={16} />
+            <input placeholder="Buscar cliente..." value={busca} onChange={(e) => setBusca(e.target.value)} />
+          </div>
+
+          {/* Contador */}
+          <p style={{ margin: '0 0 8px', fontSize: '0.78rem', color: '#94a3b8', fontWeight: 500 }}>
+            {filtrados.length} {filtrados.length === 1 ? 'cliente' : 'clientes'}
+          </p>
+        </>
+      )}
+
+      {filtrados.map((c) => {
         const iniciais = c.nome.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase();
         return (
           <div key={c.id} style={{
@@ -424,13 +452,28 @@ function TabClientes() {
               <div style={{ borderTop: '1px solid #f1f5f9', margin: '10px 0 8px' }} />
             )}
 
-            {/* Info: telefone + gato */}
+            {/* Info: telefone + whatsapp + gato */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 6 }}>
-              {c.telefone && (
-                <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: '0.8rem', color: '#475569', fontWeight: 500 }}>
-                  <Phone size={13} color="#7c3aed" /> {c.telefone}
-                </span>
-              )}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                {c.telefone && (
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: '0.8rem', color: '#475569', fontWeight: 500 }}>
+                    <Phone size={13} color="#7c3aed" /> {c.telefone}
+                  </span>
+                )}
+                {c.telefone && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); abrirWhatsApp(c.telefone); }}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 5,
+                      background: '#dcfce7', border: '1px solid #bbf7d0',
+                      borderRadius: 20, padding: '4px 10px', cursor: 'pointer',
+                      fontSize: '0.75rem', fontWeight: 700, color: '#16a34a',
+                    }}
+                  >
+                    <MessageCircle size={13} /> WhatsApp
+                  </button>
+                )}
+              </div>
               {c.gato_nome && (
                 <span style={{
                   display: 'flex', alignItems: 'center', gap: 5,
@@ -511,12 +554,6 @@ export default function FinanceiroList() {
 
   return (
     <Layout title="Financeiro" hideNav>
-      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-        <button onClick={() => navigate('/')} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5, fontSize: '0.8rem', color: 'var(--color-text-muted)', padding: '4px 0' }}>
-          <PawPrint size={14} /> Ir para o Gatil
-        </button>
-      </div>
-
       {aba === 0 && <TabResumo mes={mes} onMes={setMes} />}
       {aba === 1 && <TabLancamentos mes={mes} onMes={setMes} />}
       {aba === 2 && <TabHistorico onIrMes={irMes} />}
