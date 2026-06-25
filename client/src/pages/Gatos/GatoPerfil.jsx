@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Cat, Syringe, Pill, Plus, Trash2, Weight, X, Scale } from 'lucide-react';
+import { Cat, Syringe, Pill, Plus, Trash2, Weight, X, Scale, GitBranch } from 'lucide-react';
 import { formatarPeso } from '../../utils/peso';
 import Layout from '../../components/Layout';
 import StatusBadge from '../../components/StatusBadge';
@@ -107,6 +107,73 @@ export default function GatoPerfil() {
           Editar Gato
         </button>
       </div>
+
+      {/* ── Árvore Genealógica ── */}
+      {(gato.pai_nome || gato.mae_nome) && (
+        <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px rgba(0,0,0,0.08)', padding: '16px 14px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+            <div style={{ width: 32, height: 32, borderRadius: 10, background: 'linear-gradient(135deg, #1a4d7c, #2f6690)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <GitBranch size={16} color="#fff" />
+            </div>
+            <p style={{ margin: 0, fontWeight: 800, fontSize: '1rem', color: '#2d3748' }}>Árvore Genealógica</p>
+          </div>
+
+          {/* Pais — linha do topo */}
+          <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'flex-end' }}>
+            {/* Pai */}
+            <div
+              onClick={() => gato.pai_id && navigate(`/pais/${gato.pai_id}`)}
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, cursor: gato.pai_id ? 'pointer' : 'default', minWidth: 70 }}
+            >
+              {gato.pai_foto
+                ? <img src={gato.pai_foto} alt={gato.pai_nome} style={{ width: 56, height: 56, borderRadius: '50%', objectFit: 'cover', border: '2.5px solid #1a4d7c', boxShadow: '0 2px 8px rgba(26,77,124,0.25)' }} />
+                : <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'linear-gradient(135deg, #dbeafe, #bfdbfe)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #93c5fd' }}><Cat size={24} color="#1d4ed8" /></div>
+              }
+              <p style={{ margin: 0, fontSize: '0.78rem', fontWeight: 700, color: '#2d3748', textAlign: 'center', maxWidth: 72, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{gato.pai_nome || '—'}</p>
+              <span style={{ fontSize: '0.65rem', color: '#718096', fontWeight: 600, background: '#f0f4ff', padding: '2px 8px', borderRadius: 20 }}>Pai</span>
+            </div>
+
+            {/* Ícone central decorativo */}
+            <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#f0f4ff', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 30 }}>
+              <span style={{ fontSize: '1rem' }}>🐾</span>
+            </div>
+
+            {/* Mãe */}
+            <div
+              onClick={() => gato.mae_id && navigate(`/pais/${gato.mae_id}`)}
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, cursor: gato.mae_id ? 'pointer' : 'default', minWidth: 70 }}
+            >
+              {gato.mae_foto
+                ? <img src={gato.mae_foto} alt={gato.mae_nome} style={{ width: 56, height: 56, borderRadius: '50%', objectFit: 'cover', border: '2.5px solid #7c3aed', boxShadow: '0 2px 8px rgba(124,58,237,0.25)' }} />
+                : <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'linear-gradient(135deg, #ede9fe, #ddd6fe)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #c4b5fd' }}><Cat size={24} color="#7c3aed" /></div>
+              }
+              <p style={{ margin: 0, fontSize: '0.78rem', fontWeight: 700, color: '#2d3748', textAlign: 'center', maxWidth: 72, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{gato.mae_nome || '—'}</p>
+              <span style={{ fontSize: '0.65rem', color: '#718096', fontWeight: 600, background: '#f5f0ff', padding: '2px 8px', borderRadius: 20 }}>Mãe</span>
+            </div>
+          </div>
+
+          {/* Conector em V */}
+          <div style={{ display: 'flex', justifyContent: 'center', margin: '0 28px' }}>
+            <div style={{ flex: 1, height: 28, borderBottom: '2px solid #e2e8f0', borderRight: '2px solid #e2e8f0', borderBottomRightRadius: 10 }} />
+            <div style={{ flex: 1, height: 28, borderBottom: '2px solid #e2e8f0', borderLeft: '2px solid #e2e8f0', borderBottomLeftRadius: 10 }} />
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <div style={{ width: 2, height: 18, background: '#e2e8f0' }} />
+          </div>
+
+          {/* Gato — filho */}
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+              {gato.foto_url
+                ? <img src={gato.foto_url} alt={gato.nome} style={{ width: 64, height: 64, borderRadius: '50%', objectFit: 'cover', border: '3px solid #2f6690', boxShadow: '0 4px 14px rgba(26,77,124,0.3)' }} />
+                : <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'linear-gradient(135deg, #1a4d7c, #2f6690)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 14px rgba(26,77,124,0.3)' }}><Cat size={28} color="#fff" /></div>
+              }
+              <p style={{ margin: 0, fontSize: '0.88rem', fontWeight: 800, color: '#2d3748' }}>{gato.nome || 'Sem nome'}</p>
+              <span style={{ fontSize: '0.65rem', color: '#2f6690', fontWeight: 700, background: '#e8f0f8', padding: '2px 10px', borderRadius: 20 }}>Filhote</span>
+            </div>
+          </div>
+        </div>
+      )}
 
       <button className="btn btn-secondary" onClick={() => { setPesoValor(''); setPesoUnidade('g'); setShowPesoModal(true); }}>
         <Weight size={18} /> Registrar Peso
