@@ -17,14 +17,9 @@ const TOUR = [
     texto: 'Toque aqui para adicionar um novo filhote ao gatil ou cadastrar um pai reprodutor.',
   },
   {
-    selector: '[data-tour="gatos-tabs-sexo"]',
-    titulo: 'Filtro por Sexo',
-    texto: 'Alterne entre Todos, Machos e Fêmeas para organizar a visualização dos gatos.',
-  },
-  {
-    selector: '[data-tour="gatos-tabs-status"]',
-    titulo: 'Filtro por Status',
-    texto: 'Filtre por disponibilidade: Todos, Disponível, Reservado ou Vendido.',
+    selector: '[data-tour="gatos-filtros"]',
+    titulo: 'Filtros',
+    texto: 'Filtre por sexo (Machos/Fêmeas) e por status (Disponível, Reservado, Vendido) com scroll horizontal.',
   },
   {
     selector: '[data-tour="gatos-busca"]',
@@ -53,18 +48,43 @@ function alerteDose(proxima_dose_min, proxima_medicamento_nome) {
   const dose = new Date(proxima_dose_min + 'T00:00:00');
   const diff = Math.round((dose - hoje) / (1000 * 60 * 60 * 24));
   const med = proxima_medicamento_nome ? ` · ${proxima_medicamento_nome}` : '';
-  if (diff < 0) return { label: `Dose atrasada${med}`, cor: '#c0524a' };
-  if (diff === 0) return { label: `Dose hoje!${med}`, cor: '#b8863a' };
-  if (diff === 1) return { label: `Dose amanhã${med}`, cor: '#2f6690' };
-  return { label: `Dose em dia${med}`, cor: '#3f8c5a' };
+  if (diff < 0) return { label: `Atrasada${med}`, cor: '#c0524a', bg: '#fdecea' };
+  if (diff === 0) return { label: `Hoje!${med}`, cor: '#b8863a', bg: '#fef3e2' };
+  if (diff === 1) return { label: `Amanhã${med}`, cor: '#2f6690', bg: '#eaf3fb' };
+  return { label: `Em dia${med}`, cor: '#3f8c5a', bg: '#edf7f1' };
 }
 
 const STATUS_OPTIONS = [
-  { value: 'disponivel', label: 'Disponível', cls: 'status-disponivel' },
-  { value: 'reservado', label: 'Reservado', cls: 'status-reservado' },
-  { value: 'vendido', label: 'Vendido', cls: 'status-vendido' },
-  { value: 'mantido', label: 'Mantido no gatil', cls: 'status-mantido' },
+  { value: 'disponivel', label: 'Disponível' },
+  { value: 'reservado',  label: 'Reservado' },
+  { value: 'vendido',    label: 'Vendido' },
+  { value: 'mantido',    label: 'Mantido' },
 ];
+
+const SEXO_OPTS   = [{ v: '', l: 'Todos' }, { v: 'macho', l: '♂ Machos' }, { v: 'femea', l: '♀ Fêmeas' }];
+const STATUS_OPTS = [{ v: '', l: 'Todos' }, { v: 'disponivel', l: 'Disponível' }, { v: 'reservado', l: 'Reservado' }, { v: 'vendido', l: 'Vendido' }];
+
+function ChipBar({ opts, value, onChange, 'data-tour': dt }) {
+  return (
+    <div data-tour={dt} style={{
+      display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 2,
+      scrollbarWidth: 'none', msOverflowStyle: 'none',
+    }}>
+      {opts.map((o) => {
+        const ativo = value === o.v;
+        return (
+          <button key={o.v} onClick={() => onChange(o.v)} style={{
+            flexShrink: 0, border: 'none', borderRadius: 20, cursor: 'pointer',
+            padding: '6px 14px', fontSize: '0.78rem', fontWeight: ativo ? 700 : 500,
+            background: ativo ? 'var(--color-primary)' : '#f1f5f9',
+            color: ativo ? '#fff' : '#4a5568',
+            transition: 'all 0.15s',
+          }}>{o.l}</button>
+        );
+      })}
+    </div>
+  );
+}
 
 export default function GatosList() {
   const navigate = useNavigate();
@@ -92,7 +112,8 @@ export default function GatosList() {
   };
 
   const load = () => {
-    api.get('/gatos', { params: { busca: busca || undefined, sexo: sexo || undefined, status: statusFiltro || undefined } }).then((res) => setGatos(res.data));
+    api.get('/gatos', { params: { busca: busca || undefined, sexo: sexo || undefined, status: statusFiltro || undefined } })
+      .then((res) => setGatos(res.data));
   };
 
   useEffect(() => { load(); }, [busca, sexo, statusFiltro]);
@@ -110,17 +131,10 @@ export default function GatosList() {
         <Plus size={18} /> Cadastrar Gato
       </button>
 
-      <div className="tabs" data-tour="gatos-tabs-sexo">
-        <button className={`tab${sexo === '' ? ' active' : ''}`} onClick={() => setSexo('')}>Todos</button>
-        <button className={`tab${sexo === 'macho' ? ' active' : ''}`} onClick={() => setSexo('macho')}>Machos</button>
-        <button className={`tab${sexo === 'femea' ? ' active' : ''}`} onClick={() => setSexo('femea')}>Fêmeas</button>
-      </div>
-
-      <div className="tabs" data-tour="gatos-tabs-status">
-        <button className={`tab${statusFiltro === '' ? ' active' : ''}`} onClick={() => setStatusFiltro('')}>Todos</button>
-        <button className={`tab${statusFiltro === 'disponivel' ? ' active' : ''}`} onClick={() => setStatusFiltro('disponivel')}>Disponível</button>
-        <button className={`tab${statusFiltro === 'reservado' ? ' active' : ''}`} onClick={() => setStatusFiltro('reservado')}>Reservado</button>
-        <button className={`tab${statusFiltro === 'vendido' ? ' active' : ''}`} onClick={() => setStatusFiltro('vendido')}>Vendido</button>
+      {/* Filtros unificados em chip bars */}
+      <div data-tour="gatos-filtros" style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <ChipBar opts={SEXO_OPTS}   value={sexo}         onChange={setSexo} />
+        <ChipBar opts={STATUS_OPTS} value={statusFiltro} onChange={setStatusFiltro} />
       </div>
 
       <div className="search-input" data-tour="gatos-busca">
@@ -132,82 +146,122 @@ export default function GatosList() {
         <EmptyState icon={Cat} title="Nenhum gato cadastrado" description="Cadastre o primeiro gato do gatil." />
       )}
 
-      <div data-tour="gatos-lista">
-      {gatos.map((g) => {
-        const alerta = alerteDose(g.proxima_dose_min, g.proxima_medicamento_nome);
-        return (
-        <div key={g.id} className="card" onClick={() => navigate(`/gatos/${g.id}`)} style={{ cursor: 'pointer' }}>
-          <div className="card-row">
-            {g.foto_url ? (
-              <img src={g.foto_url} alt={g.nome} className="card-photo" />
-            ) : (
-              <span className="card-photo-placeholder"><Cat size={26} /></span>
-            )}
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                <p className="card-title" style={{ margin: 0 }}>{g.nome || 'Sem nome'}</p>
-                {alerta && (
-                  <span style={{
-                    fontSize: '0.72rem', fontWeight: 700, color: '#fff',
-                    background: alerta.cor, borderRadius: 20, padding: '2px 8px', whiteSpace: 'nowrap',
-                  }}>{alerta.label}</span>
-                )}
-              </div>
-              <p className="card-meta">
-                {g.data_nascimento ? `${g.data_nascimento.split('-').reverse().join('/')}` : ''}
-                {g.data_nascimento && <><br />Idade: {calcularIdade(g.data_nascimento)}</>}
-                {g.mae_nome && <><br />Mãe: {g.mae_nome}</>}
-                {g.pai_nome && <><br />Pai: {g.pai_nome}</>}
-                {g.ninhada_nome && <><br />Ninhada: {g.ninhada_nome}</>}
-                {g.peso != null && <><br />Peso: {formatarPeso(g.peso)}</>}
-              </p>
+      <div data-tour="gatos-lista" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {gatos.map((g) => {
+          const alerta = alerteDose(g.proxima_dose_min, g.proxima_medicamento_nome);
+          return (
+            <div key={g.id} onClick={() => navigate(`/gatos/${g.id}`)} style={{
+              background: '#fff', borderRadius: 16, padding: '12px 14px', cursor: 'pointer',
+              boxShadow: '0 2px 10px rgba(0,0,0,0.07)',
+              borderLeft: alerta ? `4px solid ${alerta.cor}` : '4px solid transparent',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
 
-              <div style={{ marginTop: 8, position: 'relative' }} onClick={(e) => e.stopPropagation()}>
-                <span
-                  className={`status-badge status-${g.status}`}
-                  style={{ cursor: 'pointer' }}
-                  onClick={() => setStatusOpen(statusOpen === g.id ? null : g.id)}
-                >
-                  {STATUS_OPTIONS.find((s) => s.value === g.status)?.label || g.status} ▾
-                </span>
+                {/* Foto circular */}
+                {g.foto_url
+                  ? <img src={g.foto_url} alt={g.nome} style={{ width: 60, height: 60, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '2.5px solid #e8f0f8' }} />
+                  : <div style={{ width: 60, height: 60, borderRadius: '50%', background: 'linear-gradient(135deg, #dbeafe, #bfdbfe)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '2px solid #bfdbfe' }}>
+                      <Cat size={26} color="#1d4ed8" />
+                    </div>
+                }
 
-                {statusOpen === g.id && (
-                  <div style={{
-                    position: 'absolute', top: '110%', left: 0, zIndex: 30,
-                    background: '#fff', border: '1px solid var(--color-border)',
-                    borderRadius: 'var(--radius-sm)', boxShadow: 'var(--shadow-elevated)',
-                    minWidth: 160, overflow: 'hidden',
-                  }}>
-                    {STATUS_OPTIONS.map((s) => (
-                      <div
-                        key={s.value}
-                        onClick={() => changeStatus(g.id, s.value)}
-                        style={{
-                          padding: '10px 14px', cursor: 'pointer', fontSize: '0.9rem',
-                          fontWeight: g.status === s.value ? 700 : 400,
-                          background: g.status === s.value ? 'var(--color-primary-light)' : 'transparent',
-                        }}
-                      >
-                        {s.label}
+                <div style={{ flex: 1, minWidth: 0 }}>
+
+                  {/* Nome + status + lixeira */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6 }}>
+                    <p style={{ margin: 0, fontWeight: 800, fontSize: '1rem', color: '#2d3748', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {g.nome || 'Sem nome'}
+                    </p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }} onClick={(e) => e.stopPropagation()}>
+                      <div style={{ position: 'relative' }}>
+                        <span
+                          className={`status-badge status-${g.status}`}
+                          style={{ cursor: 'pointer', fontSize: '0.7rem' }}
+                          onClick={() => setStatusOpen(statusOpen === g.id ? null : g.id)}
+                        >
+                          {STATUS_OPTIONS.find((s) => s.value === g.status)?.label || g.status} ▾
+                        </span>
+                        {statusOpen === g.id && (
+                          <div style={{
+                            position: 'absolute', top: '110%', right: 0, zIndex: 30,
+                            background: '#fff', border: '1px solid var(--color-border)',
+                            borderRadius: 10, boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+                            minWidth: 148, overflow: 'hidden',
+                          }}>
+                            {STATUS_OPTIONS.map((s) => (
+                              <div key={s.value} onClick={() => changeStatus(g.id, s.value)} style={{
+                                padding: '10px 14px', cursor: 'pointer', fontSize: '0.88rem',
+                                fontWeight: g.status === s.value ? 700 : 400,
+                                background: g.status === s.value ? '#f0f4ff' : 'transparent',
+                              }}>
+                                {s.label}
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
-                    ))}
+                      <button className="icon-btn" style={{ color: 'var(--color-danger)' }}
+                        onClick={() => setConfirmando(g)}>
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
                   </div>
-                )}
+
+                  {/* Badge de dose */}
+                  {alerta && (
+                    <span style={{
+                      display: 'inline-block', marginTop: 4,
+                      fontSize: '0.72rem', fontWeight: 700, color: alerta.cor,
+                      background: alerta.bg, borderRadius: 20, padding: '2px 8px',
+                      border: `1px solid ${alerta.cor}44`,
+                    }}>{alerta.label}</span>
+                  )}
+
+                  {/* Grade de info: data, idade, peso, ninhada */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3px 12px', marginTop: 6 }}>
+                    {g.data_nascimento && (
+                      <span style={{ fontSize: '0.78rem', color: '#718096', display: 'flex', alignItems: 'center', gap: 3 }}>
+                        📅 {g.data_nascimento.split('-').reverse().join('/')}
+                      </span>
+                    )}
+                    {g.data_nascimento && (
+                      <span style={{ fontSize: '0.78rem', color: '#718096', display: 'flex', alignItems: 'center', gap: 3 }}>
+                        🎂 {calcularIdade(g.data_nascimento)}
+                      </span>
+                    )}
+                    {g.peso != null && (
+                      <span style={{ fontSize: '0.78rem', color: '#718096', display: 'flex', alignItems: 'center', gap: 3 }}>
+                        ⚖️ {formatarPeso(g.peso)}
+                      </span>
+                    )}
+                    {g.ninhada_nome && (
+                      <span style={{ fontSize: '0.78rem', color: '#718096', display: 'flex', alignItems: 'center', gap: 3 }}>
+                        🐣 {g.ninhada_nome}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Pai / Mãe como chips */}
+                  {(g.mae_nome || g.pai_nome) && (
+                    <div style={{ display: 'flex', gap: 6, marginTop: 7, flexWrap: 'wrap' }}>
+                      {g.mae_nome && (
+                        <span style={{ fontSize: '0.72rem', fontWeight: 600, color: '#7c3aed', background: '#f5f0ff', borderRadius: 20, padding: '2px 10px', border: '1px solid #ddd6fe' }}>
+                          ♀ {g.mae_nome}
+                        </span>
+                      )}
+                      {g.pai_nome && (
+                        <span style={{ fontSize: '0.72rem', fontWeight: 600, color: '#1d4ed8', background: '#eff6ff', borderRadius: 20, padding: '2px 10px', border: '1px solid #bfdbfe' }}>
+                          ♂ {g.pai_nome}
+                        </span>
+                      )}
+                    </div>
+                  )}
+
+                </div>
               </div>
-
             </div>
-            <button
-              className="icon-btn"
-              style={{ color: 'var(--color-danger)', alignSelf: 'center', flexShrink: 0 }}
-              onClick={(e) => { e.stopPropagation(); setConfirmando(g); }}
-            >
-              <Trash2 size={18} />
-            </button>
-          </div>
-        </div>
-        );
-      })}
-
+          );
+        })}
       </div>
 
       {confirmando && (
