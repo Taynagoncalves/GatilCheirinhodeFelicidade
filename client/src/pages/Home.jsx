@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Cat, PawPrint, Plus, CalendarClock, X, Users, Wallet, Syringe, TrendingUp, TrendingDown, CalendarDays } from 'lucide-react';
+import { Cat, PawPrint, Plus, CalendarClock, X, Users, Wallet, Syringe, TrendingUp, TrendingDown, CalendarDays, ChevronRight, Heart } from 'lucide-react';
 import Layout from '../components/Layout';
 import EmptyState from '../components/EmptyState';
 import { usePush } from '../hooks/usePush';
@@ -106,52 +106,67 @@ export default function Home() {
 
       {/* ── Stats ── */}
       <div className="stats-grid" data-tour="home-stats">
-        <div className="stat-card" data-tour="home-stat-gatos" style={{ cursor: 'pointer' }} onClick={() => navigate('/gatos')}>
-          <span className="stat-icon" style={{ background: '#dbeafe', color: '#1d4ed8' }}><Cat size={18} /></span>
-          <span className="stat-value" style={{ color: '#1d4ed8' }}>{data?.total_gatos ?? '—'}</span>
-          <span className="stat-label" style={{ color: '#1d4ed8' }}>Gatos cadastrados</span>
-        </div>
-        <div className="stat-card" data-tour="home-stat-ninhadas" style={{ cursor: 'pointer' }} onClick={() => navigate('/ninhadas')}>
-          <span className="stat-icon" style={{ background: '#ede9fe', color: '#7c3aed' }}><PawPrint size={18} /></span>
-          <span className="stat-value" style={{ color: '#7c3aed' }}>{data?.total_ninhadas ?? '—'}</span>
-          <span className="stat-label" style={{ color: '#7c3aed' }}>Ninhadas</span>
-        </div>
-        <div className="stat-card" data-tour="home-reservados" style={{ cursor: 'pointer' }} onClick={() => navigate('/gatos?status=reservado')}>
-          <span className="stat-icon" style={{ background: '#fef3c7', color: '#d97706' }}><Users size={18} /></span>
-          <span className="stat-value" style={{ color: '#d97706' }}>{data?.total_reservados ?? '—'}</span>
-          <span className="stat-label" style={{ color: '#d97706' }}>Reservados</span>
-        </div>
-        <div className="stat-card" data-tour="home-vendidos" style={{ cursor: 'pointer' }} onClick={() => navigate('/gatos?status=vendido')}>
-          <span className="stat-icon" style={{ background: '#dcfce7', color: '#16a34a' }}><PawPrint size={18} /></span>
-          <span className="stat-value" style={{ color: '#16a34a' }}>{data?.total_vendidos ?? '—'}</span>
-          <span className="stat-label" style={{ color: '#16a34a' }}>Vendidos</span>
-        </div>
+        {[
+          { label: 'Gatos', value: data?.total_gatos, icon: <Cat size={20} />, cor: '#1d4ed8', bg: 'linear-gradient(135deg, #eff6ff, #dbeafe)', route: '/gatos', tour: 'home-stat-gatos' },
+          { label: 'Ninhadas', value: data?.total_ninhadas, icon: <PawPrint size={20} />, cor: '#7c3aed', bg: 'linear-gradient(135deg, #f5f3ff, #ede9fe)', route: '/ninhadas', tour: 'home-stat-ninhadas' },
+          { label: 'Reservados', value: data?.total_reservados, icon: <Heart size={20} />, cor: '#d97706', bg: 'linear-gradient(135deg, #fffbeb, #fef3c7)', route: '/gatos?status=reservado', tour: 'home-reservados' },
+          { label: 'Vendidos', value: data?.total_vendidos, icon: <PawPrint size={20} />, cor: '#16a34a', bg: 'linear-gradient(135deg, #f0fdf4, #dcfce7)', route: '/gatos?status=vendido', tour: 'home-vendidos' },
+        ].map((s) => (
+          <div key={s.label} data-tour={s.tour} onClick={() => navigate(s.route)} style={{
+            background: s.bg, borderRadius: 16, padding: '14px 14px 12px', cursor: 'pointer',
+            boxShadow: '0 2px 10px rgba(0,0,0,0.06)', border: `1px solid ${s.cor}18`,
+            display: 'flex', flexDirection: 'column', gap: 8,
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ width: 38, height: 38, borderRadius: 12, background: `${s.cor}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: s.cor }}>
+                {s.icon}
+              </div>
+              <ChevronRight size={14} color={`${s.cor}88`} />
+            </div>
+            <div>
+              <p style={{ margin: 0, fontSize: '1.8rem', fontWeight: 900, color: s.cor, lineHeight: 1 }}>{s.value ?? '—'}</p>
+              <p style={{ margin: '3px 0 0', fontSize: '0.74rem', fontWeight: 600, color: s.cor, opacity: 0.8 }}>{s.label}</p>
+            </div>
+          </div>
+        ))}
       </div>
 
-      {/* ── Ações rápidas (cards visuais) ── */}
+      {/* ── Ações rápidas ── */}
       <div data-tour="home-acoes" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
         <div onClick={() => setShowModal(true)} data-tour="home-btn-cadastrar" style={{
-          background: 'linear-gradient(135deg, #1a4d7c, #2f6690)',
-          borderRadius: 14, padding: '16px 12px', cursor: 'pointer',
-          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
-          boxShadow: '0 4px 14px rgba(26,77,124,0.25)',
+          background: 'linear-gradient(145deg, #1a4d7c, #2f6690)',
+          borderRadius: 16, padding: '16px 14px', cursor: 'pointer',
+          boxShadow: '0 4px 16px rgba(26,77,124,0.28)',
+          display: 'flex', flexDirection: 'column', gap: 10,
         }}>
-          <div style={{ width: 42, height: 42, background: 'rgba(255,255,255,0.18)', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Plus size={22} color="#fff" />
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ width: 40, height: 40, background: 'rgba(255,255,255,0.18)', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Plus size={22} color="#fff" />
+            </div>
+            <ChevronRight size={16} color="rgba(255,255,255,0.5)" />
           </div>
-          <span style={{ color: '#fff', fontWeight: 700, fontSize: '0.82rem', textAlign: 'center' }}>Cadastrar Gato</span>
+          <div>
+            <p style={{ margin: 0, color: '#fff', fontWeight: 800, fontSize: '0.9rem' }}>Cadastrar Gato</p>
+            <p style={{ margin: '2px 0 0', color: 'rgba(255,255,255,0.65)', fontSize: '0.72rem' }}>Novo filhote</p>
+          </div>
         </div>
 
         <div onClick={() => navigate('/pais')} style={{
-          background: 'linear-gradient(135deg, #5b21b6, #7c3aed)',
-          borderRadius: 14, padding: '16px 12px', cursor: 'pointer',
-          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
-          boxShadow: '0 4px 14px rgba(124,58,237,0.25)',
+          background: 'linear-gradient(145deg, #5b21b6, #7c3aed)',
+          borderRadius: 16, padding: '16px 14px', cursor: 'pointer',
+          boxShadow: '0 4px 16px rgba(124,58,237,0.28)',
+          display: 'flex', flexDirection: 'column', gap: 10,
         }}>
-          <div style={{ width: 42, height: 42, background: 'rgba(255,255,255,0.18)', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Users size={22} color="#fff" />
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ width: 40, height: 40, background: 'rgba(255,255,255,0.18)', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Users size={22} color="#fff" />
+            </div>
+            <ChevronRight size={16} color="rgba(255,255,255,0.5)" />
           </div>
-          <span style={{ color: '#fff', fontWeight: 700, fontSize: '0.82rem', textAlign: 'center' }}>Ver Pais</span>
+          <div>
+            <p style={{ margin: 0, color: '#fff', fontWeight: 800, fontSize: '0.9rem' }}>Ver Pais</p>
+            <p style={{ margin: '2px 0 0', color: 'rgba(255,255,255,0.65)', fontSize: '0.72rem' }}>Reprodutores</p>
+          </div>
         </div>
       </div>
 
