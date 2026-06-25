@@ -1,13 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Syringe, Pill, ClipboardList, Settings2, Trash2 } from 'lucide-react';
+import { Syringe, Settings2 } from 'lucide-react';
 import Layout from '../../components/Layout';
-import EmptyState from '../../components/EmptyState';
-import ConfirmModal from '../../components/ConfirmModal';
 import CalendarioDoses from '../../components/CalendarioDoses';
-import { useToast } from '../../components/Toast';
 import { useTour } from '../../contexts/TourContext';
-import api from '../../api/client';
 
 const TOUR = [
   {
@@ -25,41 +21,16 @@ const TOUR = [
     titulo: 'Calendário de Doses',
     texto: 'Veja as doses de cada mês no calendário. Os pontos coloridos indicam dias com doses — toque em um dia para ver os detalhes.',
   },
-  {
-    selector: '[data-tour="saude-tabs"]',
-    titulo: 'Filtro por Tipo',
-    texto: 'Alterne entre "Medicamentos" e "Vacinas" para filtrar o histórico de aplicações.',
-  },
-  {
-    selector: '[data-tour="saude-lista"]',
-    titulo: 'Histórico de Doses',
-    texto: 'Cada card mostra o gato, o medicamento, a data de aplicação e a próxima dose agendada.',
-  },
 ];
 
 export default function SaudeList() {
   const navigate = useNavigate();
-  const [tipo, setTipo] = useState('medicamento');
-  const [registros, setRegistros] = useState([]);
-  const [confirmando, setConfirmando] = useState(null);
-  const toast = useToast();
   const { setSteps } = useTour();
 
   useEffect(() => {
     setSteps(TOUR, 'saude');
     return () => setSteps([]);
   }, []);
-
-  useEffect(() => {
-    api.get('/aplicacoes', { params: { tipo } }).then((res) => setRegistros(res.data));
-  }, [tipo]);
-
-  const excluir = async (id) => {
-    await api.delete(`/aplicacoes/${id}`);
-    setRegistros((prev) => prev.filter((r) => r.id !== id));
-    setConfirmando(null);
-    toast('Registro excluído!');
-  };
 
   return (
     <Layout title="Saúde" showBack>
@@ -73,54 +44,6 @@ export default function SaudeList() {
       <div data-tour="saude-calendario">
         <CalendarioDoses />
       </div>
-
-      <div className="tabs" data-tour="saude-tabs">
-        <button className={`tab${tipo === 'medicamento' ? ' active' : ''}`} onClick={() => setTipo('medicamento')}>Medicamentos</button>
-        <button className={`tab${tipo === 'vacina' ? ' active' : ''}`} onClick={() => setTipo('vacina')}>Vacinas</button>
-      </div>
-
-      {registros.length === 0 && (
-        <EmptyState icon={ClipboardList} title="Nenhum registro encontrado" description="Registre uma dose para começar o histórico de saúde." />
-      )}
-
-      <div data-tour="saude-lista">
-      {registros.map((r) => (
-        <div key={r.id} className="card">
-          <div className="card-row">
-            {r.gato_foto ? (
-              <img src={r.gato_foto} alt={r.gato_nome} className="card-photo" />
-            ) : (
-              <span className="card-photo-placeholder">{r.tipo === 'vacina' ? <Syringe size={24} /> : <Pill size={24} />}</span>
-            )}
-            <div style={{ flex: 1 }}>
-              <p className="card-title">{r.gato_nome || 'Sem nome'}</p>
-              <p className="card-meta">
-                {r.medicamento_nome}<br />
-                Última aplicação: {r.data_aplicada.split('-').reverse().join('/')}<br />
-                {r.proxima_dose && <>Próxima dose: {r.proxima_dose.split('-').reverse().join('/')}<br /></>}
-                {r.observacoes && <>Obs: {r.observacoes}</>}
-              </p>
-            </div>
-            <button
-              className="icon-btn"
-              style={{ color: 'var(--color-danger)', alignSelf: 'center', flexShrink: 0 }}
-              onClick={() => setConfirmando(r)}
-            >
-              <Trash2 size={18} />
-            </button>
-          </div>
-        </div>
-      ))}
-
-      </div>
-
-      {confirmando && (
-        <ConfirmModal
-          message={`Excluir registro de ${confirmando.medicamento_nome} de ${confirmando.gato_nome}?`}
-          onConfirm={() => excluir(confirmando.id)}
-          onCancel={() => setConfirmando(null)}
-        />
-      )}
     </Layout>
   );
 }
