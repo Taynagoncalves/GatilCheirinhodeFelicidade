@@ -45,7 +45,6 @@ router.get('/agenda', async (req, res) => {
              CASE WHEN gato_id IS NOT NULL THEN 'gato' ELSE 'pai' END AS entidade_tipo,
              medicamento_id, MAX(data_aplicada) AS ultima_data
       FROM aplicacoes
-      WHERE proxima_dose IS NOT NULL
       GROUP BY gato_id, pai_id, medicamento_id
     ) ult ON a.medicamento_id = ult.medicamento_id
           AND a.data_aplicada = ult.ultima_data
