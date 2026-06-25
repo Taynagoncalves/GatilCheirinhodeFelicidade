@@ -337,42 +337,61 @@ function TabHistorico({ onIrMes }) {
 }
 
 // ── Aba Clientes ───────────────────────────────────────────────────────────
+const STATUS_CLIENTE = {
+  ativo:      { label: 'Cliente Ativo',    cor: '#16a34a', bg: '#dcfce7' },
+  reserva:    { label: 'Reserva',          cor: '#d97706', bg: '#fef3c7' },
+  finalizado: { label: 'Finalizado',       cor: '#2563eb', bg: '#dbeafe' },
+  inativo:    { label: 'Inativo',          cor: '#64748b', bg: '#f1f5f9' },
+};
+const FILTROS_CLIENTE = [
+  { v: '', l: 'Todos' }, { v: 'ativo', l: 'Ativos' }, { v: 'reserva', l: 'Reservas' },
+  { v: 'finalizado', l: 'Finalizados' }, { v: 'inativo', l: 'Inativos' },
+];
+
 function TabClientes() {
+  const navigate = useNavigate();
   const [clientes, setClientes] = useState([]);
+  const [stats, setStats] = useState(null);
   const [gatos, setGatos] = useState([]);
   const [busca, setBusca] = useState('');
+  const [filtroStatus, setFiltroStatus] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [editando, setEditando] = useState(null);
   const [confirmando, setConfirmando] = useState(null);
-  const [form, setForm] = useState({ nome: '', telefone: '', cidade: '', gato_id: '', data_venda: '' });
+  const [form, setForm] = useState({ nome: '', telefone: '', cidade: '', gato_id: '', data_venda: '', status: 'ativo', valor_venda: '' });
   const toast = useToast();
 
-  const carregar = () => api.get('/clientes').then((r) => setClientes(r.data));
+  const carregar = () => {
+    api.get('/clientes').then((r) => setClientes(r.data));
+    api.get('/clientes/stats').then((r) => setStats(r.data));
+  };
   useEffect(() => {
     carregar();
     api.get('/gatos').then((r) => setGatos(r.data));
   }, []);
 
-  const filtrados = clientes.filter((c) =>
-    c.nome.toLowerCase().includes(busca.toLowerCase()) ||
-    (c.cidade || '').toLowerCase().includes(busca.toLowerCase()) ||
-    (c.gato_nome || '').toLowerCase().includes(busca.toLowerCase())
-  );
+  const filtrados = clientes.filter((c) => {
+    const matchStatus = !filtroStatus || c.status === filtroStatus;
+    const matchBusca = !busca ||
+      c.nome.toLowerCase().includes(busca.toLowerCase()) ||
+      (c.cidade || '').toLowerCase().includes(busca.toLowerCase()) ||
+      (c.gato_nome || '').toLowerCase().includes(busca.toLowerCase());
+    return matchStatus && matchBusca;
+  });
 
   const abrirWhatsApp = (tel) => {
-    const numero = tel.replace(/\D/g, '');
-    const com55 = numero.startsWith('55') ? numero : `55${numero}`;
-    window.open(`https://wa.me/${com55}`, '_blank');
+    const num = tel.replace(/\D/g, '');
+    window.open(`https://wa.me/${num.startsWith('55') ? num : '55' + num}`, '_blank');
   };
 
   const abrirNovo = () => {
     setEditando(null);
-    setForm({ nome: '', telefone: '', cidade: '', gato_id: '', data_venda: new Date().toISOString().slice(0, 10) });
+    setForm({ nome: '', telefone: '', cidade: '', gato_id: '', data_venda: new Date().toISOString().slice(0, 10), status: 'ativo', valor_venda: '' });
     setShowForm(true);
   };
   const abrirEditar = (c) => {
     setEditando(c);
-    setForm({ nome: c.nome, telefone: c.telefone || '', cidade: c.cidade || '', gato_id: c.gato_id || '', data_venda: c.data_venda || '' });
+    setForm({ nome: c.nome, telefone: c.telefone || '', cidade: c.cidade || '', gato_id: c.gato_id || '', data_venda: c.data_venda || '', status: c.status || 'ativo', valor_venda: c.valor_venda || '' });
     setShowForm(true);
   };
   const salvar = async (e) => {
@@ -392,110 +411,120 @@ function TabClientes() {
 
   return (
     <div>
-      <button className="btn btn-primary" onClick={abrirNovo} style={{ marginBottom: 4 }}>
+      {/* Stats */}
+      {stats && (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 4 }}>
+          {[
+            { icon: <Users size={18} />, valor: stats.total_ativos, label: 'Clientes Ativos', sub: `+${stats.novos_mes} este mês`, cor: '#7c3aed', bg: '#f5f0ff' },
+            { icon: <Cat size={18} />, valor: stats.total_vendidos, label: 'Gatos Vendidos', sub: `+${stats.novos_vendidos} este mês`, cor: '#16a34a', bg: '#dcfce7' },
+            { icon: <Wallet size={18} />, valor: stats.total_reservas, label: 'Reservas', sub: 'pendentes', cor: '#d97706', bg: '#fef3c7' },
+          ].map((s) => (
+            <div key={s.label} style={{ background: '#fff', borderRadius: 14, padding: '10px 8px', boxShadow: '0 1px 6px rgba(0,0,0,0.07)', textAlign: 'center' }}>
+              <div style={{ width: 34, height: 34, borderRadius: '50%', background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', color: s.cor, margin: '0 auto 6px' }}>{s.icon}</div>
+              <p style={{ margin: 0, fontSize: '1.3rem', fontWeight: 900, color: s.cor, lineHeight: 1 }}>{s.valor}</p>
+              <p style={{ margin: '2px 0 0', fontSize: '0.62rem', fontWeight: 700, color: '#475569', lineHeight: 1.3 }}>{s.label}</p>
+              <p style={{ margin: '2px 0 0', fontSize: '0.6rem', color: '#94a3b8' }}>{s.sub}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <button className="btn btn-primary" onClick={abrirNovo}>
         <Plus size={16} /> Cadastrar Cliente
       </button>
 
-      {clientes.length === 0 && (
-        <EmptyState icon={Users} title="Nenhum cliente cadastrado" description="Cadastre os compradores dos filhotes aqui." />
-      )}
+      {/* Busca + filtros */}
+      <div className="search-input">
+        <Search size={16} />
+        <input placeholder="Buscar cliente..." value={busca} onChange={(e) => setBusca(e.target.value)} />
+      </div>
 
-      {clientes.length > 0 && (
-        <>
-          {/* Busca */}
-          <div className="search-input" style={{ marginBottom: 4 }}>
-            <Search size={16} />
-            <input placeholder="Buscar cliente..." value={busca} onChange={(e) => setBusca(e.target.value)} />
-          </div>
+      <div style={{ display: 'flex', gap: 6, overflowX: 'auto', scrollbarWidth: 'none', marginBottom: 4 }}>
+        {FILTROS_CLIENTE.map((f) => {
+          const ativo = filtroStatus === f.v;
+          return (
+            <button key={f.v} onClick={() => setFiltroStatus(f.v)} style={{
+              flexShrink: 0, border: ativo ? 'none' : '1.5px solid #e2e8f0',
+              borderRadius: 20, padding: '5px 14px', fontSize: '0.78rem',
+              fontWeight: ativo ? 700 : 500, cursor: 'pointer',
+              background: ativo ? 'var(--color-primary)' : '#fff',
+              color: ativo ? '#fff' : '#64748b',
+            }}>{f.l}</button>
+          );
+        })}
+      </div>
 
-          {/* Contador */}
-          <p style={{ margin: '0 0 8px', fontSize: '0.78rem', color: '#94a3b8', fontWeight: 500 }}>
-            {filtrados.length} {filtrados.length === 1 ? 'cliente' : 'clientes'}
-          </p>
-        </>
-      )}
+      {clientes.length === 0 && <EmptyState icon={Users} title="Nenhum cliente cadastrado" description="Cadastre os compradores dos filhotes aqui." />}
 
       {filtrados.map((c) => {
         const iniciais = c.nome.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase();
+        const st = STATUS_CLIENTE[c.status] || STATUS_CLIENTE.ativo;
         return (
-          <div key={c.id} style={{
-            background: '#fff', borderRadius: 16, marginBottom: 10,
-            boxShadow: '0 2px 12px rgba(0,0,0,0.07)', padding: '14px',
-          }}>
-            {/* Topo: avatar + nome + ações */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <div style={{
-                width: 46, height: 46, borderRadius: '50%', flexShrink: 0,
-                background: 'linear-gradient(135deg, #5b21b6, #7c3aed)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: '#fff', fontWeight: 800, fontSize: '1rem', letterSpacing: 0.5,
-              }}>
+          <div key={c.id} style={{ background: '#fff', borderRadius: 16, marginBottom: 10, boxShadow: '0 2px 12px rgba(0,0,0,0.07)', overflow: 'hidden' }}>
+            {/* Topo */}
+            <div style={{ padding: '14px 14px 10px', display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+              <div style={{ width: 48, height: 48, borderRadius: '50%', flexShrink: 0, background: 'linear-gradient(135deg, #5b21b6, #7c3aed)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: '1rem' }}>
                 {iniciais}
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ margin: 0, fontWeight: 800, fontSize: '0.98rem', color: '#1e293b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.nome}</p>
-                {(c.cidade || c.data_venda) && (
-                  <p style={{ margin: '2px 0 0', fontSize: '0.75rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: 8 }}>
-                    {c.cidade && <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}><MapPin size={11} />{c.cidade}</span>}
-                    {c.data_venda && <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}><CalendarDays size={11} />{c.data_venda.split('-').reverse().join('/')}</span>}
-                  </p>
-                )}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                  <p style={{ margin: 0, fontWeight: 800, fontSize: '0.98rem', color: '#1e293b' }}>{c.nome}</p>
+                  <span style={{ fontSize: '0.68rem', fontWeight: 700, color: st.cor, background: st.bg, borderRadius: 20, padding: '2px 8px' }}>{st.label}</span>
+                </div>
+                <div style={{ marginTop: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  {c.telefone && <span style={{ fontSize: '0.78rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: 4 }}><Phone size={12} color="#7c3aed" /> {c.telefone}</span>}
+                  {c.cidade && <span style={{ fontSize: '0.78rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: 4 }}><MapPin size={12} color="#7c3aed" /> {c.cidade}</span>}
+                  {c.criado_em && <span style={{ fontSize: '0.75rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: 4 }}><CalendarDays size={11} /> Cliente desde {c.criado_em.split('-').reverse().join('/')}</span>}
+                </div>
               </div>
-              <div style={{ display: 'flex', gap: 2, flexShrink: 0 }}>
-                <button className="icon-btn" style={{ color: '#94a3b8' }} onClick={() => abrirEditar(c)}><Pencil size={15} /></button>
-                <button className="icon-btn" style={{ color: 'var(--color-danger)' }} onClick={() => setConfirmando(c)}><Trash2 size={15} /></button>
-              </div>
+              <button className="icon-btn" style={{ color: '#94a3b8' }} onClick={() => abrirEditar(c)}><Pencil size={15} /></button>
             </div>
 
-            {/* Divisor */}
-            {(c.telefone || c.gato_nome) && (
-              <div style={{ borderTop: '1px solid #f1f5f9', margin: '10px 0 8px' }} />
-            )}
-
-            {/* Info: telefone + whatsapp + gato */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 6 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                {c.telefone && (
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: '0.8rem', color: '#475569', fontWeight: 500 }}>
-                    <Phone size={13} color="#7c3aed" /> {c.telefone}
-                  </span>
+            {/* Gato + Total */}
+            {(c.gato_nome || c.valor_venda) && (
+              <div style={{ margin: '0 14px', borderRadius: 10, background: '#f8fafc', padding: '8px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                {c.gato_nome && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <Cat size={14} color="#7c3aed" />
+                    <div>
+                      <p style={{ margin: 0, fontSize: '0.68rem', color: '#94a3b8' }}>1 gato adquirido</p>
+                      <p style={{ margin: 0, fontSize: '0.82rem', fontWeight: 700, color: '#1e293b' }}>{c.gato_nome}</p>
+                    </div>
+                  </div>
                 )}
-                {c.telefone && (
-                  <button
-                    onClick={(e) => { e.stopPropagation(); abrirWhatsApp(c.telefone); }}
-                    style={{
-                      display: 'flex', alignItems: 'center', gap: 5,
-                      background: '#dcfce7', border: '1px solid #bbf7d0',
-                      borderRadius: 20, padding: '4px 10px', cursor: 'pointer',
-                      fontSize: '0.75rem', fontWeight: 700, color: '#16a34a',
-                    }}
-                  >
-                    <MessageCircle size={13} /> WhatsApp
-                  </button>
+                {c.valor_venda && (
+                  <div style={{ textAlign: 'right' }}>
+                    <p style={{ margin: 0, fontSize: '0.68rem', color: '#94a3b8' }}>Total gasto</p>
+                    <p style={{ margin: 0, fontSize: '0.88rem', fontWeight: 800, color: '#16a34a' }}>{Number(c.valor_venda).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
+                  </div>
                 )}
               </div>
-              {c.gato_nome && (
-                <span style={{
-                  display: 'flex', alignItems: 'center', gap: 5,
-                  background: '#f5f0ff', borderRadius: 20, padding: '3px 10px',
-                  fontSize: '0.75rem', fontWeight: 700, color: '#7c3aed',
-                  border: '1px solid #ede9fe',
-                }}>
-                  <Cat size={12} /> {c.gato_nome}
-                </span>
+            )}
+
+            {/* Ações */}
+            <div style={{ display: 'flex', gap: 0, borderTop: '1px solid #f1f5f9', marginTop: 10 }}>
+              {c.telefone && (
+                <button onClick={() => abrirWhatsApp(c.telefone)} style={{ flex: 1, border: 'none', background: 'none', cursor: 'pointer', padding: '10px 4px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, color: '#16a34a', fontSize: '0.65rem', fontWeight: 700 }}>
+                  <MessageCircle size={16} /> WhatsApp
+                </button>
               )}
+              {c.gato_id && (
+                <button onClick={() => navigate(`/gatos/${c.gato_id}`)} style={{ flex: 1, border: 'none', background: 'none', cursor: 'pointer', padding: '10px 4px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, color: '#1d4ed8', fontSize: '0.65rem', fontWeight: 700, borderLeft: '1px solid #f1f5f9' }}>
+                  <Cat size={16} /> Ver Gato
+                </button>
+              )}
+              <button onClick={() => navigate('/financeiro')} style={{ flex: 1, border: 'none', background: 'none', cursor: 'pointer', padding: '10px 4px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, color: '#7c3aed', fontSize: '0.65rem', fontWeight: 700, borderLeft: '1px solid #f1f5f9' }}>
+                <Wallet size={16} /> Financeiro
+              </button>
+              <button onClick={() => setConfirmando(c)} style={{ flex: 1, border: 'none', background: 'none', cursor: 'pointer', padding: '10px 4px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, color: '#dc2626', fontSize: '0.65rem', fontWeight: 700, borderLeft: '1px solid #f1f5f9' }}>
+                <Trash2 size={16} /> Excluir
+              </button>
             </div>
           </div>
         );
       })}
 
-      {confirmando && (
-        <ConfirmModal
-          message={`Remover o cliente "${confirmando.nome}"?`}
-          onConfirm={excluir}
-          onCancel={() => setConfirmando(null)}
-        />
-      )}
+      {confirmando && <ConfirmModal message={`Remover o cliente "${confirmando.nome}"?`} onConfirm={excluir} onCancel={() => setConfirmando(null)} />}
 
       {showForm && (
         <div className="modal-overlay" onClick={() => setShowForm(false)}>
@@ -503,17 +532,17 @@ function TabClientes() {
             <button className="modal-close" onClick={() => setShowForm(false)}><X size={20} /></button>
             <p className="modal-title">{editando ? 'Editar Cliente' : 'Novo Cliente'}</p>
             <form onSubmit={salvar} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div className="field"><label>Nome *</label><input required value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} placeholder="Ex: Maria da Silva" /></div>
+              <div className="field"><label>Telefone</label><input value={form.telefone} onChange={(e) => setForm({ ...form, telefone: e.target.value })} placeholder="(11) 99999-9999" /></div>
+              <div className="field"><label>Cidade</label><input value={form.cidade} onChange={(e) => setForm({ ...form, cidade: e.target.value })} placeholder="Ex: São Paulo" /></div>
               <div className="field">
-                <label>Nome *</label>
-                <input required value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} placeholder="Ex: Maria da Silva" />
-              </div>
-              <div className="field">
-                <label>Telefone</label>
-                <input value={form.telefone} onChange={(e) => setForm({ ...form, telefone: e.target.value })} placeholder="(11) 99999-9999" />
-              </div>
-              <div className="field">
-                <label>Cidade</label>
-                <input value={form.cidade} onChange={(e) => setForm({ ...form, cidade: e.target.value })} placeholder="Ex: São Paulo" />
+                <label>Status</label>
+                <select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}>
+                  <option value="ativo">Ativo</option>
+                  <option value="reserva">Reserva</option>
+                  <option value="finalizado">Finalizado</option>
+                  <option value="inativo">Inativo</option>
+                </select>
               </div>
               <div className="field">
                 <label>Gato comprado</label>
@@ -522,13 +551,9 @@ function TabClientes() {
                   {gatos.map((g) => <option key={g.id} value={g.id}>{g.nome || 'Sem nome'}</option>)}
                 </select>
               </div>
-              <div className="field">
-                <label>Data da venda</label>
-                <input type="date" value={form.data_venda} onChange={(e) => setForm({ ...form, data_venda: e.target.value })} />
-              </div>
-              <button type="submit" className="btn btn-primary" disabled={!form.nome}>
-                <Plus size={16} /> {editando ? 'Salvar alterações' : 'Cadastrar'}
-              </button>
+              <div className="field"><label>Data da venda</label><input type="date" value={form.data_venda} onChange={(e) => setForm({ ...form, data_venda: e.target.value })} /></div>
+              <div className="field"><label>Valor da venda (R$)</label><input type="number" step="0.01" min="0" value={form.valor_venda} onChange={(e) => setForm({ ...form, valor_venda: e.target.value })} placeholder="0,00" /></div>
+              <button type="submit" className="btn btn-primary" disabled={!form.nome}><Plus size={16} /> {editando ? 'Salvar alterações' : 'Cadastrar'}</button>
             </form>
           </div>
         </div>
