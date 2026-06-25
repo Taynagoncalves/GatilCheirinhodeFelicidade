@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Cat, PawPrint, Plus, CalendarClock, X, Users, Wallet, TrendingUp, TrendingDown, CalendarDays, ChevronRight, Heart, ShoppingBag } from 'lucide-react';
+import { Cat, PawPrint, Plus, CalendarClock, X, Users, Wallet, TrendingUp, TrendingDown, CalendarDays, ChevronRight, Heart, ShoppingBag, BarChart3 } from 'lucide-react';
 import Layout from '../components/Layout';
 import EmptyState from '../components/EmptyState';
 import { usePush } from '../hooks/usePush';
@@ -162,45 +162,79 @@ export default function Home() {
         </div>
       </div>
 
-      {/* ── Mini card financeiro ── */}
-      {data && (
-        <div data-tour="home-saldo" onClick={() => navigate('/financeiro')} style={{
-          background: '#fff', borderRadius: 16, padding: '14px 16px', cursor: 'pointer',
-          boxShadow: '0 2px 10px rgba(0,0,0,0.07)',
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#dbeafe', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Wallet size={16} color="#1d4ed8" />
+      {/* ── Painel Financeiro ── */}
+      <div data-tour="home-saldo" style={{ borderRadius: 20, overflow: 'hidden', boxShadow: '0 4px 20px rgba(26,77,124,0.18)' }}>
+        {/* Cabeçalho gradiente */}
+        <div style={{ background: 'linear-gradient(135deg, #1a4d7c, #2f6690)', padding: '16px 16px 20px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(255,255,255,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Wallet size={18} color="#fff" />
               </div>
-              <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#1e293b' }}>Financeiro <span style={{ color: '#94a3b8', fontWeight: 500 }}>• este mês</span></span>
+              <div>
+                <p style={{ margin: 0, fontSize: '0.88rem', fontWeight: 800, color: '#fff' }}>Painel Financeiro</p>
+                <p style={{ margin: 0, fontSize: '0.68rem', color: 'rgba(255,255,255,0.65)' }}>Este mês</p>
+              </div>
             </div>
-            <span style={{ fontSize: '0.75rem', color: '#1d4ed8', fontWeight: 600 }}>Ver mais →</span>
+            <button onClick={() => navigate('/financeiro')} style={{
+              background: 'rgba(255,255,255,0.18)', border: 'none', borderRadius: 20,
+              padding: '5px 12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5,
+              color: '#fff', fontSize: '0.72rem', fontWeight: 700,
+            }}>
+              Ir ao painel <ChevronRight size={14} />
+            </button>
           </div>
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 0 }}>
-            <div style={{ flex: 1 }}>
-              <p style={{ margin: 0, fontSize: '0.7rem', color: '#94a3b8', fontWeight: 500 }}>Saldo</p>
-              <p style={{ margin: 0, fontSize: '1.3rem', fontWeight: 900, color: '#1e293b' }}>{fmt(data.fin_saldo)}</p>
-            </div>
-            <div style={{ display: 'flex', gap: 16 }}>
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                  <TrendingUp size={12} color="#16a34a" />
-                  <span style={{ fontSize: '0.68rem', color: '#16a34a', fontWeight: 600 }}>Entradas</span>
+          {/* Saldo */}
+          {data && (
+            <div>
+              <p style={{ margin: '0 0 2px', fontSize: '0.7rem', color: 'rgba(255,255,255,0.6)', fontWeight: 500 }}>Saldo do mês</p>
+              <p style={{ margin: '0 0 12px', fontSize: '2rem', fontWeight: 900, color: '#fff', lineHeight: 1 }}>{fmt(data.fin_saldo)}</p>
+              <div style={{ display: 'flex', gap: 10 }}>
+                <div style={{ flex: 1, background: 'rgba(255,255,255,0.12)', borderRadius: 12, padding: '8px 12px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 2 }}>
+                    <TrendingUp size={13} color="#4ade80" />
+                    <span style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.75)', fontWeight: 600 }}>Entradas</span>
+                  </div>
+                  <p style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800, color: '#4ade80' }}>{fmt(data.fin_entradas)}</p>
                 </div>
-                <p style={{ margin: 0, fontSize: '0.85rem', fontWeight: 700, color: '#1e293b' }}>{fmt(data.fin_entradas)}</p>
-              </div>
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                  <TrendingDown size={12} color="#dc2626" />
-                  <span style={{ fontSize: '0.68rem', color: '#dc2626', fontWeight: 600 }}>Saídas</span>
+                <div style={{ flex: 1, background: 'rgba(255,255,255,0.12)', borderRadius: 12, padding: '8px 12px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 2 }}>
+                    <TrendingDown size={13} color="#fca5a5" />
+                    <span style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.75)', fontWeight: 600 }}>Saídas</span>
+                  </div>
+                  <p style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800, color: '#fca5a5' }}>{fmt(data.fin_saidas)}</p>
                 </div>
-                <p style={{ margin: 0, fontSize: '0.85rem', fontWeight: 700, color: '#1e293b' }}>{fmt(data.fin_saidas)}</p>
               </div>
             </div>
+          )}
+        </div>
+        {/* Recursos do painel */}
+        <div style={{ background: '#fff', padding: '14px 16px' }}>
+          <p style={{ margin: '0 0 10px', fontSize: '0.72rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 0.5 }}>O que você pode fazer</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {[
+              { icon: <TrendingUp size={15} color="#16a34a" />, bg: '#dcfce7', titulo: 'Registrar entradas', sub: 'Venda de filhotes e outros recebimentos' },
+              { icon: <TrendingDown size={15} color="#dc2626" />, bg: '#fee2e2', titulo: 'Controlar saídas', sub: 'Ração, veterinário, vacinas e mais' },
+              { icon: <BarChart3 size={15} color="#1d4ed8" />, bg: '#dbeafe', titulo: 'Ver relatórios', sub: 'Gráficos e histórico por mês' },
+              { icon: <Users size={15} color="#7c3aed" />, bg: '#f5f0ff', titulo: 'Gerenciar clientes', sub: 'Compradores, reservas e contatos' },
+            ].map((item) => (
+              <div key={item.titulo} onClick={() => navigate('/financeiro')} style={{
+                display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer',
+                padding: '6px 8px', borderRadius: 10,
+              }}>
+                <div style={{ width: 32, height: 32, borderRadius: 10, background: item.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  {item.icon}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ margin: 0, fontSize: '0.8rem', fontWeight: 700, color: '#1e293b' }}>{item.titulo}</p>
+                  <p style={{ margin: 0, fontSize: '0.68rem', color: '#94a3b8' }}>{item.sub}</p>
+                </div>
+                <ChevronRight size={14} color="#cbd5e1" />
+              </div>
+            ))}
           </div>
         </div>
-      )}
+      </div>
 
       {/* ── Próximas doses ── */}
       <section data-tour="home-proximas-doses">
