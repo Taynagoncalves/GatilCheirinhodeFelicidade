@@ -73,7 +73,7 @@ export default function CalendarioDoses() {
   return (
     <div>
       {/* Card do calendário */}
-      <div style={{ background: '#fff', borderRadius: 20, boxShadow: '0 4px 20px rgba(0,0,0,0.10)', overflow: 'hidden', marginBottom: 12 }}>
+      <div data-tour="saude-calendario-grid" style={{ background: '#fff', borderRadius: 20, boxShadow: '0 4px 20px rgba(0,0,0,0.10)', overflow: 'hidden', marginBottom: 12 }}>
 
         {/* Cabeçalho gradiente */}
         <div style={{ background: 'linear-gradient(135deg, #1a4d7c, #2f6690)', padding: '18px 16px 14px' }}>
@@ -184,7 +184,7 @@ export default function CalendarioDoses() {
 
       {/* Detalhe do dia selecionado */}
       {dataSel && (
-        <div>
+        <div data-tour="saude-calendario-detalhe">
           <h2 className="section-title" style={{ marginTop: 4 }}>
             {diaSel} de {MESES[mes]}
           </h2>

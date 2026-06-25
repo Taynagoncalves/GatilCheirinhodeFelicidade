@@ -17,9 +17,14 @@ const TOUR = [
     texto: 'Acesse o catálogo de todos os medicamentos e vacinas. Você pode adicionar novos ou editar os existentes.',
   },
   {
-    selector: '[data-tour="saude-calendario"]',
+    selector: '[data-tour="saude-calendario-grid"]',
     titulo: 'Calendário de Doses',
-    texto: 'Veja todas as doses de gatos e pais no calendário. Pontos coloridos marcam os dias — vermelho para atrasada, laranja para hoje e verde para agendada. Toque em qualquer dia para ver os detalhes.',
+    texto: 'Veja todas as doses de gatos e pais organizadas por mês. Pontos coloridos marcam os dias — vermelho para atrasada, laranja para hoje e verde para agendada.',
+  },
+  {
+    selector: '[data-tour="saude-calendario-detalhe"]',
+    titulo: 'Detalhes do Dia',
+    texto: 'Ao tocar em um dia com doses, os detalhes aparecem aqui — com o nome do animal, medicamento e o status da dose. Toque no card para ir direto ao perfil.',
   },
 ];
 
