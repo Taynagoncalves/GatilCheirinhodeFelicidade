@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Search, Plus, Cat, X, PawPrint, Users, Trash2, Cake, Weight, Layers, Calendar, MoreVertical, CheckCircle2, AlertCircle, Clock } from 'lucide-react';
+import { Search, Plus, Cat, X, PawPrint, Users, Trash2, Cake, Weight, Layers, Calendar, MoreVertical, CheckCircle2, AlertCircle, Clock, ChevronRight } from 'lucide-react';
 import Layout from '../../components/Layout';
 import EmptyState from '../../components/EmptyState';
 import ConfirmModal from '../../components/ConfirmModal';
