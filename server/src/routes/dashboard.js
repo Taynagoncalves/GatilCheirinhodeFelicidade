@@ -10,10 +10,12 @@ router.get('/', async (req, res) => {
   const [[{ total_vendidos }]] = await pool.query("SELECT COUNT(*) AS total_vendidos FROM gatos WHERE status = 'vendido'");
 
   const [proximas_doses] = await pool.query(
-    `SELECT id, gato_id, pai_id, proxima_dose, gato_nome, gato_foto, medicamento_nome FROM (
+    `SELECT id, gato_id, pai_id, proxima_dose, gato_nome, gato_foto, medicamento_nome
+     FROM (
        SELECT a.id, a.gato_id, NULL AS pai_id,
               DATE_FORMAT(a.proxima_dose, '%Y-%m-%d') AS proxima_dose,
-              g.nome AS gato_nome, g.foto_url AS gato_foto, med.nome AS medicamento_nome
+              g.nome AS gato_nome, g.foto_url AS gato_foto, med.nome AS medicamento_nome,
+              ROW_NUMBER() OVER (PARTITION BY a.gato_id ORDER BY a.proxima_dose ASC, a.id DESC) AS rn
        FROM aplicacoes a
        JOIN gatos g ON a.gato_id = g.id
        JOIN medicamentos med ON a.medicamento_id = med.id
@@ -26,7 +28,8 @@ router.get('/', async (req, res) => {
        UNION ALL
        SELECT a.id, NULL AS gato_id, a.pai_id,
               DATE_FORMAT(a.proxima_dose, '%Y-%m-%d') AS proxima_dose,
-              p.nome AS gato_nome, p.foto_url AS gato_foto, med.nome AS medicamento_nome
+              p.nome AS gato_nome, p.foto_url AS gato_foto, med.nome AS medicamento_nome,
+              ROW_NUMBER() OVER (PARTITION BY a.pai_id ORDER BY a.proxima_dose ASC, a.id DESC) AS rn
        FROM aplicacoes a
        JOIN pais p ON a.pai_id = p.id
        JOIN medicamentos med ON a.medicamento_id = med.id
@@ -37,6 +40,7 @@ router.get('/', async (req, res) => {
        ) lat ON a.id = lat.ultimo_id
        WHERE a.proxima_dose IS NOT NULL AND a.pai_id IS NOT NULL
      ) t
+     WHERE rn = 1
      ORDER BY proxima_dose ASC
      LIMIT 10`
   );
