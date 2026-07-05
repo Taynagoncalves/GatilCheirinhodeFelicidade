@@ -41,17 +41,17 @@ const TOUR = [
   },
 ];
 
-function alerteDose(proxima_dose_min, proxima_medicamento_nome) {
+function alerteDose(proxima_dose_min) {
   if (!proxima_dose_min) return null;
   const hoje = new Date();
   hoje.setHours(0, 0, 0, 0);
   const dose = new Date(proxima_dose_min + 'T00:00:00');
   const diff = Math.round((dose - hoje) / (1000 * 60 * 60 * 24));
-  const med = proxima_medicamento_nome ? ` · ${proxima_medicamento_nome}` : '';
-  if (diff < 0) return { label: `Atrasada${med}`, cor: '#c0524a', bg: '#fdecea' };
-  if (diff === 0) return { label: `Hoje!${med}`, cor: '#b8863a', bg: '#fef3e2' };
-  if (diff === 1) return { label: `Amanhã${med}`, cor: '#2f6690', bg: '#eaf3fb' };
-  return { label: `Em dia${med}`, cor: '#3f8c5a', bg: '#edf7f1' };
+  if (diff < 0)  return { status: 'Dose atrasada',      cor: '#c0524a', bg: '#fdecea', icon: 'alert' };
+  if (diff === 0) return { status: 'Dose hoje!',         cor: '#b8863a', bg: '#fef3e2', icon: 'clock' };
+  if (diff === 1) return { status: 'Dose amanhã',        cor: '#2f6690', bg: '#eaf3fb', icon: 'check' };
+  if (diff <= 7)  return { status: `Dose em ${diff} dias`, cor: '#3f8c5a', bg: '#edf7f1', icon: 'check' };
+  return { status: `Dose em ${diff} dias`,               cor: '#64748b', bg: '#f8fafc', icon: 'check' };
 }
 
 const STATUS_OPTIONS = [
@@ -152,7 +152,7 @@ export default function GatosList() {
 
       <div data-tour="gatos-lista" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         {gatos.map((g) => {
-          const alerta = alerteDose(g.proxima_dose_min, g.proxima_medicamento_nome);
+          const alerta = alerteDose(g.proxima_dose_min);
           const statusDot = { disponivel: '#16a34a', reservado: '#d97706', vendido: '#dc2626', mantido: '#2563eb' }[g.status] || '#94a3b8';
           const statusLabel = STATUS_OPTIONS.find((s) => s.value === g.status)?.label || g.status;
 
@@ -288,19 +288,17 @@ export default function GatosList() {
                       background: alerta.bg, borderRadius: 12, padding: '7px 12px',
                       border: `1px solid ${alerta.cor}33`, flexShrink: 0,
                     }}>
-                      <p style={{ margin: 0, fontSize: '0.63rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 0.4 }}>Próx. medicamento</p>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 3 }}>
-                        {alerta.label.startsWith('Em dia') || alerta.label.startsWith('Amanhã')
-                          ? <CheckCircle2 size={13} color={alerta.cor} />
-                          : alerta.label.startsWith('Hoje') ? <Clock size={13} color={alerta.cor} />
-                          : <AlertCircle size={13} color={alerta.cor} />
-                        }
-                        <span style={{ fontSize: '0.78rem', fontWeight: 700, color: alerta.cor }}>
-                          {g.proxima_medicamento_nome || 'Medicamento'}
-                        </span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 3 }}>
+                        {alerta.icon === 'alert' ? <AlertCircle size={14} color={alerta.cor} />
+                          : alerta.icon === 'clock' ? <Clock size={14} color={alerta.cor} />
+                          : <CheckCircle2 size={14} color={alerta.cor} />}
+                        <span style={{ fontSize: '0.8rem', fontWeight: 800, color: alerta.cor }}>{alerta.status}</span>
                       </div>
-                      <p style={{ margin: '2px 0 0', fontSize: '0.7rem', color: '#94a3b8' }}>
-                        Próxima: {g.proxima_dose_min?.split('-').reverse().join('/')}
+                      <p style={{ margin: 0, fontSize: '0.75rem', fontWeight: 600, color: '#475569' }}>
+                        {g.proxima_medicamento_nome || 'Medicamento'}
+                      </p>
+                      <p style={{ margin: '2px 0 0', fontSize: '0.68rem', color: '#94a3b8' }}>
+                        {g.proxima_dose_min?.split('-').reverse().join('/')}
                       </p>
                     </div>
                   )}
