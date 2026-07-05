@@ -190,11 +190,13 @@ export default function GatosList() {
                           style={{
                             display: 'flex', alignItems: 'center', gap: 5, cursor: 'pointer',
                             background: statusBgs[g.status] || '#f1f5f9',
-                            borderRadius: 20, padding: '4px 10px 4px 8px',
+                            border: `1.5px solid ${statusColors[g.status] || '#94a3b8'}44`,
+                            borderRadius: 20, padding: '4px 8px 4px 8px',
                           }}
                         >
                           <span style={{ width: 7, height: 7, borderRadius: '50%', background: statusColors[g.status] || '#94a3b8', flexShrink: 0 }} />
                           <span style={{ fontSize: '0.73rem', fontWeight: 700, color: statusColors[g.status] || '#475569' }}>{statusLabel}</span>
+                          <ChevronRight size={12} color={statusColors[g.status] || '#94a3b8'} style={{ transform: 'rotate(90deg)', flexShrink: 0 }} />
                         </div>
                         {statusOpen === g.id && (
                           <div style={{
