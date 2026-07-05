@@ -163,7 +163,6 @@ export default function GatosList() {
             <div key={g.id} onClick={() => navigate(`/gatos/${g.id}`)} style={{
               background: '#fff', borderRadius: 18, cursor: 'pointer',
               boxShadow: '0 2px 16px rgba(0,0,0,0.09)',
-              overflow: 'hidden',
               borderLeft: `4px solid ${statusColors[g.status] || '#94a3b8'}`,
             }}>
               <div style={{ display: 'flex', gap: 12, padding: '14px 14px 0' }}>
