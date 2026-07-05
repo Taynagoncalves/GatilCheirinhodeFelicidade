@@ -9,41 +9,43 @@ router.get('/', async (req, res) => {
   const [[{ total_reservados }]] = await pool.query("SELECT COUNT(*) AS total_reservados FROM gatos WHERE status = 'reservado'");
   const [[{ total_vendidos }]] = await pool.query("SELECT COUNT(*) AS total_vendidos FROM gatos WHERE status = 'vendido'");
 
-  const [proximas_doses] = await pool.query(
-    `SELECT id, gato_id, pai_id, proxima_dose, gato_nome, gato_foto, medicamento_nome
-     FROM (
-       SELECT a.id, a.gato_id, NULL AS pai_id,
-              DATE_FORMAT(a.proxima_dose, '%Y-%m-%d') AS proxima_dose,
-              g.nome AS gato_nome, g.foto_url AS gato_foto, med.nome AS medicamento_nome,
-              ROW_NUMBER() OVER (PARTITION BY a.gato_id ORDER BY a.proxima_dose ASC, a.id DESC) AS rn
-       FROM aplicacoes a
-       JOIN gatos g ON a.gato_id = g.id
-       JOIN medicamentos med ON a.medicamento_id = med.id
-       JOIN (
-         SELECT gato_id, medicamento_id, MAX(id) AS ultimo_id
-         FROM aplicacoes WHERE gato_id IS NOT NULL
-         GROUP BY gato_id, medicamento_id
-       ) lat ON a.id = lat.ultimo_id
-       WHERE a.proxima_dose IS NOT NULL AND a.gato_id IS NOT NULL
-       UNION ALL
-       SELECT a.id, NULL AS gato_id, a.pai_id,
-              DATE_FORMAT(a.proxima_dose, '%Y-%m-%d') AS proxima_dose,
-              p.nome AS gato_nome, p.foto_url AS gato_foto, med.nome AS medicamento_nome,
-              ROW_NUMBER() OVER (PARTITION BY a.pai_id ORDER BY a.proxima_dose ASC, a.id DESC) AS rn
-       FROM aplicacoes a
-       JOIN pais p ON a.pai_id = p.id
-       JOIN medicamentos med ON a.medicamento_id = med.id
-       JOIN (
-         SELECT pai_id, medicamento_id, MAX(id) AS ultimo_id
-         FROM aplicacoes WHERE pai_id IS NOT NULL
-         GROUP BY pai_id, medicamento_id
-       ) lat ON a.id = lat.ultimo_id
-       WHERE a.proxima_dose IS NOT NULL AND a.pai_id IS NOT NULL
-     ) t
-     WHERE rn = 1
-     ORDER BY proxima_dose ASC
-     LIMIT 10`
+  const [rawDoses] = await pool.query(
+    `SELECT a.id, a.gato_id, NULL AS pai_id,
+            DATE_FORMAT(a.proxima_dose, '%Y-%m-%d') AS proxima_dose,
+            g.nome AS gato_nome, g.foto_url AS gato_foto, med.nome AS medicamento_nome
+     FROM aplicacoes a
+     JOIN gatos g ON a.gato_id = g.id
+     JOIN medicamentos med ON a.medicamento_id = med.id
+     JOIN (
+       SELECT gato_id, medicamento_id, MAX(id) AS ultimo_id
+       FROM aplicacoes WHERE gato_id IS NOT NULL
+       GROUP BY gato_id, medicamento_id
+     ) lat ON a.id = lat.ultimo_id
+     WHERE a.proxima_dose IS NOT NULL AND a.gato_id IS NOT NULL
+     UNION ALL
+     SELECT a.id, NULL AS gato_id, a.pai_id,
+            DATE_FORMAT(a.proxima_dose, '%Y-%m-%d') AS proxima_dose,
+            p.nome AS gato_nome, p.foto_url AS gato_foto, med.nome AS medicamento_nome
+     FROM aplicacoes a
+     JOIN pais p ON a.pai_id = p.id
+     JOIN medicamentos med ON a.medicamento_id = med.id
+     JOIN (
+       SELECT pai_id, medicamento_id, MAX(id) AS ultimo_id
+       FROM aplicacoes WHERE pai_id IS NOT NULL
+       GROUP BY pai_id, medicamento_id
+     ) lat ON a.id = lat.ultimo_id
+     WHERE a.proxima_dose IS NOT NULL AND a.pai_id IS NOT NULL
+     ORDER BY proxima_dose ASC`
   );
+
+  // Uma entrada por animal: a dose mais próxima de cada um
+  const seen = new Set();
+  const proximas_doses = rawDoses.filter((row) => {
+    const key = row.gato_id ? `g-${row.gato_id}` : `p-${row.pai_id}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  }).slice(0, 10);
 
   const [ultimos_registros] = await pool.query(
     `SELECT a.id, a.data_aplicada, a.tipo, g.nome AS gato_nome, g.foto_url AS gato_foto, med.nome AS medicamento_nome
