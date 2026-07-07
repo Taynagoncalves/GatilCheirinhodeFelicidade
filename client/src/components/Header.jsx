@@ -63,9 +63,13 @@ export default function Header({ title, subtitle, showBack, showNotification }) 
 
   return (
     <header className="top-header">
-      <div className="top-header-left">
+      <div
+        className="top-header-left"
+        onClick={!showBack ? () => window.dispatchEvent(new CustomEvent('mostrarMenu')) : undefined}
+        style={!showBack ? { cursor: 'pointer' } : undefined}
+      >
         {showBack ? (
-          <button className="top-header-back" onClick={() => navigate(-1)} aria-label="Voltar">
+          <button className="top-header-back" onClick={(e) => { e.stopPropagation(); navigate(-1); }} aria-label="Voltar">
             <ChevronLeft size={22} />
           </button>
         ) : (

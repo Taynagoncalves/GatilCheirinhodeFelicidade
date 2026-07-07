@@ -1,4 +1,4 @@
-import { StrictMode, useState } from 'react'
+import { StrictMode, useState, useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import './index.css'
@@ -12,6 +12,12 @@ function Root() {
   const [splash, setSplash] = useState(true);
   const [onboarding, setOnboarding] = useState(localStorage.getItem('onboarding_visto') !== 'v2');
   const [menuVisto, setMenuVisto] = useState(false);
+
+  useEffect(() => {
+    const handler = () => setMenuVisto(false);
+    window.addEventListener('mostrarMenu', handler);
+    return () => window.removeEventListener('mostrarMenu', handler);
+  }, []);
 
   if (splash) return <SplashScreen onDone={() => setSplash(false)} />;
   if (onboarding) return <Onboarding onDone={() => setOnboarding(false)} />;
