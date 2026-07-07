@@ -358,24 +358,21 @@ function TabClientes() {
   const [showForm, setShowForm] = useState(false);
   const [editando, setEditando] = useState(null);
   const [confirmando, setConfirmando] = useState(null);
-  const [form, setForm] = useState({ nome: '', telefone: '', cidade: '', gato_id: '', data_venda: '', status: 'ativo', valor_venda: '' });
+  const [form, setForm] = useState({ nome: '', telefone: '', cidade: '', gato_ids: [], data_venda: '', status: 'ativo', valor_venda: '' });
   const toast = useToast();
 
   const carregar = () => {
     api.get('/clientes').then((r) => setClientes(r.data));
     api.get('/clientes/stats').then((r) => setStats(r.data));
   };
-  useEffect(() => {
-    carregar();
-    api.get('/gatos').then((r) => setGatos(r.data));
-  }, []);
+  useEffect(() => { carregar(); api.get('/gatos').then((r) => setGatos(r.data)); }, []);
 
   const filtrados = clientes.filter((c) => {
     const matchStatus = !filtroStatus || c.status === filtroStatus;
     const matchBusca = !busca ||
       c.nome.toLowerCase().includes(busca.toLowerCase()) ||
       (c.cidade || '').toLowerCase().includes(busca.toLowerCase()) ||
-      (c.gato_nome || '').toLowerCase().includes(busca.toLowerCase());
+      (c.gatos || []).some(g => g.nome?.toLowerCase().includes(busca.toLowerCase()));
     return matchStatus && matchBusca;
   });
 
@@ -384,14 +381,19 @@ function TabClientes() {
     window.open(`https://wa.me/${num.startsWith('55') ? num : '55' + num}`, '_blank');
   };
 
+  const toggleGato = (id) => {
+    const ids = form.gato_ids.includes(id) ? form.gato_ids.filter(x => x !== id) : [...form.gato_ids, id];
+    setForm({ ...form, gato_ids: ids });
+  };
+
   const abrirNovo = () => {
     setEditando(null);
-    setForm({ nome: '', telefone: '', cidade: '', gato_id: '', data_venda: new Date().toISOString().slice(0, 10), status: 'ativo', valor_venda: '' });
+    setForm({ nome: '', telefone: '', cidade: '', gato_ids: [], data_venda: new Date().toISOString().slice(0, 10), status: 'ativo', valor_venda: '' });
     setShowForm(true);
   };
   const abrirEditar = (c) => {
     setEditando(c);
-    setForm({ nome: c.nome, telefone: c.telefone || '', cidade: c.cidade || '', gato_id: c.gato_id || '', data_venda: c.data_venda || '', status: c.status || 'ativo', valor_venda: c.valor_venda || '' });
+    setForm({ nome: c.nome, telefone: c.telefone || '', cidade: c.cidade || '', gato_ids: (c.gatos || []).map(g => g.id), data_venda: c.data_venda || '', status: c.status || 'ativo', valor_venda: c.valor_venda || '' });
     setShowForm(true);
   };
   const salvar = async (e) => {
@@ -429,11 +431,8 @@ function TabClientes() {
         </div>
       )}
 
-      <button className="btn btn-primary" onClick={abrirNovo}>
-        <Plus size={16} /> Cadastrar Cliente
-      </button>
+      <button className="btn btn-primary" onClick={abrirNovo}><Plus size={16} /> Cadastrar Cliente</button>
 
-      {/* Busca + filtros */}
       <div className="search-input">
         <Search size={16} />
         <input placeholder="Buscar cliente..." value={busca} onChange={(e) => setBusca(e.target.value)} />
@@ -459,9 +458,9 @@ function TabClientes() {
       {filtrados.map((c) => {
         const iniciais = c.nome.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase();
         const st = STATUS_CLIENTE[c.status] || STATUS_CLIENTE.ativo;
+        const gatos_c = c.gatos || [];
         return (
           <div key={c.id} style={{ background: '#fff', borderRadius: 16, marginBottom: 10, boxShadow: '0 2px 12px rgba(0,0,0,0.07)', overflow: 'hidden' }}>
-            {/* Topo */}
             <div style={{ padding: '14px 14px 10px', display: 'flex', alignItems: 'flex-start', gap: 12 }}>
               <div style={{ width: 48, height: 48, borderRadius: '50%', flexShrink: 0, background: 'linear-gradient(135deg, #5b21b6, #7c3aed)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: '1rem' }}>
                 {iniciais}
@@ -480,40 +479,42 @@ function TabClientes() {
               <button className="icon-btn" style={{ color: '#94a3b8' }} onClick={() => abrirEditar(c)}><Pencil size={15} /></button>
             </div>
 
-            {/* Gato + Total */}
-            {(c.gato_nome || c.valor_venda) && (
-              <div style={{ margin: '0 14px', borderRadius: 10, background: '#f8fafc', padding: '8px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                {c.gato_nome && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <Cat size={14} color="#7c3aed" />
-                    <div>
-                      <p style={{ margin: 0, fontSize: '0.68rem', color: '#94a3b8' }}>1 gato adquirido</p>
-                      <p style={{ margin: 0, fontSize: '0.82rem', fontWeight: 700, color: '#1e293b' }}>{c.gato_nome}</p>
+            {/* Gatos adquiridos + Total */}
+            {(gatos_c.length > 0 || c.valor_venda) && (
+              <div style={{ margin: '0 14px', borderRadius: 10, background: '#f8fafc', padding: '8px 12px' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
+                  {gatos_c.length > 0 && (
+                    <div style={{ flex: 1 }}>
+                      <p style={{ margin: '0 0 5px', fontSize: '0.68rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <Cat size={11} color="#7c3aed" /> {gatos_c.length} {gatos_c.length === 1 ? 'gato adquirido' : 'gatos adquiridos'}
+                      </p>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                        {gatos_c.map(g => (
+                          <span key={g.id} onClick={() => navigate(`/gatos/${g.id}`)} style={{
+                            background: '#ede9fe', color: '#7c3aed', borderRadius: 20,
+                            padding: '3px 10px', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer',
+                          }}>{g.nome}</span>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
-                {c.valor_venda && (
-                  <div style={{ textAlign: 'right' }}>
-                    <p style={{ margin: 0, fontSize: '0.68rem', color: '#94a3b8' }}>Total gasto</p>
-                    <p style={{ margin: 0, fontSize: '0.88rem', fontWeight: 800, color: '#16a34a' }}>{Number(c.valor_venda).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
-                  </div>
-                )}
+                  )}
+                  {c.valor_venda && (
+                    <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                      <p style={{ margin: 0, fontSize: '0.68rem', color: '#94a3b8' }}>Total gasto</p>
+                      <p style={{ margin: 0, fontSize: '0.88rem', fontWeight: 800, color: '#16a34a' }}>{Number(c.valor_venda).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 
-            {/* Ações */}
-            <div style={{ display: 'flex', gap: 0, borderTop: '1px solid #f1f5f9', marginTop: 10 }}>
+            <div style={{ display: 'flex', borderTop: '1px solid #f1f5f9', marginTop: 10 }}>
               {c.telefone && (
                 <button onClick={() => abrirWhatsApp(c.telefone)} style={{ flex: 1, border: 'none', background: 'none', cursor: 'pointer', padding: '10px 4px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, color: '#16a34a', fontSize: '0.65rem', fontWeight: 700 }}>
                   <MessageCircle size={16} /> WhatsApp
                 </button>
               )}
-              {c.gato_id && (
-                <button onClick={() => navigate(`/gatos/${c.gato_id}`)} style={{ flex: 1, border: 'none', background: 'none', cursor: 'pointer', padding: '10px 4px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, color: '#1d4ed8', fontSize: '0.65rem', fontWeight: 700, borderLeft: '1px solid #f1f5f9' }}>
-                  <Cat size={16} /> Ver Gato
-                </button>
-              )}
-<button onClick={() => setConfirmando(c)} style={{ flex: 1, border: 'none', background: 'none', cursor: 'pointer', padding: '10px 4px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, color: '#dc2626', fontSize: '0.65rem', fontWeight: 700, borderLeft: '1px solid #f1f5f9' }}>
+              <button onClick={() => setConfirmando(c)} style={{ flex: 1, border: 'none', background: 'none', cursor: 'pointer', padding: '10px 4px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, color: '#dc2626', fontSize: '0.65rem', fontWeight: 700, borderLeft: '1px solid #f1f5f9' }}>
                 <Trash2 size={16} /> Excluir
               </button>
             </div>
@@ -542,11 +543,20 @@ function TabClientes() {
                 </select>
               </div>
               <div className="field">
-                <label>Gato comprado</label>
-                <select value={form.gato_id} onChange={(e) => setForm({ ...form, gato_id: e.target.value })}>
-                  <option value="">Selecionar gato</option>
-                  {gatos.map((g) => <option key={g.id} value={g.id}>{g.nome || 'Sem nome'}</option>)}
-                </select>
+                <label>Gatos comprados</label>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 180, overflowY: 'auto', border: '1px solid #e2e8f0', borderRadius: 10, padding: '8px 10px' }}>
+                  {gatos.length === 0 && <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Nenhum gato cadastrado</span>}
+                  {gatos.map((g) => {
+                    const sel = form.gato_ids.includes(g.id);
+                    return (
+                      <label key={g.id} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', padding: '4px 0' }}>
+                        <input type="checkbox" checked={sel} onChange={() => toggleGato(g.id)} style={{ accentColor: '#7c3aed', width: 16, height: 16 }} />
+                        <Cat size={13} color={sel ? '#7c3aed' : '#94a3b8'} />
+                        <span style={{ fontSize: '0.85rem', fontWeight: sel ? 700 : 400, color: sel ? '#7c3aed' : '#1e293b' }}>{g.nome || 'Sem nome'}</span>
+                      </label>
+                    );
+                  })}
+                </div>
               </div>
               <div className="field"><label>Data da venda</label><input type="date" value={form.data_venda} onChange={(e) => setForm({ ...form, data_venda: e.target.value })} /></div>
               <div className="field"><label>Valor da venda (R$)</label><input type="number" step="0.01" min="0" value={form.valor_venda} onChange={(e) => setForm({ ...form, valor_venda: e.target.value })} placeholder="0,00" /></div>

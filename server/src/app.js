@@ -33,6 +33,16 @@ async function initDb() {
     try { await pool.query(sql); } catch (e) { if (e.errno !== 1060 && e.errno !== 1054) throw e; }
   }
   await pool.query(`
+    CREATE TABLE IF NOT EXISTS cliente_gatos (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      cliente_id INT NOT NULL,
+      gato_id INT NOT NULL,
+      UNIQUE KEY uk_cliente_gato (cliente_id, gato_id)
+    )
+  `);
+  // migra gato_id existente para a tabela de relacionamento
+  await pool.query(`INSERT IGNORE INTO cliente_gatos (cliente_id, gato_id) SELECT id, gato_id FROM clientes WHERE gato_id IS NOT NULL`);
+  await pool.query(`
     CREATE TABLE IF NOT EXISTS financeiro (
       id INT AUTO_INCREMENT PRIMARY KEY,
       tipo ENUM('entrada','saida') NOT NULL,
