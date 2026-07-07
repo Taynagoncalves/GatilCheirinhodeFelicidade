@@ -545,13 +545,13 @@ export default function FinanceiroList() {
   const [aba, setAba] = useState(location.state?.tab ?? 0);
   const [mes, setMes] = useState(mesAtualStr());
 
-  const irMes = (m) => { setMes(m); setAba(1); };
+  const irMes = (m) => { setMes(m); setAba(2); };
 
   const ABAS = [
+    { icon: <Users size={20} />, label: 'Clientes' },
     { icon: <BarChart3 size={20} />, label: 'Resumo' },
     { icon: <List size={20} />, label: 'Lançamentos' },
     { icon: <Clock size={20} />, label: 'Histórico' },
-    { icon: <Users size={20} />, label: 'Clientes' },
   ];
 
   return (
@@ -567,10 +567,10 @@ export default function FinanceiroList() {
         <Cat size={14} /> Ir para o Gatil
       </button>
 
-      {aba === 0 && <TabResumo mes={mes} onMes={setMes} />}
-      {aba === 1 && <TabLancamentos mes={mes} onMes={setMes} />}
-      {aba === 2 && <TabHistorico onIrMes={irMes} />}
-      {aba === 3 && <TabClientes />}
+      {aba === 0 && <TabClientes />}
+      {aba === 1 && <TabResumo mes={mes} onMes={setMes} />}
+      {aba === 2 && <TabLancamentos mes={mes} onMes={setMes} />}
+      {aba === 3 && <TabHistorico onIrMes={irMes} />}
 
       {/* Menu inferior interno */}
       <nav style={{

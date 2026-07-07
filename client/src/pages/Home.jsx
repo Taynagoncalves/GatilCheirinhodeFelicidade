@@ -224,10 +224,10 @@ export default function Home() {
         {/* Atalhos — lista horizontal limpa */}
         <div style={{ background: '#fff' }}>
           {[
-            { icon: <Users size={15} color="#7c3aed" />, dot: '#7c3aed', titulo: 'Clientes', sub: 'Compradores e reservas', tab: 3 },
-            { icon: <TrendingUp size={15} color="#16a34a" />, dot: '#16a34a', titulo: 'Entradas', sub: 'Registrar recebimentos', tab: 1 },
-            { icon: <TrendingDown size={15} color="#dc2626" />, dot: '#dc2626', titulo: 'Saídas', sub: 'Ração, veterinário e mais', tab: 1 },
-            { icon: <BarChart3 size={15} color="#1d4ed8" />, dot: '#1d4ed8', titulo: 'Relatórios', sub: 'Histórico e gráficos por mês', tab: 0 },
+            { icon: <Users size={15} color="#7c3aed" />, dot: '#7c3aed', titulo: 'Clientes', sub: 'Compradores e reservas', tab: 0 },
+            { icon: <TrendingUp size={15} color="#16a34a" />, dot: '#16a34a', titulo: 'Entradas', sub: 'Registrar recebimentos', tab: 2 },
+            { icon: <TrendingDown size={15} color="#dc2626" />, dot: '#dc2626', titulo: 'Saídas', sub: 'Ração, veterinário e mais', tab: 2 },
+            { icon: <BarChart3 size={15} color="#1d4ed8" />, dot: '#1d4ed8', titulo: 'Relatórios', sub: 'Histórico e gráficos por mês', tab: 1 },
           ].map((item, i) => (
             <div key={item.titulo} onClick={() => navigate('/financeiro', { state: { tab: item.tab } })} style={{
               display: 'flex', alignItems: 'center', gap: 12,
