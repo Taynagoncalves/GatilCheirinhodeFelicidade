@@ -163,99 +163,87 @@ export default function Home() {
       </div>
 
       {/* ── Painel Financeiro ── */}
-      <div data-tour="home-saldo" style={{ borderRadius: 22, overflow: 'hidden', boxShadow: '0 8px 32px rgba(17,60,100,0.22)' }}>
+      <div data-tour="home-saldo" style={{ borderRadius: 22, overflow: 'hidden', boxShadow: '0 6px 28px rgba(10,22,60,0.18)' }}>
 
-        {/* Hero gradiente */}
-        <div style={{ background: 'linear-gradient(145deg, #0f3460 0%, #1a5276 50%, #2980b9 100%)', padding: '20px 18px 0', position: 'relative', overflow: 'hidden' }}>
-          {/* Círculos decorativos de fundo */}
-          <div style={{ position: 'absolute', top: -30, right: -30, width: 120, height: 120, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
-          <div style={{ position: 'absolute', top: 20, right: 30, width: 60, height: 60, borderRadius: '50%', background: 'rgba(255,255,255,0.07)' }} />
+        {/* Hero */}
+        <div style={{ background: 'linear-gradient(160deg, #0a1628 0%, #102040 55%, #1a3a5c 100%)', padding: '18px 18px 18px', position: 'relative', overflow: 'hidden' }}>
+          {/* Ornamento circular sutil */}
+          <div style={{ position: 'absolute', bottom: -40, right: -40, width: 160, height: 160, borderRadius: '50%', background: 'rgba(255,255,255,0.03)', pointerEvents: 'none' }} />
+          <div style={{ position: 'absolute', top: -20, left: '55%', width: 90, height: 90, borderRadius: '50%', background: 'rgba(255,255,255,0.03)', pointerEvents: 'none' }} />
 
-          {/* Header: título + botão */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18, position: 'relative' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(255,255,255,0.2)' }}>
-                <Wallet size={20} color="#fff" />
+          {/* Linha topo: label + botão */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+              <div style={{ width: 32, height: 32, borderRadius: 9, background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Wallet size={16} color="rgba(255,255,255,0.85)" />
               </div>
               <div>
-                <p style={{ margin: 0, fontSize: '0.95rem', fontWeight: 800, color: '#fff', letterSpacing: -0.3 }}>Painel Financeiro</p>
-                <p style={{ margin: 0, fontSize: '0.7rem', color: 'rgba(255,255,255,0.6)' }}>Visão geral do mês</p>
+                <p style={{ margin: 0, fontSize: '0.82rem', fontWeight: 700, color: '#fff', letterSpacing: -0.2 }}>Financeiro</p>
+                <p style={{ margin: 0, fontSize: '0.65rem', color: 'rgba(255,255,255,0.45)', letterSpacing: 0.2 }}>Este mês</p>
               </div>
             </div>
             <button onClick={() => navigate('/financeiro')} style={{
-              background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)',
-              borderRadius: 20, padding: '6px 14px', cursor: 'pointer',
-              display: 'flex', alignItems: 'center', gap: 4,
-              color: '#fff', fontSize: '0.72rem', fontWeight: 700,
-              backdropFilter: 'blur(8px)',
+              background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.18)',
+              borderRadius: 20, padding: '5px 13px', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', gap: 3,
+              color: 'rgba(255,255,255,0.85)', fontSize: '0.7rem', fontWeight: 600,
             }}>
-              Abrir <ChevronRight size={13} />
+              Abrir <ChevronRight size={12} />
             </button>
           </div>
 
-          {/* Saldo principal */}
+          {/* Saldo */}
           {data && (
             <>
-              <div style={{ marginBottom: 18, position: 'relative' }}>
-                <p style={{ margin: '0 0 4px', fontSize: '0.72rem', color: 'rgba(255,255,255,0.55)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.8 }}>Saldo do mês</p>
-                <p style={{ margin: 0, fontSize: '2.2rem', fontWeight: 900, color: '#fff', lineHeight: 1, letterSpacing: -1 }}>{fmt(data.fin_saldo)}</p>
+              <div style={{ marginBottom: 20 }}>
+                <p style={{ margin: '0 0 3px', fontSize: '0.65rem', color: 'rgba(255,255,255,0.4)', letterSpacing: 1.2, textTransform: 'uppercase' }}>Saldo do mês</p>
+                <p style={{ margin: 0, fontSize: '2.4rem', fontWeight: 900, color: '#fff', lineHeight: 1, letterSpacing: -1.5, fontVariantNumeric: 'tabular-nums' }}>{fmt(data.fin_saldo)}</p>
               </div>
 
-              {/* Cards entradas/saídas — meia lua na base */}
-              <div style={{ display: 'flex', gap: 10, position: 'relative', zIndex: 1 }}>
-                <div style={{ flex: 1, background: 'rgba(74,222,128,0.12)', border: '1px solid rgba(74,222,128,0.25)', borderRadius: '14px 14px 0 0', padding: '10px 14px 16px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 4 }}>
-                    <div style={{ width: 22, height: 22, borderRadius: '50%', background: 'rgba(74,222,128,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <TrendingUp size={12} color="#4ade80" />
-                    </div>
-                    <span style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>Entradas</span>
+              {/* Entradas / Saídas inline */}
+              <div style={{ display: 'flex', gap: 0, background: 'rgba(255,255,255,0.07)', borderRadius: 14, overflow: 'hidden' }}>
+                <div style={{ flex: 1, padding: '11px 14px', borderRight: '1px solid rgba(255,255,255,0.08)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 3 }}>
+                    <TrendingUp size={12} color="#4ade80" />
+                    <span style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.5)', fontWeight: 600, letterSpacing: 0.3 }}>ENTRADAS</span>
                   </div>
-                  <p style={{ margin: 0, fontSize: '1rem', fontWeight: 900, color: '#4ade80' }}>{fmt(data.fin_entradas)}</p>
+                  <p style={{ margin: 0, fontSize: '0.95rem', fontWeight: 800, color: '#4ade80', fontVariantNumeric: 'tabular-nums' }}>{fmt(data.fin_entradas)}</p>
                 </div>
-                <div style={{ flex: 1, background: 'rgba(252,165,165,0.12)', border: '1px solid rgba(252,165,165,0.25)', borderRadius: '14px 14px 0 0', padding: '10px 14px 16px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 4 }}>
-                    <div style={{ width: 22, height: 22, borderRadius: '50%', background: 'rgba(252,165,165,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <TrendingDown size={12} color="#fca5a5" />
-                    </div>
-                    <span style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>Saídas</span>
+                <div style={{ flex: 1, padding: '11px 14px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 3 }}>
+                    <TrendingDown size={12} color="#f87171" />
+                    <span style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.5)', fontWeight: 600, letterSpacing: 0.3 }}>SAÍDAS</span>
                   </div>
-                  <p style={{ margin: 0, fontSize: '1rem', fontWeight: 900, color: '#fca5a5' }}>{fmt(data.fin_saidas)}</p>
+                  <p style={{ margin: 0, fontSize: '0.95rem', fontWeight: 800, color: '#f87171', fontVariantNumeric: 'tabular-nums' }}>{fmt(data.fin_saidas)}</p>
                 </div>
               </div>
             </>
           )}
         </div>
 
-        {/* Seção de recursos */}
+        {/* Atalhos — lista horizontal limpa */}
         <div style={{ background: '#fff' }}>
-          <div style={{ padding: '16px 18px 4px', display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div style={{ flex: 1, height: 1, background: '#f1f5f9' }} />
-            <span style={{ fontSize: '0.68rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 1, whiteSpace: 'nowrap' }}>Recursos disponíveis</span>
-            <div style={{ flex: 1, height: 1, background: '#f1f5f9' }} />
-          </div>
-
-          <div style={{ padding: '6px 12px 14px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-            {[
-              { icon: <Users size={16} color="#7c3aed" />, bg: 'linear-gradient(135deg,#faf5ff,#f3e8ff)', border: '#e9d5ff', titulo: 'Clientes', sub: 'Compradores e reservas', tab: 3 },
-              { icon: <TrendingUp size={16} color="#16a34a" />, bg: 'linear-gradient(135deg,#f0fdf4,#dcfce7)', border: '#bbf7d0', titulo: 'Entradas', sub: 'Registrar recebimentos', tab: 1 },
-              { icon: <TrendingDown size={16} color="#dc2626" />, bg: 'linear-gradient(135deg,#fff5f5,#fee2e2)', border: '#fecaca', titulo: 'Saídas', sub: 'Ração, vet e mais', tab: 1 },
-              { icon: <BarChart3 size={16} color="#1d4ed8" />, bg: 'linear-gradient(135deg,#eff6ff,#dbeafe)', border: '#bfdbfe', titulo: 'Relatórios', sub: 'Gráficos por mês', tab: 0 },
-            ].map((item) => (
-              <div key={item.titulo} onClick={() => navigate('/financeiro', { state: { tab: item.tab } })} style={{
-                background: item.bg, border: `1px solid ${item.border}`,
-                borderRadius: 14, padding: '12px 12px', cursor: 'pointer',
-                display: 'flex', flexDirection: 'column', gap: 8,
-              }}>
-                <div style={{ width: 34, height: 34, borderRadius: 10, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
-                  {item.icon}
-                </div>
-                <div>
-                  <p style={{ margin: 0, fontSize: '0.8rem', fontWeight: 800, color: '#1e293b' }}>{item.titulo}</p>
-                  <p style={{ margin: '1px 0 0', fontSize: '0.66rem', color: '#64748b', lineHeight: 1.3 }}>{item.sub}</p>
-                </div>
+          {[
+            { icon: <Users size={15} color="#7c3aed" />, dot: '#7c3aed', titulo: 'Clientes', sub: 'Compradores e reservas', tab: 3 },
+            { icon: <TrendingUp size={15} color="#16a34a" />, dot: '#16a34a', titulo: 'Entradas', sub: 'Registrar recebimentos', tab: 1 },
+            { icon: <TrendingDown size={15} color="#dc2626" />, dot: '#dc2626', titulo: 'Saídas', sub: 'Ração, veterinário e mais', tab: 1 },
+            { icon: <BarChart3 size={15} color="#1d4ed8" />, dot: '#1d4ed8', titulo: 'Relatórios', sub: 'Histórico e gráficos por mês', tab: 0 },
+          ].map((item, i) => (
+            <div key={item.titulo} onClick={() => navigate('/financeiro', { state: { tab: item.tab } })} style={{
+              display: 'flex', alignItems: 'center', gap: 12,
+              padding: '12px 16px', cursor: 'pointer',
+              borderTop: i === 0 ? 'none' : '1px solid #f8fafc',
+            }}>
+              <div style={{ width: 36, height: 36, borderRadius: 10, background: `${item.dot}12`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: `1px solid ${item.dot}22` }}>
+                {item.icon}
               </div>
-            ))}
-          </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{ margin: 0, fontSize: '0.82rem', fontWeight: 700, color: '#1e293b' }}>{item.titulo}</p>
+                <p style={{ margin: '1px 0 0', fontSize: '0.7rem', color: '#94a3b8' }}>{item.sub}</p>
+              </div>
+              <ChevronRight size={15} color="#cbd5e1" />
+            </div>
+          ))}
         </div>
       </div>
 
