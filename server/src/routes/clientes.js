@@ -12,69 +12,84 @@ router.get('/stats', async (req, res) => {
   res.json({ total_ativos, novos_mes: Number(novos_mes), total_vendidos: Number(total_vendidos), novos_vendidos: Number(novos_vendidos), total_reservas: Number(total_reservas) });
 });
 
+async function getGatosByCliente(clienteIds) {
+  if (!clienteIds.length) return {};
+  const [links] = await pool.query(
+    `SELECT cg.cliente_id, g.id AS gato_id, g.nome AS gato_nome, g.foto_url AS gato_foto, cg.valor
+     FROM cliente_gatos cg JOIN gatos g ON cg.gato_id = g.id
+     WHERE cg.cliente_id IN (?)`, [clienteIds]
+  );
+  const map = {};
+  links.forEach((l) => {
+    if (!map[l.cliente_id]) map[l.cliente_id] = [];
+    map[l.cliente_id].push({ id: l.gato_id, nome: l.gato_nome, foto: l.gato_foto, valor: l.valor });
+  });
+  return map;
+}
+
 router.get('/', async (req, res) => {
   const { status } = req.query;
-  let sql = `
-    SELECT c.id, c.nome, c.telefone, c.cidade, c.status, c.valor_venda,
-           DATE_FORMAT(c.data_venda, '%Y-%m-%d') AS data_venda,
-           DATE_FORMAT(c.criado_em, '%Y-%m-%d') AS criado_em
-    FROM clientes c WHERE 1=1`;
+  let sql = `SELECT c.id, c.nome, c.telefone, c.cidade, c.status, c.valor_venda,
+             DATE_FORMAT(c.data_venda, '%Y-%m-%d') AS data_venda,
+             DATE_FORMAT(c.criado_em, '%Y-%m-%d') AS criado_em
+             FROM clientes c WHERE 1=1`;
   const params = [];
   if (status) { sql += ' AND c.status = ?'; params.push(status); }
   sql += ' ORDER BY c.criado_em DESC';
   const [clientes] = await pool.query(sql, params);
-
-  const [gatoLinks] = await pool.query(`
-    SELECT cg.cliente_id, g.id AS gato_id, g.nome AS gato_nome
-    FROM cliente_gatos cg
-    JOIN gatos g ON cg.gato_id = g.id
-  `);
-
-  const gatosByCliente = {};
-  gatoLinks.forEach((link) => {
-    if (!gatosByCliente[link.cliente_id]) gatosByCliente[link.cliente_id] = [];
-    gatosByCliente[link.cliente_id].push({ id: link.gato_id, nome: link.gato_nome });
-  });
-
-  const result = clientes.map((c) => ({
+  const gatosByCliente = await getGatosByCliente(clientes.map(c => c.id));
+  res.json(clientes.map(c => ({
     ...c,
     gatos: gatosByCliente[c.id] || [],
     gato_id: (gatosByCliente[c.id] || [])[0]?.id || null,
     gato_nome: (gatosByCliente[c.id] || [])[0]?.nome || null,
-  }));
+  })));
+});
 
-  res.json(result);
+router.get('/:id', async (req, res) => {
+  const [[c]] = await pool.query(
+    `SELECT c.id, c.nome, c.telefone, c.cidade, c.status, c.valor_venda,
+            DATE_FORMAT(c.data_venda, '%Y-%m-%d') AS data_venda,
+            DATE_FORMAT(c.criado_em, '%Y-%m-%d') AS criado_em
+     FROM clientes c WHERE c.id = ?`, [req.params.id]
+  );
+  if (!c) return res.status(404).json({ error: 'Cliente não encontrado' });
+  const gatosByCliente = await getGatosByCliente([c.id]);
+  res.json({ ...c, gatos: gatosByCliente[c.id] || [] });
 });
 
 router.post('/', async (req, res) => {
-  const { nome, telefone, cidade, gato_ids, data_venda, status, valor_venda } = req.body;
+  const { nome, telefone, cidade, data_venda, status, valor_venda } = req.body;
   const [result] = await pool.query(
     `INSERT INTO clientes (nome, telefone, cidade, data_venda, status, valor_venda) VALUES (?, ?, ?, ?, ?, ?)`,
     [nome, telefone || null, cidade || null, data_venda || null, status || 'ativo', valor_venda || null]
   );
-  const clienteId = result.insertId;
-  if (gato_ids && gato_ids.length > 0) {
-    for (const gid of gato_ids) {
-      await pool.query(`INSERT IGNORE INTO cliente_gatos (cliente_id, gato_id) VALUES (?, ?)`, [clienteId, gid]);
-      await pool.query(`UPDATE gatos SET status = 'vendido' WHERE id = ?`, [gid]);
-    }
-  }
-  res.status(201).json({ id: clienteId });
+  res.status(201).json({ id: result.insertId });
 });
 
 router.put('/:id', async (req, res) => {
-  const { nome, telefone, cidade, gato_ids, data_venda, status, valor_venda } = req.body;
+  const { nome, telefone, cidade, data_venda, status, valor_venda } = req.body;
   await pool.query(
     `UPDATE clientes SET nome=?, telefone=?, cidade=?, data_venda=?, status=?, valor_venda=? WHERE id=?`,
     [nome, telefone || null, cidade || null, data_venda || null, status || 'ativo', valor_venda || null, req.params.id]
   );
-  await pool.query(`DELETE FROM cliente_gatos WHERE cliente_id = ?`, [req.params.id]);
-  if (gato_ids && gato_ids.length > 0) {
-    for (const gid of gato_ids) {
-      await pool.query(`INSERT IGNORE INTO cliente_gatos (cliente_id, gato_id) VALUES (?, ?)`, [req.params.id, gid]);
-      await pool.query(`UPDATE gatos SET status = 'vendido' WHERE id = ?`, [gid]);
-    }
-  }
+  res.json({ ok: true });
+});
+
+// Adicionar gato ao cliente
+router.post('/:id/gatos', async (req, res) => {
+  const { gato_id, valor } = req.body;
+  await pool.query(
+    `INSERT INTO cliente_gatos (cliente_id, gato_id, valor) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE valor = VALUES(valor)`,
+    [req.params.id, gato_id, valor || null]
+  );
+  await pool.query(`UPDATE gatos SET status = 'vendido' WHERE id = ?`, [gato_id]);
+  res.json({ ok: true });
+});
+
+// Remover gato do cliente
+router.delete('/:id/gatos/:gato_id', async (req, res) => {
+  await pool.query(`DELETE FROM cliente_gatos WHERE cliente_id = ? AND gato_id = ?`, [req.params.id, req.params.gato_id]);
   res.json({ ok: true });
 });
 

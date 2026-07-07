@@ -37,9 +37,11 @@ async function initDb() {
       id INT AUTO_INCREMENT PRIMARY KEY,
       cliente_id INT NOT NULL,
       gato_id INT NOT NULL,
+      valor DECIMAL(10,2) NULL,
       UNIQUE KEY uk_cliente_gato (cliente_id, gato_id)
     )
   `);
+  try { await pool.query(`ALTER TABLE cliente_gatos ADD COLUMN valor DECIMAL(10,2) NULL`); } catch (e) { if (e.errno !== 1060) throw e; }
   // migra gato_id existente para a tabela de relacionamento
   await pool.query(`INSERT IGNORE INTO cliente_gatos (cliente_id, gato_id) SELECT id, gato_id FROM clientes WHERE gato_id IS NOT NULL`);
   await pool.query(`

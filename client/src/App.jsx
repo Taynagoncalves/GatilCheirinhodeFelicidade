@@ -17,6 +17,7 @@ import MedicamentoForm from './pages/Saude/MedicamentoForm';
 import RegistroForm from './pages/Saude/RegistroForm';
 import AgendaDoses from './pages/Saude/AgendaDoses';
 import FinanceiroList from './pages/Financeiro/FinanceiroList';
+import ClientePerfil from './pages/Financeiro/ClientePerfil';
 
 export default function App() {
   return (
@@ -45,6 +46,7 @@ export default function App() {
       <Route path="/saude/medicamentos/novo" element={<MedicamentoForm />} />
       <Route path="/saude/agenda" element={<AgendaDoses />} />
       <Route path="/financeiro" element={<FinanceiroList />} />
+      <Route path="/clientes/:id" element={<ClientePerfil />} />
     </Routes>
     </TourProvider>
   );
