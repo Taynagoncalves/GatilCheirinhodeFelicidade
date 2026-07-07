@@ -403,6 +403,64 @@ function DemoHome() {
   );
 }
 
+// ─── demo: clientes ──────────────────────────────────────────────────────────
+function DemoClientes() {
+  const p = useLoop([1400, 560, 380, 1900, 300]);
+  const clientes = [
+    { sigla: 'MR', cor: '#7c3aed', name: '68%', sub: '44%', badge: { txt: '1 gato', cor: '#7c3aed', bg: '#f3f0ff' } },
+    { sigla: 'JS', cor: '#0e7490', name: '60%', sub: '40%', badge: { txt: '2 gatos', cor: '#0e7490', bg: '#ecfeff' } },
+    { sigla: 'AL', cor: '#2d6b44', name: '55%', sub: '36%', badge: { txt: '1 gato', cor: '#2d6b44', bg: '#edf7f1' } },
+  ];
+  return (
+    <Phone title="Clientes" headerBg="#7c3aed" icon={<Users size={13} />}>
+      <div style={{ padding: '8px 7px', display: 'flex', flexDirection: 'column', gap: 5 }}>
+        {clientes.map((c, i) => (
+          <div key={i} style={{
+            background: '#fff', borderRadius: 8, padding: '6px 8px',
+            display: 'flex', alignItems: 'center', gap: 7,
+            boxShadow: i === 0 && p >= 1 ? `0 0 12px ${c.cor}40` : '0 1px 5px rgba(0,0,0,0.08)',
+            border: i === 0 && p >= 1 ? `1.5px solid ${c.cor}` : '1.5px solid transparent',
+            transition: 'all 0.25s',
+          }}>
+            <div style={{
+              width: 26, height: 26, borderRadius: 8,
+              background: `linear-gradient(140deg, ${c.cor}, ${c.cor}bb)`,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: '#fff', fontSize: '0.38rem', fontWeight: 800,
+            }}>{c.sigla}</div>
+            <div style={{ flex: 1 }}>
+              <TextLine w={c.name} h={6} mb={3} />
+              <TextLine w={c.sub} h={4} color="#94a3b8" />
+            </div>
+            <span style={{ fontSize: '0.36rem', fontWeight: 700, color: c.badge.cor, background: c.badge.bg, border: `1px solid ${c.badge.cor}44`, borderRadius: 8, padding: '2px 5px' }}>{c.badge.txt}</span>
+          </div>
+        ))}
+        <GradBtn label="＋  Novo Cliente" color="#7c3aed" pressed={false} icon={Plus} />
+      </div>
+      <Finger tapX={94} tapY={73} phase={p} />
+      <Sheet show={p === 3}>
+        <SheetTitle>Perfil do Cliente</SheetTitle>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+          <div style={{ width: 32, height: 32, borderRadius: 10, background: 'linear-gradient(135deg,#7c3aed,#a78bfa)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '0.5rem', fontWeight: 800 }}>MR</div>
+          <div>
+            <TextLine w="80px" h={6} color="#1e293b" mb={3} />
+            <TextLine w="56px" h={4} color="#94a3b8" />
+          </div>
+        </div>
+        <div style={{ background: '#f8fafc', borderRadius: 7, padding: '5px 7px', marginBottom: 4 }}>
+          <div style={{ fontSize: '0.36rem', color: '#7c3aed', fontWeight: 700, marginBottom: 4 }}>🐱 Gatos adquiridos</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <CatAvatar color="#e07820" size={20} />
+            <div style={{ flex: 1 }}><TextLine w="55%" h={5} /></div>
+            <span style={{ fontSize: '0.34rem', color: '#2d6b44', fontWeight: 700 }}>R$ 1.200</span>
+          </div>
+        </div>
+        <SheetBtn label="+ Adicionar Gato" color="#7c3aed" />
+      </Sheet>
+    </Phone>
+  );
+}
+
 // ─── demo: financeiro ─────────────────────────────────────────────────────────
 function DemoFinanceiro() {
   const p = useLoop([1400, 560, 380, 1900, 300]);
@@ -501,6 +559,12 @@ const SLIDES = [
     visual: () => <DemoHome />,
     titulo: 'Controle Total',
     texto: 'Veja gatos, ninhadas e vendas num só lugar — com as próximas doses e seus status em destaque.',
+  },
+  {
+    gradient: 'linear-gradient(155deg, #3b1260 0%, #7c3aed 65%, #a78bfa 100%)',
+    visual: () => <DemoClientes />,
+    titulo: 'Clientes',
+    texto: 'Cadastre quem comprou seus filhotes. Veja o perfil de cada cliente, os gatos adquiridos e o valor pago por cada um.',
   },
   {
     gradient: 'linear-gradient(155deg, #3b1f6b 0%, #6d28d9 65%, #7b5ea7 100%)',

@@ -18,6 +18,23 @@ export default function Header({ title, subtitle, showBack, showNotification }) 
   const [testando, setTestando] = useState(false);
   const panelRef = useRef(null);
 
+  // Na primeira abertura deste navegador, marca todas as notificações existentes
+  // como lidas para evitar falsos "novos" em dispositivos que nunca viram o app antes
+  useEffect(() => {
+    if (localStorage.getItem(STORAGE_LIDAS) !== null) return;
+    api.get('/notificacoes').then((res) => {
+      const ids = res.data.map((n) => n.id);
+      if (ids.length) {
+        localStorage.setItem(STORAGE_LIDAS, JSON.stringify(ids));
+        setLidas(ids);
+      } else {
+        localStorage.setItem(STORAGE_LIDAS, '[]');
+      }
+    }).catch(() => {
+      localStorage.setItem(STORAGE_LIDAS, '[]');
+    });
+  }, []);
+
   useEffect(() => {
     if (!open) return;
     api.get('/notificacoes').then((res) => setNotifs(res.data));
