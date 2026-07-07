@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Search, Plus, Cat, X, PawPrint, Users, Trash2, Cake, Weight, Layers, Calendar, MoreVertical, CheckCircle2, AlertCircle, Clock, ChevronRight } from 'lucide-react';
+import { Search, Plus, Cat, X, PawPrint, Users, Trash2, Cake, Weight, Layers, Calendar, MoreVertical, CheckCircle2, AlertCircle, Clock, ChevronRight, User } from 'lucide-react';
 import Layout from '../../components/Layout';
 import EmptyState from '../../components/EmptyState';
 import ConfirmModal from '../../components/ConfirmModal';
@@ -246,6 +246,14 @@ export default function GatosList() {
                     {g.ninhada_nome && (
                       <span style={{ display: 'flex', alignItems: 'center', gap: 4, background: '#f5f0ff', border: '1px solid #ede9fe', borderRadius: 20, padding: '3px 9px', fontSize: '0.8rem', color: '#7c3aed', fontWeight: 600 }}>
                         <Layers size={12} color="#7c3aed" /> {g.ninhada_nome}
+                      </span>
+                    )}
+                    {g.status === 'vendido' && g.cliente_nome && (
+                      <span
+                        onClick={(e) => { e.stopPropagation(); navigate(`/clientes/${g.cliente_id}`); }}
+                        style={{ display: 'flex', alignItems: 'center', gap: 4, background: 'linear-gradient(135deg, #7c3aed, #a78bfa)', borderRadius: 20, padding: '3px 10px', fontSize: '0.8rem', color: '#fff', fontWeight: 700, cursor: 'pointer' }}
+                      >
+                        <User size={12} /> {g.cliente_nome}
                       </span>
                     )}
                   </div>

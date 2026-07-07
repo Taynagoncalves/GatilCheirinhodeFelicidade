@@ -18,11 +18,14 @@ router.get('/', async (req, res) => {
             FROM aplicacoes a
             JOIN medicamentos med ON a.medicamento_id = med.id
             WHERE a.gato_id = g.id AND a.proxima_dose IS NOT NULL
-            ORDER BY a.id DESC LIMIT 1) AS proxima_medicamento_nome
+            ORDER BY a.id DESC LIMIT 1) AS proxima_medicamento_nome,
+           c.id AS cliente_id, c.nome AS cliente_nome
     FROM gatos g
     LEFT JOIN pais m ON g.mae_id = m.id
     LEFT JOIN pais p ON g.pai_id = p.id
     LEFT JOIN ninhadas n ON g.ninhada_id = n.id
+    LEFT JOIN cliente_gatos cg ON cg.gato_id = g.id
+    LEFT JOIN clientes c ON c.id = cg.cliente_id
     WHERE 1=1`;
   const params = [];
   if (busca) {
@@ -46,11 +49,14 @@ router.get('/:id', async (req, res) => {
   const [rows] = await pool.query(
     `SELECT g.id, g.nome, g.cor, g.sexo, DATE_FORMAT(g.data_nascimento, '%Y-%m-%d') AS data_nascimento,
             g.ninhada_id, g.mae_id, g.pai_id, g.status, g.foto_url, g.observacoes, g.peso,
-            m.nome AS mae_nome, m.foto_url AS mae_foto, p.nome AS pai_nome, p.foto_url AS pai_foto, n.nome AS ninhada_nome
+            m.nome AS mae_nome, m.foto_url AS mae_foto, p.nome AS pai_nome, p.foto_url AS pai_foto, n.nome AS ninhada_nome,
+            c.id AS cliente_id, c.nome AS cliente_nome
      FROM gatos g
      LEFT JOIN pais m ON g.mae_id = m.id
      LEFT JOIN pais p ON g.pai_id = p.id
      LEFT JOIN ninhadas n ON g.ninhada_id = n.id
+     LEFT JOIN cliente_gatos cg ON cg.gato_id = g.id
+     LEFT JOIN clientes c ON c.id = cg.cliente_id
      WHERE g.id = ?`,
     [req.params.id]
   );
@@ -129,6 +135,8 @@ router.patch('/:id/peso', async (req, res) => {
 });
 
 router.delete('/:id', async (req, res) => {
+  await pool.query('DELETE FROM aplicacoes WHERE gato_id = ?', [req.params.id]);
+  await pool.query('DELETE FROM cliente_gatos WHERE gato_id = ?', [req.params.id]);
   await pool.query('DELETE FROM gatos WHERE id = ?', [req.params.id]);
   res.json({ ok: true });
 });

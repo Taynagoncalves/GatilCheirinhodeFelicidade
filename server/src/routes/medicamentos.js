@@ -26,6 +26,7 @@ router.post('/', async (req, res) => {
 });
 
 router.delete('/:id', async (req, res) => {
+  await pool.query('DELETE FROM aplicacoes WHERE medicamento_id = ?', [req.params.id]);
   await pool.query('DELETE FROM medicamentos WHERE id = ?', [req.params.id]);
   res.json({ ok: true });
 });

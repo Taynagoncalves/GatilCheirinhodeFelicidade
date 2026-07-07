@@ -51,6 +51,8 @@ router.get('/agenda', async (req, res) => {
     LEFT JOIN pais p ON a.pai_id = p.id
     JOIN medicamentos med ON a.medicamento_id = med.id
     WHERE a.proxima_dose IS NOT NULL
+      AND (a.gato_id IS NULL OR g.id IS NOT NULL)
+      AND (a.pai_id IS NULL OR p.id IS NOT NULL)
     ORDER BY a.proxima_dose ASC
   `);
   res.json(rows);

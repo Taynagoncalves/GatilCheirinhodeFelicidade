@@ -77,6 +77,9 @@ async function initDb() {
       criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `);
+  // limpa aplicacoes órfãs (gato ou pai deletados sem cascade)
+  await pool.query(`DELETE FROM aplicacoes WHERE gato_id IS NOT NULL AND gato_id NOT IN (SELECT id FROM gatos)`);
+  await pool.query(`DELETE FROM aplicacoes WHERE pai_id IS NOT NULL AND pai_id NOT IN (SELECT id FROM pais)`);
 }
 initDb().catch((e) => console.error('initDb error:', e));
 

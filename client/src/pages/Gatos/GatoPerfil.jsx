@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Cat, Syringe, Pill, Plus, Trash2, Weight, X, Scale, GitBranch } from 'lucide-react';
+import { Cat, Syringe, Pill, Plus, Trash2, Weight, X, Scale, GitBranch, User } from 'lucide-react';
 import { formatarPeso } from '../../utils/peso';
 import Layout from '../../components/Layout';
 import StatusBadge from '../../components/StatusBadge';
@@ -90,7 +90,24 @@ export default function GatoPerfil() {
         )}
         <div style={{ marginTop: 14 }}>
           <p className="card-title" style={{ fontSize: '1.2rem' }}>{gato.nome || 'Sem nome'}</p>
-          <div style={{ margin: '6px 0' }}><StatusBadge status={gato.status} /></div>
+          <div style={{ margin: '6px 0', display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+            <StatusBadge status={gato.status} />
+            {gato.status === 'vendido' && gato.cliente_nome && (
+              <button
+                onClick={() => navigate(`/clientes/${gato.cliente_id}`)}
+                style={{
+                  all: 'unset', cursor: 'pointer',
+                  display: 'inline-flex', alignItems: 'center', gap: 5,
+                  background: 'linear-gradient(135deg, #7c3aed, #a78bfa)',
+                  color: '#fff', fontSize: '0.78rem', fontWeight: 700,
+                  borderRadius: 20, padding: '4px 12px',
+                  boxShadow: '0 2px 8px rgba(124,58,237,0.3)',
+                }}
+              >
+                <User size={13} /> Vendido para {gato.cliente_nome}
+              </button>
+            )}
+          </div>
           <p className="card-meta">
             Cor: {gato.cor || 'Não informado'}<br />
             Sexo: {gato.sexo === 'macho' ? 'Macho' : 'Fêmea'}<br />
