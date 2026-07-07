@@ -221,27 +221,27 @@ export default function Home() {
           )}
         </div>
 
-        {/* Atalhos — lista horizontal limpa */}
-        <div style={{ background: '#fff' }}>
+        {/* Atalhos — grid de cards */}
+        <div style={{ background: '#fff', padding: '12px 12px 14px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
           {[
-            { icon: <Users size={15} color="#7c3aed" />, dot: '#7c3aed', titulo: 'Clientes', sub: 'Compradores e reservas', tab: 0 },
-            { icon: <TrendingUp size={15} color="#16a34a" />, dot: '#16a34a', titulo: 'Entradas', sub: 'Registrar recebimentos', tab: 2 },
-            { icon: <TrendingDown size={15} color="#dc2626" />, dot: '#dc2626', titulo: 'Saídas', sub: 'Ração, veterinário e mais', tab: 2 },
-            { icon: <BarChart3 size={15} color="#1d4ed8" />, dot: '#1d4ed8', titulo: 'Relatórios', sub: 'Histórico e gráficos por mês', tab: 1 },
-          ].map((item, i) => (
+            { icon: <Users size={18} color="#7c3aed" />, dot: '#7c3aed', bg: '#f5f0ff', titulo: 'Clientes', sub: 'Compradores e reservas', tab: 0 },
+            { icon: <TrendingUp size={18} color="#16a34a" />, dot: '#16a34a', bg: '#f0fdf4', titulo: 'Entradas', sub: 'Registrar recebimentos', tab: 2 },
+            { icon: <TrendingDown size={18} color="#dc2626" />, dot: '#dc2626', bg: '#fff5f5', titulo: 'Saídas', sub: 'Ração, vet e mais', tab: 2 },
+            { icon: <BarChart3 size={18} color="#1d4ed8" />, dot: '#1d4ed8', bg: '#eff6ff', titulo: 'Relatórios', sub: 'Gráficos por mês', tab: 1 },
+          ].map((item) => (
             <div key={item.titulo} onClick={() => navigate('/financeiro', { state: { tab: item.tab } })} style={{
-              display: 'flex', alignItems: 'center', gap: 12,
-              padding: '12px 16px', cursor: 'pointer',
-              borderTop: i === 0 ? 'none' : '1px solid #f8fafc',
+              background: '#fff', border: `1.5px solid ${item.dot}20`,
+              borderRadius: 14, padding: '12px 12px 10px', cursor: 'pointer',
+              display: 'flex', flexDirection: 'column', gap: 10,
+              boxShadow: '0 1px 4px rgba(0,0,0,0.05)',
             }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, background: `${item.dot}12`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: `1px solid ${item.dot}22` }}>
+              <div style={{ width: 38, height: 38, borderRadius: 11, background: item.bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 {item.icon}
               </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ margin: 0, fontSize: '0.82rem', fontWeight: 700, color: '#1e293b' }}>{item.titulo}</p>
-                <p style={{ margin: '1px 0 0', fontSize: '0.7rem', color: '#94a3b8' }}>{item.sub}</p>
+              <div>
+                <p style={{ margin: 0, fontSize: '0.83rem', fontWeight: 800, color: '#1e293b' }}>{item.titulo}</p>
+                <p style={{ margin: '2px 0 0', fontSize: '0.68rem', color: '#94a3b8', lineHeight: 1.3 }}>{item.sub}</p>
               </div>
-              <ChevronRight size={15} color="#cbd5e1" />
             </div>
           ))}
         </div>
