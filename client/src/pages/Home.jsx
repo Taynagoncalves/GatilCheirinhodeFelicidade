@@ -236,12 +236,12 @@ export default function Home() {
 
           <div style={{ padding: '6px 12px 14px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
             {[
-              { icon: <TrendingUp size={16} color="#16a34a" />, bg: 'linear-gradient(135deg,#f0fdf4,#dcfce7)', border: '#bbf7d0', titulo: 'Entradas', sub: 'Registrar recebimentos' },
-              { icon: <TrendingDown size={16} color="#dc2626" />, bg: 'linear-gradient(135deg,#fff5f5,#fee2e2)', border: '#fecaca', titulo: 'Saídas', sub: 'Ração, vet e mais' },
-              { icon: <BarChart3 size={16} color="#1d4ed8" />, bg: 'linear-gradient(135deg,#eff6ff,#dbeafe)', border: '#bfdbfe', titulo: 'Relatórios', sub: 'Gráficos por mês' },
-              { icon: <Users size={16} color="#7c3aed" />, bg: 'linear-gradient(135deg,#faf5ff,#f3e8ff)', border: '#e9d5ff', titulo: 'Clientes', sub: 'Compradores e reservas' },
+              { icon: <Users size={16} color="#7c3aed" />, bg: 'linear-gradient(135deg,#faf5ff,#f3e8ff)', border: '#e9d5ff', titulo: 'Clientes', sub: 'Compradores e reservas', tab: 3 },
+              { icon: <TrendingUp size={16} color="#16a34a" />, bg: 'linear-gradient(135deg,#f0fdf4,#dcfce7)', border: '#bbf7d0', titulo: 'Entradas', sub: 'Registrar recebimentos', tab: 1 },
+              { icon: <TrendingDown size={16} color="#dc2626" />, bg: 'linear-gradient(135deg,#fff5f5,#fee2e2)', border: '#fecaca', titulo: 'Saídas', sub: 'Ração, vet e mais', tab: 1 },
+              { icon: <BarChart3 size={16} color="#1d4ed8" />, bg: 'linear-gradient(135deg,#eff6ff,#dbeafe)', border: '#bfdbfe', titulo: 'Relatórios', sub: 'Gráficos por mês', tab: 0 },
             ].map((item) => (
-              <div key={item.titulo} onClick={() => navigate('/financeiro')} style={{
+              <div key={item.titulo} onClick={() => navigate('/financeiro', { state: { tab: item.tab } })} style={{
                 background: item.bg, border: `1px solid ${item.border}`,
                 borderRadius: 14, padding: '12px 12px', cursor: 'pointer',
                 display: 'flex', flexDirection: 'column', gap: 8,

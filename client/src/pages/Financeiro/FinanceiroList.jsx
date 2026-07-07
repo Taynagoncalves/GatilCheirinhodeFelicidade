@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   TrendingUp, TrendingDown, Wallet, Plus, Trash2, X,
   PawPrint, Pencil, ChevronLeft, ChevronRight,
@@ -562,7 +562,8 @@ function TabClientes() {
 // ── Container principal ────────────────────────────────────────────────────
 export default function FinanceiroList() {
   const navigate = useNavigate();
-  const [aba, setAba] = useState(0);
+  const location = useLocation();
+  const [aba, setAba] = useState(location.state?.tab ?? 0);
   const [mes, setMes] = useState(mesAtualStr());
 
   const irMes = (m) => { setMes(m); setAba(1); };
