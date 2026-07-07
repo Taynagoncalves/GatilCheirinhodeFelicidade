@@ -119,7 +119,7 @@ export default function MenuPrincipal({ onEntrar }) {
           <div style={{ textAlign: 'left' }}>
             <p style={{ margin: 0, fontWeight: 800, fontSize: '1.2rem', color: '#fff' }}>Financeiro</p>
             <p style={{ margin: '4px 0 0', fontSize: '0.85rem', color: 'rgba(255,255,255,0.75)', lineHeight: 1.4 }}>
-              Registre vendas e gastos,{'\n'}acompanhe o saldo do mês
+              Vendas, gastos, clientes{'\n'}e saldo do mês
             </p>
           </div>
         </button>
