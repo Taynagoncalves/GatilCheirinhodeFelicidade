@@ -359,6 +359,8 @@ function TabClientes() {
   const [editando, setEditando] = useState(null);
   const [confirmando, setConfirmando] = useState(null);
   const [form, setForm] = useState({ nome: '', telefone: '', cidade: '', data_venda: '', status: 'ativo' });
+  const [gatosVendidos, setGatosVendidos] = useState([]);
+  const [showGatosVendidos, setShowGatosVendidos] = useState(false);
   const toast = useToast();
 
   const carregar = () => {
@@ -368,13 +370,21 @@ function TabClientes() {
   useEffect(() => { carregar(); api.get('/gatos').then((r) => setGatos(r.data)); }, []);
 
   const filtrados = clientes.filter((c) => {
-    const matchStatus = !filtroStatus || c.status === filtroStatus;
+    const matchStatus = !filtroStatus
+      ? true
+      : filtroStatus === 'reserva'
+        ? (c.gatos || []).some(g => g.status === 'reservado')
+        : c.status === filtroStatus;
     const matchBusca = !busca ||
       c.nome.toLowerCase().includes(busca.toLowerCase()) ||
       (c.cidade || '').toLowerCase().includes(busca.toLowerCase()) ||
       (c.gatos || []).some(g => g.nome?.toLowerCase().includes(busca.toLowerCase()));
     return matchStatus && matchBusca;
   });
+
+  const abrirGatosVendidos = () => {
+    api.get('/gatos?status=vendido').then(r => { setGatosVendidos(r.data); setShowGatosVendidos(true); });
+  };
 
   const abrirWhatsApp = (tel) => {
     const num = tel.replace(/\D/g, '');
@@ -407,11 +417,17 @@ function TabClientes() {
       {stats && (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 4 }}>
           {[
-            { icon: <Users size={18} />, valor: stats.total_ativos, label: 'Clientes Ativos', sub: `+${stats.novos_mes} este mês`, cor: '#7c3aed', bg: '#f5f0ff' },
-            { icon: <Cat size={18} />, valor: stats.total_vendidos, label: 'Gatos Vendidos', sub: `+${stats.novos_vendidos} este mês`, cor: '#16a34a', bg: '#dcfce7' },
-            { icon: <Wallet size={18} />, valor: stats.total_reservas, label: 'Reservas', sub: 'pendentes', cor: '#d97706', bg: '#fef3c7' },
+            { icon: <Users size={18} />, valor: stats.total_ativos, label: 'Clientes Ativos', sub: `+${stats.novos_mes} este mês`, cor: '#7c3aed', bg: '#f5f0ff', onClick: null },
+            { icon: <Cat size={18} />, valor: stats.total_vendidos, label: 'Gatos Vendidos', sub: `+${stats.novos_vendidos} este mês`, cor: '#16a34a', bg: '#dcfce7', onClick: abrirGatosVendidos },
+            { icon: <Wallet size={18} />, valor: stats.total_reservas, label: 'Reservas', sub: 'pendentes', cor: '#d97706', bg: '#fef3c7', onClick: () => setFiltroStatus(filtroStatus === 'reserva' ? '' : 'reserva') },
           ].map((s) => (
-            <div key={s.label} style={{ background: '#fff', borderRadius: 14, padding: '10px 8px', boxShadow: '0 1px 6px rgba(0,0,0,0.07)', textAlign: 'center' }}>
+            <div key={s.label} onClick={s.onClick || undefined} style={{
+              background: s.onClick && filtroStatus === 'reserva' && s.label === 'Reservas' ? '#fef3c7' : '#fff',
+              borderRadius: 14, padding: '10px 8px', boxShadow: '0 1px 6px rgba(0,0,0,0.07)', textAlign: 'center',
+              cursor: s.onClick ? 'pointer' : 'default',
+              border: s.onClick && filtroStatus === 'reserva' && s.label === 'Reservas' ? '2px solid #d97706' : '2px solid transparent',
+              transition: 'all 0.15s',
+            }}>
               <div style={{ width: 34, height: 34, borderRadius: '50%', background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', color: s.cor, margin: '0 auto 6px' }}>{s.icon}</div>
               <p style={{ margin: 0, fontSize: '1.3rem', fontWeight: 900, color: s.cor, lineHeight: 1 }}>{s.valor}</p>
               <p style={{ margin: '2px 0 0', fontSize: '0.62rem', fontWeight: 700, color: '#475569', lineHeight: 1.3 }}>{s.label}</p>
@@ -527,6 +543,37 @@ function TabClientes() {
       })}
 
       {confirmando && <ConfirmModal message={`Remover o cliente "${confirmando.nome}"?`} onConfirm={excluir} onCancel={() => setConfirmando(null)} />}
+
+      {/* Modal: Gatos Vendidos */}
+      {showGatosVendidos && (
+        <div className="modal-overlay" onClick={() => setShowGatosVendidos(false)}>
+          <div className="modal-box" onClick={e => e.stopPropagation()} style={{ maxHeight: '80vh', display: 'flex', flexDirection: 'column' }}>
+            <button className="modal-close" onClick={() => setShowGatosVendidos(false)}><X size={20} /></button>
+            <p className="modal-title" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Cat size={18} color="#16a34a" /> Gatos Vendidos
+              <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#16a34a', background: '#dcfce7', borderRadius: 20, padding: '1px 8px' }}>{gatosVendidos.length}</span>
+            </p>
+            <div style={{ overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {gatosVendidos.length === 0 && <p style={{ color: '#94a3b8', textAlign: 'center', fontSize: '0.85rem' }}>Nenhum gato vendido ainda.</p>}
+              {gatosVendidos.map(g => (
+                <div key={g.id} onClick={() => { setShowGatosVendidos(false); navigate(`/gatos/${g.id}`); }}
+                  style={{ display: 'flex', alignItems: 'center', gap: 10, background: '#f8fafc', borderRadius: 12, padding: '8px 10px', cursor: 'pointer', borderLeft: '3px solid #16a34a' }}>
+                  {g.foto_url
+                    ? <img src={g.foto_url} alt={g.nome} style={{ width: 42, height: 42, borderRadius: 10, objectFit: 'cover', flexShrink: 0 }} />
+                    : <div style={{ width: 42, height: 42, borderRadius: 10, background: '#dcfce7', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><Cat size={18} color="#16a34a" /></div>
+                  }
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{ margin: 0, fontWeight: 700, fontSize: '0.9rem', color: '#1e293b' }}>{g.nome || 'Sem nome'}</p>
+                    {g.cliente_nome && <p style={{ margin: '2px 0 0', fontSize: '0.75rem', color: '#7c3aed', fontWeight: 600 }}>👤 {g.cliente_nome}</p>}
+                    {g.data_nascimento && <p style={{ margin: '1px 0 0', fontSize: '0.72rem', color: '#94a3b8' }}>{g.data_nascimento.split('-').reverse().join('/')}</p>}
+                  </div>
+                  <ChevronRight size={16} color="#94a3b8" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {showForm && (
         <div className="modal-overlay" onClick={() => setShowForm(false)}>
