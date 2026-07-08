@@ -450,6 +450,10 @@ function TabClientes() {
         const st = STATUS_CLIENTE[c.status] || STATUS_CLIENTE.ativo;
         const gatos_c = c.gatos || [];
         const totalGasto = gatos_c.reduce((sum, g) => sum + (Number(g.valor) || 0), 0);
+        const totalPago  = gatos_c.reduce((sum, g) => sum + (Number(g.valor_pago) || 0), 0);
+        const pct = totalGasto > 0 ? Math.min(100, Math.round((totalPago / totalGasto) * 100)) : 0;
+        const pagamentoCompleto = totalGasto > 0 && totalPago >= totalGasto;
+        const pagamentoParcial  = totalPago > 0 && !pagamentoCompleto;
         return (
           <div key={c.id} onClick={() => navigate(`/clientes/${c.id}`)} style={{ background: '#fff', borderRadius: 16, marginBottom: 10, boxShadow: '0 2px 12px rgba(0,0,0,0.07)', overflow: 'hidden', cursor: 'pointer' }}>
             <div style={{ padding: '14px 14px 10px', display: 'flex', alignItems: 'flex-start', gap: 12 }}>
@@ -470,21 +474,45 @@ function TabClientes() {
             </div>
 
             {(c.gato_nome || totalGasto > 0) && (
-              <div style={{ margin: '0 14px', borderRadius: 10, background: '#f8fafc', padding: '8px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                {c.gato_nome && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <Cat size={14} color="#7c3aed" />
-                    <div>
-                      <p style={{ margin: 0, fontSize: '0.68rem', color: '#94a3b8' }}>{gatos_c.length} {gatos_c.length === 1 ? 'gato adquirido' : 'gatos adquiridos'}</p>
-                      <p style={{ margin: 0, fontSize: '0.82rem', fontWeight: 700, color: '#1e293b' }}>{c.gato_nome}{gatos_c.length > 1 ? ` +${gatos_c.length - 1}` : ''}</p>
+              <div style={{ margin: '0 14px', borderRadius: 10, background: '#f8fafc', padding: '8px 12px' }}>
+                {/* linha topo: gato + total */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: totalGasto > 0 ? 8 : 0 }}>
+                  {c.gato_nome && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <Cat size={14} color="#7c3aed" />
+                      <div>
+                        <p style={{ margin: 0, fontSize: '0.68rem', color: '#94a3b8' }}>{gatos_c.length} {gatos_c.length === 1 ? 'gato adquirido' : 'gatos adquiridos'}</p>
+                        <p style={{ margin: 0, fontSize: '0.82rem', fontWeight: 700, color: '#1e293b' }}>{c.gato_nome}{gatos_c.length > 1 ? ` +${gatos_c.length - 1}` : ''}</p>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                  {totalGasto > 0 && (
+                    <div style={{ textAlign: 'right' }}>
+                      <p style={{ margin: 0, fontSize: '0.68rem', color: '#94a3b8' }}>Total</p>
+                      <p style={{ margin: 0, fontSize: '0.88rem', fontWeight: 800, color: '#16a34a' }}>{Number(totalGasto).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* barra de pagamento */}
                 {totalGasto > 0 && (
-                  <div style={{ textAlign: 'right' }}>
-                    <p style={{ margin: 0, fontSize: '0.68rem', color: '#94a3b8' }}>Total gasto</p>
-                    <p style={{ margin: 0, fontSize: '0.88rem', fontWeight: 800, color: '#16a34a' }}>{Number(totalGasto).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
-                  </div>
+                  <>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                      <span style={{ fontSize: '0.68rem', fontWeight: 700, color: pagamentoCompleto ? '#16a34a' : pagamentoParcial ? '#d97706' : '#94a3b8' }}>
+                        {pagamentoCompleto ? '✓ Pago integralmente' : pagamentoParcial ? `${pct}% pago` : 'Aguardando pagamento'}
+                      </span>
+                      <span style={{ fontSize: '0.68rem', color: '#94a3b8' }}>
+                        {Number(totalPago).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} / {Number(totalGasto).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                      </span>
+                    </div>
+                    <div style={{ height: 5, background: '#e2e8f0', borderRadius: 3, overflow: 'hidden' }}>
+                      <div style={{
+                        height: '100%', borderRadius: 3, width: `${pct}%`,
+                        background: pagamentoCompleto ? 'linear-gradient(90deg,#16a34a,#22c55e)' : 'linear-gradient(90deg,#d97706,#f59e0b)',
+                        transition: 'width 0.4s ease',
+                      }} />
+                    </div>
+                  </>
                 )}
               </div>
             )}
