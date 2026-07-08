@@ -428,19 +428,9 @@ function TabClientes() {
         <input placeholder="Buscar cliente..." value={busca} onChange={(e) => setBusca(e.target.value)} />
       </div>
 
-      <div style={{ display: 'flex', gap: 6, overflowX: 'auto', scrollbarWidth: 'none', marginBottom: 4 }}>
-        {FILTROS_CLIENTE.map((f) => {
-          const ativo = filtroStatus === f.v;
-          return (
-            <button key={f.v} onClick={() => setFiltroStatus(f.v)} style={{
-              flexShrink: 0, border: ativo ? 'none' : '1.5px solid #e2e8f0',
-              borderRadius: 20, padding: '5px 14px', fontSize: '0.78rem',
-              fontWeight: ativo ? 700 : 500, cursor: 'pointer',
-              background: ativo ? 'var(--color-primary)' : '#fff',
-              color: ativo ? '#fff' : '#64748b',
-            }}>{f.l}</button>
-          );
-        })}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+        <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#64748b' }}>Clientes</span>
+        {filtrados.length > 0 && <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#7c3aed', background: '#f5f0ff', borderRadius: 20, padding: '1px 8px' }}>{filtrados.length}</span>}
       </div>
 
       {clientes.length === 0 && <EmptyState icon={Users} title="Nenhum cliente cadastrado" description="Cadastre os compradores dos filhotes aqui." />}
