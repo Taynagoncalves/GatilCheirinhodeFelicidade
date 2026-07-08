@@ -111,8 +111,9 @@ export default function GatoPerfil() {
                 }}>
                   {gato.cliente_nome.split(' ').slice(0,2).map(w => w[0]).join('').toUpperCase()}
                 </span>
-                <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#fff', letterSpacing: 0.1 }}>
-                  {gato.cliente_nome}
+                <span style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
+                  <span style={{ fontSize: '0.62rem', fontWeight: 500, color: 'rgba(255,255,255,0.75)' }}>Vendido para</span>
+                  <span style={{ fontSize: '0.85rem', fontWeight: 800, color: '#fff' }}>{gato.cliente_nome}</span>
                 </span>
               </button>
             )}
