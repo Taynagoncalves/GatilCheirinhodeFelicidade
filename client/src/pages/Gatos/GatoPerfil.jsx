@@ -97,14 +97,23 @@ export default function GatoPerfil() {
                 onClick={() => navigate(`/clientes/${gato.cliente_id}`)}
                 style={{
                   all: 'unset', cursor: 'pointer',
-                  display: 'inline-flex', alignItems: 'center', gap: 5,
-                  background: 'linear-gradient(135deg, #7c3aed, #a78bfa)',
-                  color: '#fff', fontSize: '0.78rem', fontWeight: 700,
-                  borderRadius: 20, padding: '4px 12px',
-                  boxShadow: '0 2px 8px rgba(124,58,237,0.3)',
+                  display: 'inline-flex', alignItems: 'center', gap: 7,
+                  background: 'linear-gradient(135deg, #4c1d95 0%, #7c3aed 60%, #a78bfa 100%)',
+                  borderRadius: 24, padding: '4px 14px 4px 4px',
+                  boxShadow: '0 3px 12px rgba(124,58,237,0.4)',
                 }}
               >
-                <User size={13} /> Vendido para {gato.cliente_nome}
+                <span style={{
+                  width: 26, height: 26, borderRadius: '50%',
+                  background: 'rgba(255,255,255,0.22)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: '0.62rem', fontWeight: 900, color: '#fff', letterSpacing: 0.3, flexShrink: 0,
+                }}>
+                  {gato.cliente_nome.split(' ').slice(0,2).map(w => w[0]).join('').toUpperCase()}
+                </span>
+                <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#fff', letterSpacing: 0.1 }}>
+                  {gato.cliente_nome}
+                </span>
               </button>
             )}
           </div>

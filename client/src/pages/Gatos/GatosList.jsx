@@ -251,9 +251,24 @@ export default function GatosList() {
                     {g.status === 'vendido' && g.cliente_nome && (
                       <span
                         onClick={(e) => { e.stopPropagation(); navigate(`/clientes/${g.cliente_id}`); }}
-                        style={{ display: 'flex', alignItems: 'center', gap: 4, background: 'linear-gradient(135deg, #7c3aed, #a78bfa)', borderRadius: 20, padding: '3px 10px', fontSize: '0.8rem', color: '#fff', fontWeight: 700, cursor: 'pointer' }}
+                        style={{
+                          display: 'inline-flex', alignItems: 'center', gap: 6, cursor: 'pointer',
+                          background: 'linear-gradient(135deg, #4c1d95 0%, #7c3aed 60%, #a78bfa 100%)',
+                          borderRadius: 22, padding: '3px 11px 3px 3px',
+                          boxShadow: '0 2px 10px rgba(124,58,237,0.35)',
+                        }}
                       >
-                        <User size={12} /> {g.cliente_nome}
+                        <span style={{
+                          width: 22, height: 22, borderRadius: '50%',
+                          background: 'rgba(255,255,255,0.22)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          fontSize: '0.58rem', fontWeight: 900, color: '#fff', letterSpacing: 0.3, flexShrink: 0,
+                        }}>
+                          {g.cliente_nome.split(' ').slice(0,2).map(w => w[0]).join('').toUpperCase()}
+                        </span>
+                        <span style={{ fontSize: '0.78rem', fontWeight: 700, color: '#fff', letterSpacing: 0.1 }}>
+                          {g.cliente_nome}
+                        </span>
                       </span>
                     )}
                   </div>
