@@ -15,14 +15,14 @@ router.get('/stats', async (req, res) => {
 async function getGatosByCliente(clienteIds) {
   if (!clienteIds.length) return {};
   const [links] = await pool.query(
-    `SELECT cg.cliente_id, g.id AS gato_id, g.nome AS gato_nome, g.foto_url AS gato_foto, cg.valor
+    `SELECT cg.cliente_id, g.id AS gato_id, g.nome AS gato_nome, g.foto_url AS gato_foto, cg.valor, cg.valor_pago, g.status AS gato_status
      FROM cliente_gatos cg JOIN gatos g ON cg.gato_id = g.id
      WHERE cg.cliente_id IN (?)`, [clienteIds]
   );
   const map = {};
   links.forEach((l) => {
     if (!map[l.cliente_id]) map[l.cliente_id] = [];
-    map[l.cliente_id].push({ id: l.gato_id, nome: l.gato_nome, foto: l.gato_foto, valor: l.valor });
+    map[l.cliente_id].push({ id: l.gato_id, nome: l.gato_nome, foto: l.gato_foto, valor: l.valor, valor_pago: l.valor_pago, status: l.gato_status });
   });
   return map;
 }
@@ -76,15 +76,42 @@ router.put('/:id', async (req, res) => {
   res.json({ ok: true });
 });
 
-// Adicionar gato ao cliente
+// Adicionar gato ao cliente (status inicial = reservado, muda para vendido só quando pago)
 router.post('/:id/gatos', async (req, res) => {
   const { gato_id, valor } = req.body;
   await pool.query(
-    `INSERT INTO cliente_gatos (cliente_id, gato_id, valor) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE valor = VALUES(valor)`,
+    `INSERT INTO cliente_gatos (cliente_id, gato_id, valor, valor_pago) VALUES (?, ?, ?, 0) ON DUPLICATE KEY UPDATE valor = VALUES(valor)`,
     [req.params.id, gato_id, valor || null]
   );
-  await pool.query(`UPDATE gatos SET status = 'vendido' WHERE id = ?`, [gato_id]);
+  await pool.query(`UPDATE gatos SET status = 'reservado' WHERE id = ?`, [gato_id]);
   res.json({ ok: true });
+});
+
+// Registrar pagamento de um gato do cliente
+router.patch('/:id/gatos/:gato_id/pagamento', async (req, res) => {
+  const { valor_pago } = req.body;
+  const pago = Number(valor_pago) || 0;
+
+  await pool.query(
+    `UPDATE cliente_gatos SET valor_pago = ? WHERE cliente_id = ? AND gato_id = ?`,
+    [pago, req.params.id, req.params.gato_id]
+  );
+
+  // Determina novo status do gato baseado no pagamento
+  const [[link]] = await pool.query(
+    `SELECT valor, valor_pago FROM cliente_gatos WHERE cliente_id = ? AND gato_id = ?`,
+    [req.params.id, req.params.gato_id]
+  );
+
+  let novoStatus = 'reservado';
+  if (pago > 0 && link.valor && pago >= Number(link.valor)) {
+    novoStatus = 'vendido';
+  } else if (pago > 0) {
+    novoStatus = 'reservado';
+  }
+
+  await pool.query(`UPDATE gatos SET status = ? WHERE id = ?`, [novoStatus, req.params.gato_id]);
+  res.json({ ok: true, status: novoStatus });
 });
 
 // Remover gato do cliente
