@@ -383,6 +383,7 @@ function TabClientes() {
   });
 
   const abrirGatosVendidos = () => {
+    setFiltroStatus('');
     api.get('/gatos?status=vendido').then(r => { setGatosVendidos(r.data); setShowGatosVendidos(true); });
   };
 
