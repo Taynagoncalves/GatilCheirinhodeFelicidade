@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 require('dotenv').config();
 
 const pool = require('./db/pool');
@@ -101,6 +102,10 @@ app.use('/api/financeiro', require('./routes/financeiro'));
 app.use('/api/clientes', require('./routes/clientes'));
 
 app.get('/api/health', (req, res) => res.json({ ok: true }));
+
+const clientDist = path.join(__dirname, '../../client/dist');
+app.use(express.static(clientDist));
+app.get('*', (req, res) => res.sendFile(path.join(clientDist, 'index.html')));
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
