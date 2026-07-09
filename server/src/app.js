@@ -107,7 +107,7 @@ app.get('/api/health', (req, res) => res.json({ ok: true }));
 
 const clientDist = path.join(__dirname, '../../client/dist');
 app.use(express.static(clientDist));
-app.get('*', (req, res) => res.sendFile(path.join(clientDist, 'index.html')));
+app.get('/{*path}', (req, res) => res.sendFile(path.join(clientDist, 'index.html')));
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
