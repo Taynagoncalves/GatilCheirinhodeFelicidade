@@ -17,7 +17,31 @@ import Layout from '../../components/Layout';
 import EmptyState from '../../components/EmptyState';
 import ConfirmModal from '../../components/ConfirmModal';
 import { useToast } from '../../components/Toast';
+import { useTour } from '../../contexts/TourContext';
 import api from '../../api/client';
+
+const TOUR = [
+  {
+    selector: '[data-tour="pais-cadastrar"]',
+    titulo: 'Novo Pai ou Mãe',
+    texto: 'Toque aqui para cadastrar um novo reprodutor — informe nome, raça, cor, data de nascimento e foto.',
+  },
+  {
+    selector: '[data-tour="pais-busca"]',
+    titulo: 'Busca',
+    texto: 'Pesquise pelo nome do pai ou mãe para encontrá-lo rapidamente na lista.',
+  },
+  {
+    selector: '[data-tour="pais-tabs"]',
+    titulo: 'Pais e Mães',
+    texto: 'Alterne entre Pais (machos) e Mães (fêmeas) com um toque.',
+  },
+  {
+    selector: '[data-tour="pais-lista"]',
+    titulo: 'Cards de Reprodutores',
+    texto: 'Toque em um card para ver o perfil completo. O badge colorido indica o status da dose — vermelho para atrasada, laranja para hoje e verde para em dia. Use Editar ou Excluir sem precisar abrir o perfil.',
+  },
+];
 
 export default function PaisList() {
   const navigate = useNavigate();
@@ -26,6 +50,9 @@ export default function PaisList() {
   const [pais, setPais] = useState([]);
   const toast = useToast();
   const [confirmId, setConfirmId] = useState(null);
+  const { setSteps } = useTour();
+
+  useEffect(() => { setSteps(TOUR, 'pais'); return () => setSteps([]); }, []);
 
   const load = () => {
     api.get('/pais', { params: { sexo, busca: busca || undefined } }).then((res) => setPais(res.data));
@@ -44,16 +71,16 @@ export default function PaisList() {
 
   return (
     <Layout title="Pais" showBack>
-      <button className="btn btn-primary" onClick={() => navigate('/pais/novo')}>
+      <button className="btn btn-primary" data-tour="pais-cadastrar" onClick={() => navigate('/pais/novo')}>
         <Plus size={18} /> Novo Pai ou Mãe
       </button>
 
-      <div className="search-input">
+      <div className="search-input" data-tour="pais-busca">
         <Search size={18} />
         <input placeholder="Buscar Pais..." value={busca} onChange={(e) => setBusca(e.target.value)} />
       </div>
 
-      <div className="tabs">
+      <div className="tabs" data-tour="pais-tabs">
         <button className={`tab${sexo === 'macho' ? ' active' : ''}`} onClick={() => setSexo('macho')}>Pais</button>
         <button className={`tab${sexo === 'femea' ? ' active' : ''}`} onClick={() => setSexo('femea')}>Mães</button>
       </div>
@@ -62,6 +89,7 @@ export default function PaisList() {
         <EmptyState icon={PawPrint} title="Nenhum registro encontrado" description="Cadastre o primeiro pai ou mãe do gatil." />
       )}
 
+      <div data-tour="pais-lista">
       {pais.map((p) => {
         const alerta = alerteDose(p.proxima_dose_min, p.proxima_medicamento_nome);
         return (
@@ -98,6 +126,7 @@ export default function PaisList() {
         </div>
         );
       })}
+      </div>
       {confirmId && (
         <ConfirmModal
           message="Deseja remover este registro?"

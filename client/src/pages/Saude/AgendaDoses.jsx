@@ -3,7 +3,31 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Cat, Syringe, Pill, CalendarClock } from 'lucide-react';
 import Layout from '../../components/Layout';
 import EmptyState from '../../components/EmptyState';
+import { useTour } from '../../contexts/TourContext';
 import api from '../../api/client';
+
+const TOUR = [
+  {
+    selector: '[data-tour="agenda-cabecalho"]',
+    titulo: 'Navegação por Mês',
+    texto: 'Use as setas para navegar entre meses. O total de doses agendadas para o mês atual aparece logo abaixo do nome do mês.',
+  },
+  {
+    selector: '[data-tour="agenda-grade"]',
+    titulo: 'Calendário de Doses',
+    texto: 'Dias com doses têm pontos coloridos abaixo do número. Toque em qualquer dia para ver os detalhes das doses daquele dia.',
+  },
+  {
+    selector: '[data-tour="agenda-legenda"]',
+    titulo: 'Legenda de Cores',
+    texto: 'Vermelho = dose atrasada, laranja = dose hoje, verde = agendada futuramente.',
+  },
+  {
+    selector: '[data-tour="agenda-detalhe"]',
+    titulo: 'Detalhes do Dia',
+    texto: 'Ao tocar em um dia, os cards aparecem aqui mostrando o animal, medicamento e status da dose. Toque no card para ir direto ao perfil.',
+  },
+];
 
 const DIAS_SEMANA = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 const MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
@@ -50,6 +74,9 @@ export default function AgendaDoses() {
   const [ano, setAno] = useState(agora.getFullYear());
   const [mes, setMes] = useState(agora.getMonth());
   const [diaSel, setDiaSel] = useState(agora.getDate());
+  const { setSteps } = useTour();
+
+  useEffect(() => { setSteps(TOUR, 'agenda'); return () => setSteps([]); }, []);
 
   useEffect(() => {
     api.get('/aplicacoes/agenda').then((res) => setDoses(res.data));
@@ -86,7 +113,7 @@ export default function AgendaDoses() {
     <Layout title="Agenda de Doses" showBack>
 
       {/* ── Cabeçalho do calendário ── */}
-      <div style={{ background: 'linear-gradient(135deg, var(--color-primary), #2f6690)', borderRadius: 'var(--radius-md)', padding: '16px', marginBottom: 12 }}>
+      <div data-tour="agenda-cabecalho" style={{ background: 'linear-gradient(135deg, var(--color-primary), #2f6690)', borderRadius: 'var(--radius-md)', padding: '16px', marginBottom: 12 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
           <button onClick={() => navMes(-1)} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: 8, width: 32, height: 32, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
             <ChevronLeft size={18} />
@@ -107,6 +134,7 @@ export default function AgendaDoses() {
           ))}
 
           {/* Células dos dias */}
+          <div data-tour="agenda-grade" style={{ display: 'contents' }}>
           {grade.map((dia, i) => {
             if (!dia) return <div key={`e-${i}`} />;
             const dateStr = toDateStr(ano, mes, dia);
@@ -142,11 +170,12 @@ export default function AgendaDoses() {
               </div>
             );
           })}
+          </div>
         </div>
       </div>
 
       {/* Legenda */}
-      <div style={{ display: 'flex', gap: 12, justifyContent: 'center', marginBottom: 12 }}>
+      <div data-tour="agenda-legenda" style={{ display: 'flex', gap: 12, justifyContent: 'center', marginBottom: 12 }}>
         {[['#c0524a','Atrasada'],['#b8863a','Hoje'],['#3f8c5a','Agendada']].map(([cor, label]) => (
           <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>
             <span style={{ width: 8, height: 8, borderRadius: '50%', background: cor, display: 'block' }} />
@@ -157,7 +186,7 @@ export default function AgendaDoses() {
 
       {/* ── Detalhe do dia selecionado ── */}
       {dataSel && (
-        <section>
+        <section data-tour="agenda-detalhe">
           <h2 className="section-title" style={{ marginTop: 4 }}>
             {diaSel} de {MESES[mes]}
           </h2>

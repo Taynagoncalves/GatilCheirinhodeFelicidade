@@ -4,7 +4,31 @@ import { Cat, Phone, MapPin, CalendarDays, Plus, Trash2, X, Pencil, ChevronRight
 import Layout from '../../components/Layout';
 import ConfirmModal from '../../components/ConfirmModal';
 import { useToast } from '../../components/Toast';
+import { useTour } from '../../contexts/TourContext';
 import api from '../../api/client';
+
+const TOUR = [
+  {
+    selector: '[data-tour="cperfil-header"]',
+    titulo: 'Perfil do Cliente',
+    texto: 'Nome, iniciais e status do cliente. Toque no lápis para editar os dados cadastrais a qualquer momento.',
+  },
+  {
+    selector: '[data-tour="cperfil-info"]',
+    titulo: 'Informações de Contato',
+    texto: 'Telefone com atalho direto para o WhatsApp, cidade e data de cadastro do cliente.',
+  },
+  {
+    selector: '[data-tour="cperfil-gatos"]',
+    titulo: 'Gatos Adquiridos',
+    texto: 'Lista todos os gatos comprados por este cliente. Use "+ Adicionar" para vincular um novo gato e informar o valor da venda.',
+  },
+  {
+    selector: '[data-tour="cperfil-pagamento"]',
+    titulo: 'Controle de Pagamento',
+    texto: 'A barra colorida mostra quanto já foi pago. Toque no ícone $ para registrar o valor pago — o gato muda para Reservado se pagamento parcial, ou Vendido se pago integralmente.',
+  },
+];
 
 const STATUS_CLIENTE = {
   ativo:      { label: 'Cliente Ativo',  cor: '#16a34a', bg: '#dcfce7' },
@@ -28,8 +52,11 @@ export default function ClientePerfil() {
   const [confirmRemove, setConfirmRemove] = useState(null);
   const [addForm, setAddForm] = useState({ gato_id: '', valor: '' });
   const [editForm, setEditForm] = useState({});
-  const [pagamentoGato, setPagamentoGato] = useState(null); // { id, nome, valor, valor_pago }
+  const [pagamentoGato, setPagamentoGato] = useState(null);
   const [valorPagoInput, setValorPagoInput] = useState('');
+  const { setSteps } = useTour();
+
+  useEffect(() => { setSteps(TOUR, 'clienteperfil'); return () => setSteps([]); }, []);
 
   const carregar = () => api.get(`/clientes/${id}`).then(r => setCliente(r.data));
 
@@ -108,7 +135,7 @@ export default function ClientePerfil() {
     <Layout title="Perfil do Cliente" showBack>
 
       {/* Header */}
-      <div style={{ background: 'linear-gradient(135deg, #5b21b6, #7c3aed)', borderRadius: 20, padding: '20px 18px', position: 'relative' }}>
+      <div data-tour="cperfil-header" style={{ background: 'linear-gradient(135deg, #5b21b6, #7c3aed)', borderRadius: 20, padding: '20px 18px', position: 'relative' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           <div style={{ width: 60, height: 60, borderRadius: '50%', background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem', fontWeight: 900, color: '#fff', flexShrink: 0 }}>
             {iniciais}
@@ -124,7 +151,7 @@ export default function ClientePerfil() {
       </div>
 
       {/* Informações */}
-      <div style={{ background: '#fff', borderRadius: 16, padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 10, boxShadow: '0 2px 10px rgba(0,0,0,0.06)' }}>
+      <div data-tour="cperfil-info" style={{ background: '#fff', borderRadius: 16, padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 10, boxShadow: '0 2px 10px rgba(0,0,0,0.06)' }}>
         {cliente.telefone && (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.88rem', color: '#475569' }}>
@@ -148,7 +175,7 @@ export default function ClientePerfil() {
       </div>
 
       {/* Gatos adquiridos */}
-      <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 10px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
+      <div data-tour="cperfil-gatos" style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 10px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
         <div style={{ padding: '14px 16px 10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <p style={{ margin: 0, fontWeight: 800, fontSize: '0.92rem', color: '#1e293b', display: 'flex', alignItems: 'center', gap: 6 }}>
             <Cat size={16} color="#7c3aed" /> Gatos adquiridos
@@ -198,7 +225,7 @@ export default function ClientePerfil() {
 
               {/* Barra de pagamento */}
               {total > 0 && (
-                <div style={{ padding: '0 16px 12px' }}>
+                <div data-tour={i === 0 ? 'cperfil-pagamento' : undefined} style={{ padding: '0 16px 12px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 5 }}>
                     <span style={{ fontSize: '0.7rem', fontWeight: 600, color: pagamentoCompleto ? '#16a34a' : pagamentoParcial ? '#d97706' : '#94a3b8' }}>
                       {pagamentoCompleto ? '✓ Pago integralmente' : pagamentoParcial ? `${pct}% pago` : 'Aguardando pagamento'}

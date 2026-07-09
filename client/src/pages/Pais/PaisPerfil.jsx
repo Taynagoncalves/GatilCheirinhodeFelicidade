@@ -5,9 +5,38 @@ import Layout from '../../components/Layout';
 import EmptyState from '../../components/EmptyState';
 import ConfirmModal from '../../components/ConfirmModal';
 import { useToast } from '../../components/Toast';
+import { useTour } from '../../contexts/TourContext';
 import api from '../../api/client';
 import { calcularIdade } from '../../utils/idade';
 import { formatarPeso } from '../../utils/peso';
+
+const TOUR = [
+  {
+    selector: '[data-tour="paiperfil-info"]',
+    titulo: 'Informações do Reprodutor',
+    texto: 'Todos os dados cadastrados: sexo, raça, cor, data de nascimento, idade calculada automaticamente e peso atual.',
+  },
+  {
+    selector: '[data-tour="paiperfil-acoes"]',
+    titulo: 'Editar e Registrar Peso',
+    texto: 'Toque em "Editar" para alterar qualquer dado ou foto. Use "Registrar Peso" para salvar o peso atual em gramas ou quilos — o histórico fica salvo automaticamente.',
+  },
+  {
+    selector: '[data-tour="paiperfil-dose"]',
+    titulo: 'Registrar Dose',
+    texto: 'Registre uma nova dose de vacina ou medicamento diretamente para este reprodutor.',
+  },
+  {
+    selector: '[data-tour="paiperfil-historico-saude"]',
+    titulo: 'Histórico de Saúde',
+    texto: 'Todas as doses registradas aparecem aqui com data de aplicação e próxima dose agendada. Use a lixeira para remover um registro incorreto.',
+  },
+  {
+    selector: '[data-tour="paiperfil-historico-peso"]',
+    titulo: 'Histórico de Peso',
+    texto: 'Acompanhe a evolução do peso ao longo do tempo. Cada registro mostra o peso e a data de medição.',
+  },
+];
 
 export default function PaisPerfil() {
   const { id } = useParams();
@@ -18,6 +47,9 @@ export default function PaisPerfil() {
   const [pesoUnidade, setPesoUnidade] = useState('kg');
   const [confirmando, setConfirmando] = useState(null);
   const toast = useToast();
+  const { setSteps } = useTour();
+
+  useEffect(() => { setSteps(TOUR, 'paiperfil'); return () => setSteps([]); }, []);
 
   const carregar = () => api.get(`/pais/${id}`).then((res) => setPai(res.data));
 
@@ -44,7 +76,7 @@ export default function PaisPerfil() {
 
   return (
     <Layout title="Perfil do Pai / Mãe" showBack>
-      <div className="card">
+      <div className="card" data-tour="paiperfil-info">
         {pai.foto_url ? (
           <img src={pai.foto_url} alt={pai.nome} style={{ width: '100%', height: 220, objectFit: 'cover', borderRadius: 'var(--radius-md)' }} />
         ) : (
@@ -64,7 +96,7 @@ export default function PaisPerfil() {
             {pai.observacoes && <><br />Obs: {pai.observacoes}</>}
           </p>
         </div>
-        <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
+        <div style={{ display: 'flex', gap: 10, marginTop: 12 }} data-tour="paiperfil-acoes">
           <button className="btn btn-outline" style={{ flex: 1 }} onClick={() => navigate(`/pais/${id}/editar`)}>
             Editar
           </button>
@@ -74,11 +106,11 @@ export default function PaisPerfil() {
         </div>
       </div>
 
-      <button className="btn btn-primary" onClick={() => navigate(`/saude/registrar?pai_id=${id}`)}>
+      <button className="btn btn-primary" data-tour="paiperfil-dose" onClick={() => navigate(`/saude/registrar?pai_id=${id}`)}>
         <Plus size={18} /> Registrar Dose
       </button>
 
-      <section>
+      <section data-tour="paiperfil-historico-saude">
         <h2 className="section-title">Histórico de Saúde</h2>
         {(!pai.historico || pai.historico.length === 0) ? (
           <EmptyState icon={Pill} title="Nenhum registro de saúde" description="Os registros de vacinas e medicamentos aparecerão aqui." />
@@ -105,7 +137,7 @@ export default function PaisPerfil() {
         )}
       </section>
 
-      <section>
+      <section data-tour="paiperfil-historico-peso">
         <h2 className="section-title">Histórico de Peso</h2>
         {(!pai.historico_peso || pai.historico_peso.length === 0) ? (
           <EmptyState icon={Scale} title="Nenhum peso registrado" description="Registre o peso para acompanhar a evolução." />

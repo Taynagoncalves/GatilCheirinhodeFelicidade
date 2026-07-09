@@ -3,12 +3,34 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Cat, Calendar, PawPrint, Pencil } from 'lucide-react';
 import Layout from '../../components/Layout';
 import EmptyState from '../../components/EmptyState';
+import { useTour } from '../../contexts/TourContext';
 import api from '../../api/client';
+
+const TOUR = [
+  {
+    selector: '[data-tour="ninhada-info"]',
+    titulo: 'Informações da Ninhada',
+    texto: 'Dados da ninhada: mãe, pai, data de nascimento e quantidade de filhotes registrada.',
+  },
+  {
+    selector: '[data-tour="ninhada-editar"]',
+    titulo: 'Editar Ninhada',
+    texto: 'Toque para alterar qualquer dado desta ninhada — nome, pais, data ou foto.',
+  },
+  {
+    selector: '[data-tour="ninhada-filhotes"]',
+    titulo: 'Filhotes',
+    texto: 'Todos os filhotes vinculados aparecem aqui. Toque em qualquer um para ir direto ao perfil completo com dados de saúde, status e genealogia.',
+  },
+];
 
 export default function NinhadaDetalhe() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [ninhada, setNinhada] = useState(null);
+  const { setSteps } = useTour();
+
+  useEffect(() => { setSteps(TOUR, 'ninhada-detalhe'); return () => setSteps([]); }, []);
 
   useEffect(() => {
     api.get(`/ninhadas/${id}`).then((res) => setNinhada(res.data));
@@ -18,7 +40,7 @@ export default function NinhadaDetalhe() {
 
   return (
     <Layout title={ninhada.nome} showBack>
-      <div className="card">
+      <div className="card" data-tour="ninhada-info">
         <div className="card-row">
           {ninhada.foto_url ? (
             <img src={ninhada.foto_url} alt={ninhada.nome} className="card-photo" />
@@ -42,12 +64,12 @@ export default function NinhadaDetalhe() {
           </span>
         </p>
         {ninhada.observacoes && <p className="card-meta" style={{ marginTop: 8 }}>{ninhada.observacoes}</p>}
-        <button className="btn btn-outline" style={{ marginTop: 12 }} onClick={() => navigate(`/ninhadas/${id}/editar`)}>
+        <button className="btn btn-outline" data-tour="ninhada-editar" style={{ marginTop: 12 }} onClick={() => navigate(`/ninhadas/${id}/editar`)}>
           <Pencil size={15} /> Editar Ninhada
         </button>
       </div>
 
-      <section>
+      <section data-tour="ninhada-filhotes">
         <h2 className="section-title">Filhotes</h2>
         {ninhada.filhotes.length === 0 && (
           <EmptyState icon={Cat} title="Nenhum filhote cadastrado" description="Cadastre os filhotes desta ninhada no módulo Gatos." />

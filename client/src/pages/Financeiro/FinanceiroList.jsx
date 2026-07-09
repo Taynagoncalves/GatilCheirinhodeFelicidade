@@ -9,7 +9,49 @@ import Layout from '../../components/Layout';
 import EmptyState from '../../components/EmptyState';
 import ConfirmModal from '../../components/ConfirmModal';
 import { useToast } from '../../components/Toast';
+import { useTour } from '../../contexts/TourContext';
 import api from '../../api/client';
+
+const TOUR_CLIENTES = [
+  {
+    selector: '[data-tour="cli-stats"]',
+    titulo: 'Resumo de Clientes',
+    texto: 'Veja o total de clientes ativos, gatos vendidos e reservas. Toque em "Gatos Vendidos" para ver a lista completa, ou em "Reservas" para filtrar os clientes com pagamento pendente.',
+  },
+  {
+    selector: '[data-tour="cli-cadastrar"]',
+    titulo: 'Cadastrar Cliente',
+    texto: 'Toque para registrar um novo cliente — informe nome, telefone e cidade.',
+  },
+  {
+    selector: '[data-tour="cli-busca"]',
+    titulo: 'Busca',
+    texto: 'Pesquise por nome, cidade ou nome do gato vinculado para encontrar rapidamente um cliente.',
+  },
+  {
+    selector: '[data-tour="cli-cards"]',
+    titulo: 'Cards de Clientes',
+    texto: 'Cada card mostra nome, contato e os gatos adquiridos com a barra de pagamento. Toque em "Ver Gatos" para abrir o perfil completo com controle de pagamento por gato.',
+  },
+];
+
+const TOUR_LANCAMENTOS = [
+  {
+    selector: '[data-tour="lanc-botoes"]',
+    titulo: 'Registrar Entrada ou Gasto',
+    texto: 'Toque em "Registrar Entrada" para vendas e receitas, ou "Registrar Gasto" para despesas como veterinário, ração e higiene.',
+  },
+  {
+    selector: '[data-tour="lanc-filtros"]',
+    titulo: 'Filtrar Lançamentos',
+    texto: 'Alterne entre Todos, Entradas e Gastos para visualizar apenas o que precisa.',
+  },
+  {
+    selector: '[data-tour="lanc-lista"]',
+    titulo: 'Lista de Lançamentos',
+    texto: 'Cada lançamento mostra categoria, valor e data. Use o lápis para editar ou a lixeira para excluir. Entradas aparecem em verde e gastos em vermelho.',
+  },
+];
 
 const MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
 const CATEGORIAS_SAIDA = ['Veterinário','Ração','Vacina','Higiene','Transporte','Outros'];
@@ -201,6 +243,8 @@ function TabLancamentos({ mes, onMes }) {
   const [editando, setEditando] = useState(null);
   const [form, setForm] = useState({ tipo: 'saida', categoria: 'Veterinário', descricao: '', valor: '', gato_id: '', data_registro: new Date().toISOString().slice(0, 10) });
   const toast = useToast();
+  const { setSteps } = useTour();
+  useEffect(() => { setSteps(TOUR_LANCAMENTOS, 'financeiro-lancamentos'); return () => setSteps([]); }, []);
 
   const carregar = () => {
     api.get('/financeiro', { params: { mes, tipo: filtro || undefined } }).then((r) => setRegistros(r.data));
@@ -241,7 +285,7 @@ function TabLancamentos({ mes, onMes }) {
     <div>
       <SeletorMes mes={mes} onChange={onMes} />
 
-      <div style={{ display: 'flex', gap: 8 }}>
+      <div data-tour="lanc-botoes" style={{ display: 'flex', gap: 8 }}>
         <button
           onClick={() => abrirNovo('entrada')}
           style={{ flex: 1, padding: '11px 8px', borderRadius: 'var(--radius-md)', border: '1.5px solid #3f8c5a', background: '#f0faf4', color: '#3f8c5a', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
@@ -256,7 +300,7 @@ function TabLancamentos({ mes, onMes }) {
         </button>
       </div>
 
-      <div className="tabs">
+      <div data-tour="lanc-filtros" className="tabs">
         <button className={`tab${filtro === '' ? ' active' : ''}`} onClick={() => setFiltro('')}>Todos {registros.length > 0 && `(${registros.length})`}</button>
         <button className={`tab${filtro === 'entrada' ? ' active' : ''}`} onClick={() => setFiltro('entrada')}>Entradas</button>
         <button className={`tab${filtro === 'saida' ? ' active' : ''}`} onClick={() => setFiltro('saida')}>Gastos</button>
@@ -264,6 +308,7 @@ function TabLancamentos({ mes, onMes }) {
 
       {registros.length === 0 && <EmptyState icon={Wallet} title="Nenhum lançamento" description="Registre entradas e gastos neste mês." />}
 
+      <div data-tour="lanc-lista">
       {registros.map((r) => (
         <div key={r.id} style={{ background: '#fff', borderRadius: 'var(--radius-md)', marginBottom: 8, overflow: 'hidden', boxShadow: 'var(--shadow-card)', borderLeft: `4px solid ${r.tipo === 'entrada' ? '#3f8c5a' : '#c0524a'}` }}>
           <div style={{ display: 'flex', alignItems: 'center', padding: '12px 14px', gap: 12 }}>
@@ -288,6 +333,8 @@ function TabLancamentos({ mes, onMes }) {
           </div>
         </div>
       ))}
+
+      </div>
 
       {confirmando && (
         <ConfirmModal
@@ -362,6 +409,8 @@ function TabClientes() {
   const [gatosVendidos, setGatosVendidos] = useState([]);
   const [showGatosVendidos, setShowGatosVendidos] = useState(false);
   const toast = useToast();
+  const { setSteps } = useTour();
+  useEffect(() => { setSteps(TOUR_CLIENTES, 'financeiro-clientes'); return () => setSteps([]); }, []);
 
   const carregar = () => {
     api.get('/clientes').then((r) => setClientes(r.data));
@@ -416,7 +465,7 @@ function TabClientes() {
     <div>
       {/* Stats */}
       {stats && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 4 }}>
+        <div data-tour="cli-stats" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 4 }}>
           {[
             { icon: <Users size={18} />, valor: stats.total_ativos, label: 'Clientes Ativos', sub: `+${stats.novos_mes} este mês`, cor: '#7c3aed', bg: '#f5f0ff', onClick: null },
             { icon: <Cat size={18} />, valor: stats.total_vendidos, label: 'Gatos Vendidos', sub: `+${stats.novos_vendidos} este mês`, cor: '#16a34a', bg: '#dcfce7', onClick: abrirGatosVendidos },
@@ -438,9 +487,9 @@ function TabClientes() {
         </div>
       )}
 
-      <button className="btn btn-primary" onClick={abrirNovo}><Plus size={16} /> Cadastrar Cliente</button>
+      <button className="btn btn-primary" data-tour="cli-cadastrar" onClick={abrirNovo}><Plus size={16} /> Cadastrar Cliente</button>
 
-      <div className="search-input">
+      <div className="search-input" data-tour="cli-busca">
         <Search size={16} />
         <input placeholder="Buscar cliente..." value={busca} onChange={(e) => setBusca(e.target.value)} />
       </div>
@@ -452,6 +501,7 @@ function TabClientes() {
 
       {clientes.length === 0 && <EmptyState icon={Users} title="Nenhum cliente cadastrado" description="Cadastre os compradores dos filhotes aqui." />}
 
+      <div data-tour="cli-cards">
       {filtrados.map((c) => {
         const iniciais = c.nome.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase();
         const st = STATUS_CLIENTE[c.status] || STATUS_CLIENTE.ativo;
@@ -542,6 +592,8 @@ function TabClientes() {
           </div>
         );
       })}
+
+      </div>
 
       {confirmando && <ConfirmModal message={`Remover o cliente "${confirmando.nome}"?`} onConfirm={excluir} onCancel={() => setConfirmando(null)} />}
 
