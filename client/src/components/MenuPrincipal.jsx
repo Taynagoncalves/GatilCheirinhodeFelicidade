@@ -76,9 +76,10 @@ export default function MenuPrincipal({ onEntrar }) {
           <div style={{ position: 'absolute', top: -10, right: -10, opacity: 0.18 }}><PataIcon size={100} color="#fff" /></div>
           <div style={{
             width: 60, height: 60, borderRadius: 16, flexShrink: 0,
+            background: 'rgba(255,255,255,0.18)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
-            <img src="/logo.png" alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain', mixBlendMode: 'multiply' }} />
+            <Cat size={32} color="#fff" strokeWidth={1.5} />
           </div>
           <div style={{ textAlign: 'left' }}>
             <p style={{ margin: 0, fontWeight: 800, fontSize: '1.2rem', color: '#fff' }}>Gestão do Gatil</p>
