@@ -53,8 +53,8 @@
 }
 
 .splash-pata {
-  width: 90px;
-  height: 90px;
+  width: 200px;
+  height: 200px;
   animation: splashPulsar 1.4s ease-in-out infinite;
 }
 

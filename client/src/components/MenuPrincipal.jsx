@@ -37,14 +37,15 @@ export default function MenuPrincipal({ onEntrar }) {
       {/* Cabeçalho */}
       <div style={{ marginTop: 72, textAlign: 'center', zIndex: 1 }}>
         <div style={{
-          width: 72, height: 72, borderRadius: '50%',
-          background: 'rgba(255,255,255,0.1)',
-          backdropFilter: 'blur(8px)',
+          width: 100, height: 100, borderRadius: 24,
+          background: '#fff',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           margin: '0 auto 16px',
           boxShadow: '0 4px 24px rgba(0,0,0,0.3)',
+          overflow: 'hidden',
+          padding: 6,
         }}>
-          <PataIcon size={48} color="#fff" />
+          <img src="/logo.png" alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
         </div>
         <p style={{ margin: 0, fontSize: '0.78rem', color: 'rgba(255,255,255,0.55)', letterSpacing: 2, textTransform: 'uppercase', fontWeight: 600 }}>
           Cheirinho de Felicidade
@@ -79,10 +80,11 @@ export default function MenuPrincipal({ onEntrar }) {
           <div style={{ position: 'absolute', top: -10, right: -10, opacity: 0.18 }}><PataIcon size={100} color="#fff" /></div>
           <div style={{
             width: 60, height: 60, borderRadius: 16, flexShrink: 0,
-            background: 'rgba(255,255,255,0.18)',
+            background: '#fff',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
+            overflow: 'hidden', padding: 4,
           }}>
-            <Cat size={32} color="#fff" strokeWidth={1.5} />
+            <img src="/logo.png" alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
           </div>
           <div style={{ textAlign: 'left' }}>
             <p style={{ margin: 0, fontWeight: 800, fontSize: '1.2rem', color: '#fff' }}>Gestão do Gatil</p>
