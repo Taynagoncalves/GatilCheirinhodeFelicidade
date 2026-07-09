@@ -15,7 +15,7 @@ export default function SplashScreen({ onDone }) {
         <div className="splash-pata">
           <img src="/logo.png" alt="Cheirinho de Felicidade" style={{
             width: '100%', height: '100%', objectFit: 'contain',
-            borderRadius: 24, boxShadow: '0 8px 32px rgba(0,0,0,0.25)',
+            mixBlendMode: 'multiply',
           }} />
         </div>
         <h1 className="splash-titulo">Cheirinho de Felicidade</h1>

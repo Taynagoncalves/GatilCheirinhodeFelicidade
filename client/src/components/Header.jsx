@@ -91,7 +91,7 @@ export default function Header({ title, subtitle, showBack, showNotification }) 
           </button>
         ) : (
           <span className="top-header-icon" style={{ background: 'transparent', padding: 0, overflow: 'hidden' }}>
-            <img src="/logo.png" alt="Logo" style={{ width: 36, height: 36, objectFit: 'contain', borderRadius: 8 }} />
+            <img src="/logo.png" alt="Logo" style={{ width: 36, height: 36, objectFit: 'contain', mixBlendMode: 'multiply' }} />
           </span>
         )}
         <div className="top-header-titles">
