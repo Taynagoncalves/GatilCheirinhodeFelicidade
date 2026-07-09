@@ -141,7 +141,13 @@ export default function PaisPerfil() {
           </label>
           {pai.pkd_arquivo_url && (
             <button
-              onClick={() => setShowPkd(true)}
+              onClick={() => {
+                if (pai.pkd_arquivo_tipo === 'pdf') {
+                  window.open(pai.pkd_arquivo_url, '_blank');
+                } else {
+                  setShowPkd(true);
+                }
+              }}
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: 6,
                 padding: '8px 14px', borderRadius: 'var(--radius-md)',
@@ -149,7 +155,7 @@ export default function PaisPerfil() {
                 color: '#16a34a', fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer',
               }}
             >
-              🔬 Ver resultado PKD
+              {pai.pkd_arquivo_tipo === 'pdf' ? '📄' : '🔬'} Ver resultado PKD
             </button>
           )}
         </div>
@@ -293,25 +299,16 @@ export default function PaisPerfil() {
           <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.78rem', marginBottom: 12, fontWeight: 600 }}>
             Resultado PKD — {pai.nome}
           </p>
-          {pai.pkd_arquivo_url?.toLowerCase().includes('.pdf') || pai.pkd_arquivo_url?.toLowerCase().includes('/pdf') ? (
-            <iframe
-              src={pai.pkd_arquivo_url}
-              title="Resultado PKD"
-              onClick={e => e.stopPropagation()}
-              style={{ width: '95vw', height: '85vh', border: 'none', borderRadius: 12 }}
-            />
-          ) : (
-            <img
-              src={pai.pkd_arquivo_url}
-              alt="Resultado PKD"
-              onClick={e => e.stopPropagation()}
-              style={{
-                maxWidth: '95vw', maxHeight: '85vh',
-                borderRadius: 12, objectFit: 'contain',
-                boxShadow: '0 8px 40px rgba(0,0,0,0.6)',
-              }}
-            />
-          )}
+          <img
+            src={pai.pkd_arquivo_url}
+            alt="Resultado PKD"
+            onClick={e => e.stopPropagation()}
+            style={{
+              maxWidth: '95vw', maxHeight: '85vh',
+              borderRadius: 12, objectFit: 'contain',
+              boxShadow: '0 8px 40px rgba(0,0,0,0.6)',
+            }}
+          />
         </div>
       )}
 
