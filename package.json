@@ -4,9 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "cd client && npm install && npm run build",
-    "start": "node server/src/app.js",
-    "install:all": "npm install && cd server && npm install && cd ../client && npm install"
+    "build": "cd server && npm install && cd ../client && npm install && npm run build",
+    "start": "node server/src/app.js"
   },
   "keywords": [],
   "author": "",
