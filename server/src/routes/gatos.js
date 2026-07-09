@@ -45,6 +45,16 @@ router.get('/', async (req, res) => {
   res.json(rows);
 });
 
+router.get('/publico/:id', async (req, res) => {
+  const [rows] = await pool.query(
+    `SELECT g.nome, g.foto_url, g.sexo, DATE_FORMAT(g.data_nascimento, '%Y-%m-%d') AS data_nascimento, g.peso
+     FROM gatos g WHERE g.id = ?`,
+    [req.params.id]
+  );
+  if (!rows.length) return res.status(404).json({ erro: 'Não encontrado' });
+  res.json(rows[0]);
+});
+
 router.get('/:id', async (req, res) => {
   const [rows] = await pool.query(
     `SELECT g.id, g.nome, g.cor, g.sexo, DATE_FORMAT(g.data_nascimento, '%Y-%m-%d') AS data_nascimento,

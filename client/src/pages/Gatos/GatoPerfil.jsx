@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Cat, Syringe, Pill, Plus, Trash2, Weight, X, Scale, GitBranch, User } from 'lucide-react';
+import { Cat, Syringe, Pill, Plus, Trash2, Weight, X, Scale, GitBranch, User, Share2 } from 'lucide-react';
 import { formatarPeso } from '../../utils/peso';
 import Layout from '../../components/Layout';
 import StatusBadge from '../../components/StatusBadge';
@@ -69,6 +69,16 @@ export default function GatoPerfil() {
     carregarGato();
   };
 
+  const compartilhar = async () => {
+    const url = `${window.location.origin}/g/${id}`;
+    if (navigator.share) {
+      try { await navigator.share({ title: gato.nome || 'Gatinho', url }); } catch {}
+    } else {
+      await navigator.clipboard.writeText(url);
+      toast('Link copiado!');
+    }
+  };
+
   const excluirRegistro = async (regId) => {
     await api.delete(`/aplicacoes/${regId}`);
     setConfirmando(null);
@@ -130,9 +140,25 @@ export default function GatoPerfil() {
             {gato.observacoes && <><br />Obs: {gato.observacoes}</>}
           </p>
         </div>
-        <button className="btn btn-outline" data-tour="perfil-editar" style={{ marginTop: 12 }} onClick={() => navigate(`/gatos/${id}/editar`)}>
-          Editar Gato
-        </button>
+        <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+          <button className="btn btn-outline" data-tour="perfil-editar" style={{ flex: 1 }} onClick={() => navigate(`/gatos/${id}/editar`)}>
+            Editar Gato
+          </button>
+          <button
+            onClick={compartilhar}
+            title="Compartilhar"
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+              padding: '0 18px', height: 44, borderRadius: 'var(--radius-md)',
+              border: '1.5px solid var(--color-primary)',
+              background: 'linear-gradient(135deg, #5b21b6, #7c3aed)',
+              color: '#fff', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer',
+              flexShrink: 0,
+            }}
+          >
+            <Share2 size={16} />
+          </button>
+        </div>
       </div>
 
       {/* ── Árvore Genealógica ── */}
