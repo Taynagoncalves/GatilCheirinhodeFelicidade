@@ -147,9 +147,9 @@ export default function Home() {
         </div>
 
         <div onClick={() => navigate('/pais')} style={{
-          background: 'linear-gradient(145deg, #5b21b6, #7c3aed)',
+          background: 'linear-gradient(145deg, #d97706, #f59e0b)',
           borderRadius: 16, padding: '14px', cursor: 'pointer',
-          boxShadow: '0 4px 16px rgba(124,58,237,0.28)',
+          boxShadow: '0 4px 16px rgba(217,119,6,0.32)',
           display: 'flex', alignItems: 'center', gap: 12,
         }}>
           <div style={{ width: 44, height: 44, background: 'rgba(255,255,255,0.18)', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
