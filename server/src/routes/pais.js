@@ -32,7 +32,7 @@ router.get('/:id', async (req, res) => {
   const [rows] = await pool.query(
     `SELECT p.id, p.nome, p.sexo, p.raca, p.cor,
             DATE_FORMAT(p.data_nascimento, '%Y-%m-%d') AS data_nascimento,
-            p.foto_url, p.observacoes, p.peso,
+            p.foto_url, p.observacoes, p.peso, p.pkd,
             p.pai_id, pai_rec.nome AS pai_nome, pai_rec.foto_url AS pai_foto,
             p.mae_id, mae_rec.nome AS mae_nome, mae_rec.foto_url AS mae_foto
      FROM pais p
@@ -67,20 +67,20 @@ router.get('/:id', async (req, res) => {
 });
 
 router.post('/', upload.single('foto'), async (req, res) => {
-  const { nome, sexo, raca, cor, data_nascimento, observacoes, peso, pai_id, mae_id } = req.body;
+  const { nome, sexo, raca, cor, data_nascimento, observacoes, peso, pai_id, mae_id, pkd } = req.body;
   const foto_url = req.file ? req.file.path : null;
   const [result] = await pool.query(
-    `INSERT INTO pais (nome, sexo, raca, cor, data_nascimento, foto_url, observacoes, peso, pai_id, mae_id)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [nome, sexo, raca || null, cor || null, data_nascimento || null, foto_url, observacoes || null, peso || null, pai_id || null, mae_id || null]
+    `INSERT INTO pais (nome, sexo, raca, cor, data_nascimento, foto_url, observacoes, peso, pai_id, mae_id, pkd)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [nome, sexo, raca || null, cor || null, data_nascimento || null, foto_url, observacoes || null, peso || null, pai_id || null, mae_id || null, pkd || null]
   );
   res.status(201).json({ id: result.insertId });
 });
 
 router.put('/:id', upload.single('foto'), async (req, res) => {
-  const { nome, sexo, raca, cor, data_nascimento, observacoes, peso, pai_id, mae_id } = req.body;
-  const fields = [nome, sexo, raca || null, cor || null, data_nascimento || null, observacoes || null, peso || null, pai_id || null, mae_id || null];
-  let sql = 'UPDATE pais SET nome=?, sexo=?, raca=?, cor=?, data_nascimento=?, observacoes=?, peso=?, pai_id=?, mae_id=?';
+  const { nome, sexo, raca, cor, data_nascimento, observacoes, peso, pai_id, mae_id, pkd } = req.body;
+  const fields = [nome, sexo, raca || null, cor || null, data_nascimento || null, observacoes || null, peso || null, pai_id || null, mae_id || null, pkd || null];
+  let sql = 'UPDATE pais SET nome=?, sexo=?, raca=?, cor=?, data_nascimento=?, observacoes=?, peso=?, pai_id=?, mae_id=?, pkd=?';
   if (req.file) {
     fields.push(req.file.path);
     sql += ', foto_url=?';

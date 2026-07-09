@@ -86,6 +86,17 @@ export default function PaisPerfil() {
         )}
         <div style={{ marginTop: 14 }}>
           <p className="card-title" style={{ fontSize: '1.2rem' }}>{pai.nome}</p>
+          {pai.pkd && (
+            <span style={{
+              display: 'inline-flex', alignItems: 'center', gap: 5,
+              fontSize: '0.75rem', fontWeight: 700,
+              color: pai.pkd === 'negativo' ? '#16a34a' : '#dc2626',
+              background: pai.pkd === 'negativo' ? '#dcfce7' : '#fee2e2',
+              borderRadius: 20, padding: '3px 10px', marginBottom: 8,
+            }}>
+              {pai.pkd === 'negativo' ? '✓ PKD Negativado' : '✕ PKD Positivo'}
+            </span>
+          )}
           <p className="card-meta" style={{ marginTop: 6 }}>
             Sexo: {pai.sexo === 'macho' ? 'Macho' : 'Fêmea'}<br />
             Raça: {pai.raca || 'Não informado'}<br />

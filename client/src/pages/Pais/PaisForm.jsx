@@ -20,6 +20,7 @@ export default function PaisForm() {
     peso: '',
     pai_id: '',
     mae_id: '',
+    pkd: '',
   });
   const [pesoUnidade, setPesoUnidade] = useState('kg');
   const [foto, setFoto] = useState(null);
@@ -47,6 +48,7 @@ export default function PaisForm() {
           peso: pesoG ? (usaKg ? (pesoG / 1000).toString() : pesoG.toString()) : '',
           pai_id: res.data.pai_id || '',
           mae_id: res.data.mae_id || '',
+          pkd: res.data.pkd || '',
         });
         setPreview(res.data.foto_url);
       });
@@ -133,6 +135,15 @@ export default function PaisForm() {
               <option value="g">g</option>
               <option value="kg">kg</option>
             </select>
+          </div>
+        </div>
+
+        <div className="field">
+          <label>PKD (Doença Renal Policística)</label>
+          <div className="tabs" style={{ marginBottom: 0 }}>
+            <button type="button" className={`tab${form.pkd === '' ? ' active' : ''}`} onClick={() => setForm({ ...form, pkd: '' })}>Não testado</button>
+            <button type="button" className={`tab${form.pkd === 'negativo' ? ' active' : ''}`} onClick={() => setForm({ ...form, pkd: 'negativo' })}>Negativado</button>
+            <button type="button" className={`tab${form.pkd === 'positivo' ? ' active' : ''}`} onClick={() => setForm({ ...form, pkd: 'positivo' })}>Positivo</button>
           </div>
         </div>
 
