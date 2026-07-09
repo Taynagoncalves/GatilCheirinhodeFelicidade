@@ -70,7 +70,9 @@ export default function GatoPerfil() {
   };
 
   const compartilhar = async () => {
-    const url = `${window.location.origin}/g/${id}`;
+    const apiBase = import.meta.env.VITE_API_URL || '';
+    const serverOrigin = apiBase ? new URL(apiBase).origin : window.location.origin;
+    const url = `${serverOrigin}/g/${id}`;
     if (navigator.share) {
       try { await navigator.share({ title: gato.nome || 'Gatinho', url }); } catch {}
     } else {
