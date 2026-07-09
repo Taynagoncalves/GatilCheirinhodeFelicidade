@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { PawPrint, Weight, X, Scale, Syringe, Pill, Plus, Trash2, GitBranch } from 'lucide-react';
+import { PawPrint, Weight, X, Scale, Syringe, Pill, Plus, Trash2, GitBranch, Share2 } from 'lucide-react';
 import Layout from '../../components/Layout';
 import EmptyState from '../../components/EmptyState';
 import ConfirmModal from '../../components/ConfirmModal';
@@ -62,6 +62,18 @@ export default function PaisPerfil() {
     setConfirmando(null);
     toast('Registro excluído!');
     carregar();
+  };
+
+  const compartilhar = async () => {
+    const apiBase = import.meta.env.VITE_API_URL || '';
+    const serverOrigin = apiBase ? new URL(apiBase).origin : window.location.origin;
+    const url = `${serverOrigin}/p/${id}`;
+    if (navigator.share) {
+      try { await navigator.share({ title: pai.nome || 'Reprodutor', url }); } catch {}
+    } else {
+      await navigator.clipboard.writeText(url);
+      toast('Link copiado!');
+    }
   };
 
   const uploadPkd = async (e) => {
@@ -166,6 +178,19 @@ export default function PaisPerfil() {
           </button>
           <button className="btn btn-secondary" style={{ flex: 1 }} onClick={() => { setPesoValor(''); setPesoUnidade('kg'); setShowPesoModal(true); }}>
             <Weight size={16} /> Registrar Peso
+          </button>
+          <button
+            onClick={compartilhar}
+            title="Compartilhar"
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              padding: '0 14px', height: 44, borderRadius: 'var(--radius-md)',
+              border: '1.5px solid var(--color-primary)',
+              background: 'linear-gradient(135deg, #5b21b6, #7c3aed)',
+              color: '#fff', cursor: 'pointer', flexShrink: 0,
+            }}
+          >
+            <Share2 size={16} />
           </button>
         </div>
       </div>
