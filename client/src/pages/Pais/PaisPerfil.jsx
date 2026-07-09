@@ -46,6 +46,8 @@ export default function PaisPerfil() {
   const [pesoValor, setPesoValor] = useState('');
   const [pesoUnidade, setPesoUnidade] = useState('kg');
   const [confirmando, setConfirmando] = useState(null);
+  const [showPkd, setShowPkd] = useState(false);
+  const [uploadandoPkd, setUploadandoPkd] = useState(false);
   const toast = useToast();
   const { setSteps } = useTour();
 
@@ -60,6 +62,23 @@ export default function PaisPerfil() {
     setConfirmando(null);
     toast('Registro excluído!');
     carregar();
+  };
+
+  const uploadPkd = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setUploadandoPkd(true);
+    const data = new FormData();
+    data.append('arquivo', file);
+    try {
+      await api.post(`/pais/${id}/pkd-arquivo`, data);
+      toast('Arquivo PKD salvo!');
+      carregar();
+    } catch {
+      toast('Erro ao enviar arquivo.');
+    } finally {
+      setUploadandoPkd(false);
+    }
   };
 
   const salvarPeso = async () => {
@@ -107,6 +126,34 @@ export default function PaisPerfil() {
             {pai.observacoes && <><br />Obs: {pai.observacoes}</>}
           </p>
         </div>
+        {/* Botões PKD */}
+        <div style={{ display: 'flex', gap: 8, marginTop: 10, flexWrap: 'wrap' }}>
+          <label style={{
+            display: 'inline-flex', alignItems: 'center', gap: 6,
+            padding: '8px 14px', borderRadius: 'var(--radius-md)',
+            border: '1.5px solid var(--color-primary)',
+            background: 'var(--color-accent)', color: 'var(--color-primary)',
+            fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer',
+            opacity: uploadandoPkd ? 0.6 : 1,
+          }}>
+            {uploadandoPkd ? 'Enviando...' : pai.pkd_arquivo_url ? '↑ Substituir arquivo PKD' : '+ Adicionar arquivo PKD'}
+            <input type="file" accept="image/*" style={{ display: 'none' }} onChange={uploadPkd} disabled={uploadandoPkd} />
+          </label>
+          {pai.pkd_arquivo_url && (
+            <button
+              onClick={() => setShowPkd(true)}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 6,
+                padding: '8px 14px', borderRadius: 'var(--radius-md)',
+                border: '1.5px solid #16a34a', background: '#dcfce7',
+                color: '#16a34a', fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer',
+              }}
+            >
+              🔬 Ver resultado PKD
+            </button>
+          )}
+        </div>
+
         <div style={{ display: 'flex', gap: 10, marginTop: 12 }} data-tour="paiperfil-acoes">
           <button className="btn btn-outline" style={{ flex: 1 }} onClick={() => navigate(`/pais/${id}/editar`)}>
             Editar
@@ -218,6 +265,46 @@ export default function PaisPerfil() {
           onConfirm={() => excluirRegistro(confirmando.id)}
           onCancel={() => setConfirmando(null)}
         />
+      )}
+
+      {/* Modal tela cheia — resultado PKD */}
+      {showPkd && pai.pkd_arquivo_url && (
+        <div
+          onClick={() => setShowPkd(false)}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 1000,
+            background: 'rgba(0,0,0,0.95)',
+            display: 'flex', flexDirection: 'column',
+            alignItems: 'center', justifyContent: 'center',
+          }}
+        >
+          <button
+            onClick={() => setShowPkd(false)}
+            style={{
+              position: 'absolute', top: 16, right: 16,
+              background: 'rgba(255,255,255,0.15)', border: 'none',
+              borderRadius: '50%', width: 40, height: 40,
+              color: '#fff', fontSize: '1.2rem', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}
+          >
+            <X size={20} />
+          </button>
+          <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.78rem', marginBottom: 12, fontWeight: 600 }}>
+            Resultado PKD — {pai.nome}
+          </p>
+          <img
+            src={pai.pkd_arquivo_url}
+            alt="Resultado PKD"
+            onClick={e => e.stopPropagation()}
+            style={{
+              maxWidth: '95vw', maxHeight: '85vh',
+              borderRadius: 12,
+              objectFit: 'contain',
+              boxShadow: '0 8px 40px rgba(0,0,0,0.6)',
+            }}
+          />
+        </div>
       )}
 
       {showPesoModal && (

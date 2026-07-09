@@ -32,7 +32,7 @@ router.get('/:id', async (req, res) => {
   const [rows] = await pool.query(
     `SELECT p.id, p.nome, p.sexo, p.raca, p.cor,
             DATE_FORMAT(p.data_nascimento, '%Y-%m-%d') AS data_nascimento,
-            p.foto_url, p.observacoes, p.peso, p.pkd,
+            p.foto_url, p.observacoes, p.peso, p.pkd, p.pkd_arquivo_url,
             p.pai_id, pai_rec.nome AS pai_nome, pai_rec.foto_url AS pai_foto,
             p.mae_id, mae_rec.nome AS mae_nome, mae_rec.foto_url AS mae_foto
      FROM pais p
@@ -89,6 +89,12 @@ router.put('/:id', upload.single('foto'), async (req, res) => {
   sql += ' WHERE id=?';
   await pool.query(sql, fields);
   res.json({ ok: true });
+});
+
+router.post('/:id/pkd-arquivo', upload.single('arquivo'), async (req, res) => {
+  if (!req.file) return res.status(400).json({ erro: 'Nenhum arquivo enviado' });
+  await pool.query('UPDATE pais SET pkd_arquivo_url = ? WHERE id = ?', [req.file.path, req.params.id]);
+  res.json({ url: req.file.path });
 });
 
 router.patch('/:id/peso', async (req, res) => {
