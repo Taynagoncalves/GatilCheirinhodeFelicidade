@@ -18,6 +18,16 @@ const storage = new CloudinaryStorage({
   },
 });
 
-const upload = multer({ storage });
+const storageDocs = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: 'cheirinho-de-felicidade-docs',
+    allowed_formats: ['jpg', 'jpeg', 'png', 'webp', 'pdf'],
+    resource_type: 'auto',
+  },
+});
 
-module.exports = { cloudinary, upload };
+const upload = multer({ storage });
+const uploadDoc = multer({ storage: storageDocs });
+
+module.exports = { cloudinary, upload, uploadDoc };

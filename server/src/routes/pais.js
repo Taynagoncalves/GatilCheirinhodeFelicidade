@@ -1,6 +1,6 @@
 const express = require('express');
 const pool = require('../db/pool');
-const { upload } = require('../config/cloudinary');
+const { upload, uploadDoc } = require('../config/cloudinary');
 
 const router = express.Router();
 
@@ -91,7 +91,7 @@ router.put('/:id', upload.single('foto'), async (req, res) => {
   res.json({ ok: true });
 });
 
-router.post('/:id/pkd-arquivo', upload.single('arquivo'), async (req, res) => {
+router.post('/:id/pkd-arquivo', uploadDoc.single('arquivo'), async (req, res) => {
   if (!req.file) return res.status(400).json({ erro: 'Nenhum arquivo enviado' });
   await pool.query('UPDATE pais SET pkd_arquivo_url = ? WHERE id = ?', [req.file.path, req.params.id]);
   res.json({ url: req.file.path });

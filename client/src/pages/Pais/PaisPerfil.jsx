@@ -137,7 +137,7 @@ export default function PaisPerfil() {
             opacity: uploadandoPkd ? 0.6 : 1,
           }}>
             {uploadandoPkd ? 'Enviando...' : pai.pkd_arquivo_url ? '↑ Substituir arquivo PKD' : '+ Adicionar arquivo PKD'}
-            <input type="file" accept="image/*" style={{ display: 'none' }} onChange={uploadPkd} disabled={uploadandoPkd} />
+            <input type="file" accept="image/*,application/pdf" style={{ display: 'none' }} onChange={uploadPkd} disabled={uploadandoPkd} />
           </label>
           {pai.pkd_arquivo_url && (
             <button
@@ -293,17 +293,25 @@ export default function PaisPerfil() {
           <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.78rem', marginBottom: 12, fontWeight: 600 }}>
             Resultado PKD — {pai.nome}
           </p>
-          <img
-            src={pai.pkd_arquivo_url}
-            alt="Resultado PKD"
-            onClick={e => e.stopPropagation()}
-            style={{
-              maxWidth: '95vw', maxHeight: '85vh',
-              borderRadius: 12,
-              objectFit: 'contain',
-              boxShadow: '0 8px 40px rgba(0,0,0,0.6)',
-            }}
-          />
+          {pai.pkd_arquivo_url?.toLowerCase().includes('.pdf') || pai.pkd_arquivo_url?.toLowerCase().includes('/pdf') ? (
+            <iframe
+              src={pai.pkd_arquivo_url}
+              title="Resultado PKD"
+              onClick={e => e.stopPropagation()}
+              style={{ width: '95vw', height: '85vh', border: 'none', borderRadius: 12 }}
+            />
+          ) : (
+            <img
+              src={pai.pkd_arquivo_url}
+              alt="Resultado PKD"
+              onClick={e => e.stopPropagation()}
+              style={{
+                maxWidth: '95vw', maxHeight: '85vh',
+                borderRadius: 12, objectFit: 'contain',
+                boxShadow: '0 8px 40px rgba(0,0,0,0.6)',
+              }}
+            />
+          )}
         </div>
       )}
 
