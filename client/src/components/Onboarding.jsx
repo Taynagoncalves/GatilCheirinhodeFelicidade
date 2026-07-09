@@ -531,7 +531,7 @@ function DemoFinanceiro() {
 const SLIDES = [
   {
     gradient: 'linear-gradient(155deg, #1a4060 0%, #2f6690 65%, #3d85b5 100%)',
-    visual: () => <div className="ob-icon-circle"><PataIcon size={82} /></div>,
+    visual: () => <div className="ob-icon-circle" style={{ background: '#fff', borderRadius: 24, padding: 8, width: 180, height: 180, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 32px rgba(0,0,0,0.25)' }}><img src="/logo.png" alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} /></div>,
     subtitulo: 'Cheirinho de Felicidade',
     titulo: 'Olá, Lidia! 🐾',
     texto: 'Bem-vinda ao seu espaço exclusivo para gerir o gatil com amor, organização e praticidade.',
