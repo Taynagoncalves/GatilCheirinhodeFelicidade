@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { PawPrint, Weight, X, Scale, Syringe, Pill, Plus, Trash2 } from 'lucide-react';
+import { PawPrint, Weight, X, Scale, Syringe, Pill, Plus, Trash2, GitBranch } from 'lucide-react';
 import Layout from '../../components/Layout';
 import EmptyState from '../../components/EmptyState';
 import ConfirmModal from '../../components/ConfirmModal';
@@ -105,6 +105,49 @@ export default function PaisPerfil() {
           </button>
         </div>
       </div>
+
+      {/* Árvore genealógica do reprodutor */}
+      {(pai.pai_nome || pai.mae_nome) && (
+        <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px rgba(0,0,0,0.08)', padding: '16px 14px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+            <div style={{ width: 32, height: 32, borderRadius: 10, background: 'linear-gradient(135deg, #1a4d7c, #2f6690)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <GitBranch size={16} color="#fff" />
+            </div>
+            <p style={{ margin: 0, fontWeight: 800, fontSize: '1rem', color: '#2d3748' }}>Genealogia</p>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+            {/* Pai */}
+            <div
+              onClick={() => pai.pai_id && navigate(`/pais/${pai.pai_id}`)}
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, cursor: pai.pai_id ? 'pointer' : 'default', minWidth: 80 }}
+            >
+              {pai.pai_foto
+                ? <img src={pai.pai_foto} alt={pai.pai_nome} style={{ width: 52, height: 52, borderRadius: '50%', objectFit: 'cover', border: '2.5px solid #1a4d7c' }} />
+                : <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'linear-gradient(135deg, #dbeafe, #bfdbfe)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #93c5fd' }}><PawPrint size={22} color="#1d4ed8" /></div>
+              }
+              <p style={{ margin: 0, fontSize: '0.78rem', fontWeight: 700, color: '#2d3748', textAlign: 'center', maxWidth: 80, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{pai.pai_nome || '—'}</p>
+              <span style={{ fontSize: '0.65rem', color: '#718096', fontWeight: 600, background: '#f0f4ff', padding: '2px 8px', borderRadius: 20 }}>Pai</span>
+            </div>
+
+            <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#f0f4ff', display: 'flex', alignItems: 'center', justifyContent: 'center', alignSelf: 'center' }}>
+              <span style={{ fontSize: '1rem' }}>🐾</span>
+            </div>
+
+            {/* Mãe */}
+            <div
+              onClick={() => pai.mae_id && navigate(`/pais/${pai.mae_id}`)}
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, cursor: pai.mae_id ? 'pointer' : 'default', minWidth: 80 }}
+            >
+              {pai.mae_foto
+                ? <img src={pai.mae_foto} alt={pai.mae_nome} style={{ width: 52, height: 52, borderRadius: '50%', objectFit: 'cover', border: '2.5px solid #7c3aed' }} />
+                : <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'linear-gradient(135deg, #ede9fe, #ddd6fe)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #c4b5fd' }}><PawPrint size={22} color="#7c3aed" /></div>
+              }
+              <p style={{ margin: 0, fontSize: '0.78rem', fontWeight: 700, color: '#2d3748', textAlign: 'center', maxWidth: 80, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{pai.mae_nome || '—'}</p>
+              <span style={{ fontSize: '0.65rem', color: '#718096', fontWeight: 600, background: '#f5f0ff', padding: '2px 8px', borderRadius: 20 }}>Mãe</span>
+            </div>
+          </div>
+        </div>
+      )}
 
       <button className="btn btn-primary" data-tour="paiperfil-dose" onClick={() => navigate(`/saude/registrar?pai_id=${id}`)}>
         <Plus size={18} /> Registrar Dose

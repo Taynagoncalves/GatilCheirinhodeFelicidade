@@ -29,7 +29,18 @@ router.get('/', async (req, res) => {
 });
 
 router.get('/:id', async (req, res) => {
-  const [rows] = await pool.query(`SELECT id, nome, sexo, raca, cor, DATE_FORMAT(data_nascimento, '%Y-%m-%d') AS data_nascimento, foto_url, observacoes, peso FROM pais WHERE id = ?`, [req.params.id]);
+  const [rows] = await pool.query(
+    `SELECT p.id, p.nome, p.sexo, p.raca, p.cor,
+            DATE_FORMAT(p.data_nascimento, '%Y-%m-%d') AS data_nascimento,
+            p.foto_url, p.observacoes, p.peso,
+            p.pai_id, pai_rec.nome AS pai_nome, pai_rec.foto_url AS pai_foto,
+            p.mae_id, mae_rec.nome AS mae_nome, mae_rec.foto_url AS mae_foto
+     FROM pais p
+     LEFT JOIN pais pai_rec ON pai_rec.id = p.pai_id
+     LEFT JOIN pais mae_rec ON mae_rec.id = p.mae_id
+     WHERE p.id = ?`,
+    [req.params.id]
+  );
   if (!rows.length) return res.status(404).json({ error: 'Não encontrado' });
 
   const [historico_peso] = await pool.query(
@@ -56,20 +67,20 @@ router.get('/:id', async (req, res) => {
 });
 
 router.post('/', upload.single('foto'), async (req, res) => {
-  const { nome, sexo, raca, cor, data_nascimento, observacoes, peso } = req.body;
+  const { nome, sexo, raca, cor, data_nascimento, observacoes, peso, pai_id, mae_id } = req.body;
   const foto_url = req.file ? req.file.path : null;
   const [result] = await pool.query(
-    `INSERT INTO pais (nome, sexo, raca, cor, data_nascimento, foto_url, observacoes, peso)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-    [nome, sexo, raca || null, cor || null, data_nascimento || null, foto_url, observacoes || null, peso || null]
+    `INSERT INTO pais (nome, sexo, raca, cor, data_nascimento, foto_url, observacoes, peso, pai_id, mae_id)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [nome, sexo, raca || null, cor || null, data_nascimento || null, foto_url, observacoes || null, peso || null, pai_id || null, mae_id || null]
   );
   res.status(201).json({ id: result.insertId });
 });
 
 router.put('/:id', upload.single('foto'), async (req, res) => {
-  const { nome, sexo, raca, cor, data_nascimento, observacoes, peso } = req.body;
-  const fields = [nome, sexo, raca || null, cor || null, data_nascimento || null, observacoes || null, peso || null];
-  let sql = 'UPDATE pais SET nome=?, sexo=?, raca=?, cor=?, data_nascimento=?, observacoes=?, peso=?';
+  const { nome, sexo, raca, cor, data_nascimento, observacoes, peso, pai_id, mae_id } = req.body;
+  const fields = [nome, sexo, raca || null, cor || null, data_nascimento || null, observacoes || null, peso || null, pai_id || null, mae_id || null];
+  let sql = 'UPDATE pais SET nome=?, sexo=?, raca=?, cor=?, data_nascimento=?, observacoes=?, peso=?, pai_id=?, mae_id=?';
   if (req.file) {
     fields.push(req.file.path);
     sql += ', foto_url=?';

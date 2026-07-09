@@ -18,11 +18,18 @@ export default function PaisForm() {
     sexo: 'macho',
     observacoes: '',
     peso: '',
+    pai_id: '',
+    mae_id: '',
   });
   const [pesoUnidade, setPesoUnidade] = useState('kg');
   const [foto, setFoto] = useState(null);
   const [preview, setPreview] = useState(null);
+  const [todosPais, setTodosPais] = useState([]);
   const toast = useToast();
+
+  useEffect(() => {
+    api.get('/pais').then(r => setTodosPais(r.data));
+  }, []);
 
   useEffect(() => {
     if (isEdit) {
@@ -38,6 +45,8 @@ export default function PaisForm() {
           sexo: res.data.sexo,
           observacoes: res.data.observacoes || '',
           peso: pesoG ? (usaKg ? (pesoG / 1000).toString() : pesoG.toString()) : '',
+          pai_id: res.data.pai_id || '',
+          mae_id: res.data.mae_id || '',
         });
         setPreview(res.data.foto_url);
       });
@@ -125,6 +134,26 @@ export default function PaisForm() {
               <option value="kg">kg</option>
             </select>
           </div>
+        </div>
+
+        <div className="field">
+          <label>Pai (opcional)</label>
+          <select value={form.pai_id} onChange={(e) => setForm({ ...form, pai_id: e.target.value })}>
+            <option value="">Não informado</option>
+            {todosPais.filter(p => p.sexo === 'macho' && (!isEdit || p.id !== Number(id))).map(p => (
+              <option key={p.id} value={p.id}>{p.nome}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="field">
+          <label>Mãe (opcional)</label>
+          <select value={form.mae_id} onChange={(e) => setForm({ ...form, mae_id: e.target.value })}>
+            <option value="">Não informado</option>
+            {todosPais.filter(p => p.sexo === 'femea' && (!isEdit || p.id !== Number(id))).map(p => (
+              <option key={p.id} value={p.id}>{p.nome}</option>
+            ))}
+          </select>
         </div>
 
         <div className="field">

@@ -30,6 +30,8 @@ async function initDb() {
     `ALTER TABLE ninhadas ADD COLUMN foto_url VARCHAR(500) NULL`,
     `ALTER TABLE clientes ADD COLUMN status ENUM('ativo','reserva','finalizado','inativo') NOT NULL DEFAULT 'ativo'`,
     `ALTER TABLE clientes ADD COLUMN valor_venda DECIMAL(10,2) NULL`,
+    `ALTER TABLE pais ADD COLUMN pai_id INT NULL`,
+    `ALTER TABLE pais ADD COLUMN mae_id INT NULL`,
   ]) {
     try { await pool.query(sql); } catch (e) { if (e.errno !== 1060 && e.errno !== 1054) throw e; }
   }
