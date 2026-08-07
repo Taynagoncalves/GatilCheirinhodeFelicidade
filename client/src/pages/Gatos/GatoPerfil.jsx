@@ -281,7 +281,10 @@ export default function GatoPerfil() {
                   <Scale size={18} />
                 </span>
                 <div style={{ flex: 1 }}>
-                  <p className="card-title" style={{ fontSize: '0.92rem' }}>{formatarPeso(h.peso)}</p>
+                  <p className="card-title" style={{ fontSize: '0.92rem' }}>
+                    {formatarPeso(h.peso)}
+                    {h.origem === 'inicial' && <span className="card-meta" style={{ marginLeft: 6 }}>(peso inicial)</span>}
+                  </p>
                   <p className="card-meta">{h.data_registro.split('-').reverse().join('/')}</p>
                 </div>
               </div>

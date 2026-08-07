@@ -35,6 +35,7 @@ async function initDb() {
     `ALTER TABLE pais ADD COLUMN pkd ENUM('positivo','negativo') NULL`,
     `ALTER TABLE pais ADD COLUMN pkd_arquivo_url VARCHAR(500) NULL`,
     `ALTER TABLE pais ADD COLUMN pkd_arquivo_tipo VARCHAR(10) NULL`,
+    `ALTER TABLE historico_peso ADD COLUMN origem VARCHAR(20) NULL`,
   ]) {
     try { await pool.query(sql); } catch (e) { if (e.errno !== 1060 && e.errno !== 1054) throw e; }
   }

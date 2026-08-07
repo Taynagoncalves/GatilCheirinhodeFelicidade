@@ -85,7 +85,7 @@ router.get('/:id', async (req, res) => {
   );
 
   const [historico_peso] = await pool.query(
-    `SELECT id, peso, DATE_FORMAT(data_registro, '%Y-%m-%d') AS data_registro
+    `SELECT id, peso, origem, DATE_FORMAT(data_registro, '%Y-%m-%d') AS data_registro
      FROM historico_peso
      WHERE tipo = 'gato' AND entidade_id = ?
      ORDER BY data_registro DESC, criado_em DESC`,
@@ -107,6 +107,12 @@ router.post('/', upload.single('foto'), async (req, res) => {
       status || 'disponivel', foto_url, observacoes || null, peso || null,
     ]
   );
+  if (peso) {
+    await pool.query(
+      `INSERT INTO historico_peso (tipo, entidade_id, peso, data_registro, origem) VALUES ('gato', ?, ?, CURDATE(), 'inicial')`,
+      [result.insertId, peso]
+    );
+  }
   res.status(201).json({ id: result.insertId });
 });
 
