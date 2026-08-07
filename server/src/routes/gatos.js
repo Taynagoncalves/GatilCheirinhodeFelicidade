@@ -52,7 +52,14 @@ router.get('/publico/:id', async (req, res) => {
     [req.params.id]
   );
   if (!rows.length) return res.status(404).json({ erro: 'Não encontrado' });
-  res.json(rows[0]);
+  const [historico_peso] = await pool.query(
+    `SELECT id, peso, origem, DATE_FORMAT(data_registro, '%Y-%m-%d') AS data_registro
+     FROM historico_peso
+     WHERE tipo = 'gato' AND entidade_id = ?
+     ORDER BY data_registro DESC, criado_em DESC`,
+    [req.params.id]
+  );
+  res.json({ ...rows[0], historico_peso });
 });
 
 router.get('/:id', async (req, res) => {

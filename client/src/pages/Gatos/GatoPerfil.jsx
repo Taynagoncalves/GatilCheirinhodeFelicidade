@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Cat, Syringe, Pill, Plus, Trash2, Weight, X, Scale, GitBranch, User, Share2 } from 'lucide-react';
+import { Cat, Syringe, Pill, Plus, Trash2, Weight, X, Scale, GitBranch, User, Share2, ChevronRight } from 'lucide-react';
 import { formatarPeso } from '../../utils/peso';
 import Layout from '../../components/Layout';
 import StatusBadge from '../../components/StatusBadge';
@@ -270,12 +270,18 @@ export default function GatoPerfil() {
       </section>
 
       <section>
-        <h2 className="section-title">Histórico de Peso</h2>
+        <button
+          onClick={() => navigate(`/gatos/${id}/peso`)}
+          style={{ all: 'unset', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}
+        >
+          <h2 className="section-title" style={{ margin: 0 }}>Histórico de Peso</h2>
+          <ChevronRight size={18} style={{ color: 'var(--color-text-muted)' }} />
+        </button>
         {(!gato.historico_peso || gato.historico_peso.length === 0) ? (
           <EmptyState icon={Scale} title="Nenhum peso registrado" description="Registre o peso para acompanhar o crescimento." />
         ) : (
-          <div className="card">
-            {gato.historico_peso.map((h) => (
+          <div className="card" style={{ cursor: 'pointer' }} onClick={() => navigate(`/gatos/${id}/peso`)}>
+            {gato.historico_peso.slice(0, 3).map((h) => (
               <div key={h.id} className="list-row" style={{ marginBottom: 8, border: 'none', background: 'var(--color-bg)', display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span className="card-photo-placeholder" style={{ width: 40, height: 40, flexShrink: 0 }}>
                   <Scale size={18} />
@@ -289,6 +295,11 @@ export default function GatoPerfil() {
                 </div>
               </div>
             ))}
+            {gato.historico_peso.length > 3 && (
+              <p className="card-meta" style={{ textAlign: 'center', margin: '4px 0 0', fontWeight: 600, color: 'var(--color-primary)' }}>
+                Ver histórico completo ({gato.historico_peso.length})
+              </p>
+            )}
           </div>
         )}
       </section>

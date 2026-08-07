@@ -108,6 +108,43 @@ export default function GatoPublico() {
             </div>
           </div>
 
+          {/* Histórico de peso */}
+          {gato.historico_peso && gato.historico_peso.length > 0 && (
+            <div style={{
+              marginTop: 20,
+              background: 'rgba(255,255,255,0.07)',
+              backdropFilter: 'blur(20px)',
+              borderRadius: 24,
+              overflow: 'hidden',
+              boxShadow: '0 24px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.08)',
+              padding: '18px 20px 20px',
+            }}>
+              <p style={{
+                margin: '0 0 14px', fontSize: '0.7rem', letterSpacing: '0.1em', textTransform: 'uppercase',
+                color: 'rgba(255,255,255,0.45)', fontWeight: 700,
+              }}>
+                Histórico de peso
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {gato.historico_peso.map((h) => (
+                  <div key={h.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: '0.9rem', fontWeight: 700, color: '#fff' }}>
+                      {formatarPeso(h.peso)}
+                      {h.origem === 'inicial' && (
+                        <span style={{ marginLeft: 8, fontSize: '0.68rem', fontWeight: 500, color: 'rgba(255,255,255,0.5)' }}>
+                          (peso inicial)
+                        </span>
+                      )}
+                    </span>
+                    <span style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.5)' }}>
+                      {h.data_registro.split('-').reverse().join('/')}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Rodapé da marca */}
           <div style={{ textAlign: 'center', marginTop: 28 }}>
             <p style={{ margin: 0, fontSize: '0.7rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', fontWeight: 600 }}>
