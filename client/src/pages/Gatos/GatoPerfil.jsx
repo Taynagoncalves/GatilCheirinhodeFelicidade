@@ -104,29 +104,22 @@ export default function GatoPerfil() {
           <p className="card-title" style={{ fontSize: '1.2rem' }}>{gato.nome || 'Sem nome'}</p>
           <div style={{ margin: '6px 0', display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
             <StatusBadge status={gato.status} />
-            {gato.status === 'vendido' && gato.cliente_nome && (
+            {(gato.status === 'vendido' || gato.status === 'reservado') && gato.cliente_nome && (
               <button
                 onClick={() => navigate(`/clientes/${gato.cliente_id}`)}
                 style={{
                   all: 'unset', cursor: 'pointer',
-                  display: 'inline-flex', alignItems: 'center', gap: 7,
-                  background: 'linear-gradient(135deg, #4c1d95 0%, #7c3aed 60%, #a78bfa 100%)',
-                  borderRadius: 24, padding: '4px 14px 4px 4px',
-                  boxShadow: '0 3px 12px rgba(124,58,237,0.4)',
+                  display: 'inline-flex', alignItems: 'center', gap: 4,
+                  background: 'var(--color-primary-light)',
+                  border: '1px solid var(--color-accent)',
+                  borderRadius: 999, padding: '3px 10px',
+                  fontSize: '0.72rem', color: 'var(--color-primary-dark)',
                 }}
               >
-                <span style={{
-                  width: 26, height: 26, borderRadius: '50%',
-                  background: 'rgba(255,255,255,0.22)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: '0.62rem', fontWeight: 900, color: '#fff', letterSpacing: 0.3, flexShrink: 0,
-                }}>
-                  {gato.cliente_nome.split(' ').slice(0,2).map(w => w[0]).join('').toUpperCase()}
+                <span style={{ fontWeight: 500 }}>
+                  {gato.status === 'vendido' ? 'Vendido para' : 'Reservado para'}
                 </span>
-                <span style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
-                  <span style={{ fontSize: '0.62rem', fontWeight: 500, color: 'rgba(255,255,255,0.75)' }}>Vendido para</span>
-                  <span style={{ fontSize: '0.85rem', fontWeight: 800, color: '#fff' }}>{gato.cliente_nome}</span>
-                </span>
+                <span style={{ fontWeight: 700 }}>{gato.cliente_nome}</span>
               </button>
             )}
           </div>
