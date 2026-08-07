@@ -40,6 +40,13 @@ async function initDb() {
     try { await pool.query(sql); } catch (e) { if (e.errno !== 1060 && e.errno !== 1054) throw e; }
   }
   await pool.query(`
+    INSERT INTO historico_peso (tipo, entidade_id, peso, data_registro, origem)
+    SELECT 'gato', g.id, g.peso, COALESCE(g.data_nascimento, CURDATE()), 'inicial'
+    FROM gatos g
+    WHERE g.peso IS NOT NULL
+      AND NOT EXISTS (SELECT 1 FROM historico_peso h WHERE h.tipo = 'gato' AND h.entidade_id = g.id)
+  `);
+  await pool.query(`
     CREATE TABLE IF NOT EXISTS cliente_gatos (
       id INT AUTO_INCREMENT PRIMARY KEY,
       cliente_id INT NOT NULL,
