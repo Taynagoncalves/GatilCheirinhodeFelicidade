@@ -70,7 +70,7 @@ export default function GatoPesoHistorico() {
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
             padding: '0 18px', height: 44, borderRadius: 'var(--radius-md)',
             border: '1.5px solid var(--color-primary)',
-            background: 'linear-gradient(135deg, #5b21b6, #7c3aed)',
+            background: 'linear-gradient(135deg, var(--color-primary-dark), var(--color-primary))',
             color: '#fff', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer',
             flexShrink: 0,
           }}
