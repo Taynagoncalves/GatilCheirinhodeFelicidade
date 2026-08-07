@@ -6,6 +6,7 @@ import GatoForm from './pages/Gatos/GatoForm';
 import GatoPerfil from './pages/Gatos/GatoPerfil';
 import GatoPesoHistorico from './pages/Gatos/GatoPesoHistorico';
 import GatoPublico from './pages/Gatos/GatoPublico';
+import GatoPesoPublico from './pages/Gatos/GatoPesoPublico';
 import PaisList from './pages/Pais/PaisList';
 import PaisForm from './pages/Pais/PaisForm';
 import PaisPerfil from './pages/Pais/PaisPerfil';
@@ -28,6 +29,7 @@ export default function App() {
       <Route path="/" element={<Home />} />
 
       <Route path="/g/:id" element={<GatoPublico />} />
+      <Route path="/g/:id/peso" element={<GatoPesoPublico />} />
 
       <Route path="/gatos" element={<GatosList />} />
       <Route path="/gatos/novo" element={<GatoForm />} />

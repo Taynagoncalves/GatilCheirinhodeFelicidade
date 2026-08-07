@@ -32,7 +32,7 @@ export default function GatoPesoHistorico() {
   const compartilhar = async () => {
     const apiBase = import.meta.env.VITE_API_URL || '';
     const serverOrigin = apiBase ? new URL(apiBase).origin : window.location.origin;
-    const url = `${serverOrigin}/g/${id}`;
+    const url = `${serverOrigin}/g/${id}/peso`;
     if (navigator.share) {
       try { await navigator.share({ title: `Histórico de peso de ${gato?.nome || 'gatinho'}`, url }); } catch {}
     } else {
