@@ -8,10 +8,12 @@ import SplashScreen from './components/SplashScreen.jsx'
 import Onboarding from './components/Onboarding.jsx'
 import MenuPrincipal from './components/MenuPrincipal.jsx'
 
+const rotaPublica = window.location.pathname.startsWith('/g/');
+
 function Root() {
-  const [splash, setSplash] = useState(true);
-  const [onboarding, setOnboarding] = useState(localStorage.getItem('onboarding_visto') !== 'v2');
-  const [menuVisto, setMenuVisto] = useState(false);
+  const [splash, setSplash] = useState(!rotaPublica);
+  const [onboarding, setOnboarding] = useState(!rotaPublica && localStorage.getItem('onboarding_visto') !== 'v2');
+  const [menuVisto, setMenuVisto] = useState(rotaPublica);
 
   useEffect(() => {
     const handler = () => setMenuVisto(false);
