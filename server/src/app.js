@@ -46,6 +46,22 @@ async function initDb() {
     WHERE g.peso IS NOT NULL
       AND NOT EXISTS (SELECT 1 FROM historico_peso h WHERE h.tipo = 'gato' AND h.entidade_id = g.id)
   `);
+  // gatos que já tinham registros de peso antes desse recurso existir: marca o mais antigo como 'inicial'
+  await pool.query(`
+    UPDATE historico_peso h
+    JOIN (
+      SELECT entidade_id, MIN(data_registro) AS min_data
+      FROM historico_peso
+      WHERE tipo = 'gato'
+      GROUP BY entidade_id
+    ) m ON m.entidade_id = h.entidade_id AND m.min_data = h.data_registro
+    SET h.origem = 'inicial'
+    WHERE h.tipo = 'gato'
+      AND NOT EXISTS (
+        SELECT 1 FROM historico_peso h2
+        WHERE h2.tipo = 'gato' AND h2.entidade_id = h.entidade_id AND h2.origem = 'inicial'
+      )
+  `);
   await pool.query(`
     CREATE TABLE IF NOT EXISTS cliente_gatos (
       id INT AUTO_INCREMENT PRIMARY KEY,
