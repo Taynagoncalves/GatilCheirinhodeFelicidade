@@ -11,6 +11,8 @@
   --color-danger: #c0524a;
   --color-success: #3f8c5a;
   --color-warning: #b8863a;
+  --color-cio: #c2568a;
+  --color-cio-light: #fbeaf2;
 
   --radius-sm: 10px;
   --radius-md: 16px;
@@ -967,6 +969,112 @@ h1, h2, h3, p {
 .status-reservado { background: #fbf1de; color: var(--color-warning); }
 .status-vendido { background: #f0e9f6; color: #7a4fa0; }
 .status-mantido { background: var(--color-primary-light); color: var(--color-primary-dark); }
+
+/* Ninhadas / Cios */
+.ninhada-card,
+.cio-card {
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.ninhada-card:active,
+.cio-card:active {
+  transform: scale(0.99);
+}
+
+.pill-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--color-primary-light);
+  color: var(--color-primary-dark);
+  font-weight: 700;
+  font-size: 0.78rem;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.cio-card {
+  border-left: 4px solid var(--color-cio);
+}
+
+.cio-duo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.cio-photo {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--color-cio-light);
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1.5px var(--color-cio-light);
+}
+
+.cio-photo-placeholder {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--color-cio-light);
+  color: var(--color-cio);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1.5px var(--color-cio-light);
+}
+
+.cio-heart {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-cio);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin: 0 -6px;
+  box-shadow: 0 0 0 2px #fff;
+}
+
+.cio-date-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--color-cio-light);
+  color: var(--color-cio);
+  font-weight: 700;
+  font-size: 0.78rem;
+  padding: 4px 10px;
+  border-radius: 999px;
+  margin-top: 6px;
+}
+
+.cio-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  background: var(--color-cio-light);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+}
+
+.cio-preview .cio-photo,
+.cio-preview .cio-photo-placeholder {
+  width: 84px;
+  height: 84px;
+}
+
+.cio-preview .cio-heart {
+  width: 32px;
+  height: 32px;
+  margin: 0 -10px;
+}
 
 /* Filtros */
 .filtros-row {

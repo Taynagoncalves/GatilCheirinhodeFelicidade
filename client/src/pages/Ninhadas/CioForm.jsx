@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Cat, Heart } from 'lucide-react';
 import Layout from '../../components/Layout';
 import { useToast } from '../../components/Toast';
 import api from '../../api/client';
@@ -21,6 +22,9 @@ export default function CioForm() {
     api.get('/pais', { params: { sexo: 'macho' } }).then((res) => setMachos(res.data));
   }, []);
 
+  const gataSelecionada = gatas.find((g) => String(g.id) === String(form.gata_id));
+  const machoSelecionado = machos.find((m) => String(m.id) === String(form.macho_id));
+
   const submit = async (e) => {
     e.preventDefault();
     await api.post('/cios', form);
@@ -31,6 +35,20 @@ export default function CioForm() {
   return (
     <Layout title="Registrar Cio" showBack>
       <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div className="cio-preview">
+          {gataSelecionada?.foto_url ? (
+            <img src={gataSelecionada.foto_url} alt={gataSelecionada.nome} className="cio-photo" />
+          ) : (
+            <span className="cio-photo-placeholder"><Cat size={30} /></span>
+          )}
+          <span className="cio-heart"><Heart size={16} fill="currentColor" /></span>
+          {machoSelecionado?.foto_url ? (
+            <img src={machoSelecionado.foto_url} alt={machoSelecionado.nome} className="cio-photo" />
+          ) : (
+            <span className="cio-photo-placeholder"><Cat size={30} /></span>
+          )}
+        </div>
+
         <div className="field">
           <label>Gata</label>
           <select value={form.gata_id} onChange={(e) => setForm({ ...form, gata_id: e.target.value })} required>

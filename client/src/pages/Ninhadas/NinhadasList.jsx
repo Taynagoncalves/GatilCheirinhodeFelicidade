@@ -8,6 +8,18 @@ import { useToast } from '../../components/Toast';
 import { useTour } from '../../contexts/TourContext';
 import api from '../../api/client';
 
+const diasAtras = (dataStr) => {
+  if (!dataStr) return null;
+  const hoje = new Date();
+  hoje.setHours(0, 0, 0, 0);
+  const data = new Date(`${dataStr}T00:00:00`);
+  const dias = Math.round((hoje - data) / 86400000);
+  if (dias === 0) return 'Hoje';
+  if (dias === 1) return 'Ontem';
+  if (dias > 1) return `Há ${dias} dias`;
+  return dataStr.split('-').reverse().join('/');
+};
+
 const TOUR = [
   {
     selector: '[data-tour="ninhadas-nova"]',
@@ -104,9 +116,9 @@ export default function NinhadasList() {
             <EmptyState icon={PawPrint} title="Nenhuma ninhada cadastrada" description="Cadastre a primeira ninhada do gatil." />
           )}
 
-          <div data-tour="ninhadas-lista">
+          <div data-tour="ninhadas-lista" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {ninhadas.map((n) => (
-            <div key={n.id} className="card" style={{ cursor: 'pointer' }} onClick={() => navigate(`/ninhadas/${n.id}`)}>
+            <div key={n.id} className="card ninhada-card" style={{ cursor: 'pointer' }} onClick={() => navigate(`/ninhadas/${n.id}`)}>
               <div className="card-row">
                 {n.foto_url ? (
                   <img src={n.foto_url} alt={n.nome} className="card-photo" />
@@ -119,12 +131,12 @@ export default function NinhadasList() {
                     Mãe: {n.mae_nome || 'Não informado'}<br />
                     Pai: {n.pai_nome || 'Não informado'}
                   </p>
-                  <p className="card-meta" style={{ display: 'flex', gap: 14, marginTop: 6 }}>
+                  <p className="card-meta" style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 8 }}>
                     <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                       <Calendar size={14} /> {n.data_nascimento ? n.data_nascimento.split('-').reverse().join('/') : '—'}
                     </span>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                      <PawPrint size={14} /> {n.quantidade_filhotes} filhotes
+                    <span className="pill-count">
+                      <PawPrint size={12} /> {n.quantidade_filhotes} filhotes
                     </span>
                   </p>
                   <div className="card-actions" onClick={(e) => e.stopPropagation()}>
@@ -144,25 +156,31 @@ export default function NinhadasList() {
             <EmptyState icon={Heart} title="Nenhum cio registrado" description="Registre o cio de uma gata reprodutora e o macho utilizado no cruzamento." />
           )}
 
-          <div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {cios.map((c) => (
-            <div key={c.id} className="card">
+            <div key={c.id} className="card cio-card">
               <div className="card-row">
-                {c.gata_foto ? (
-                  <img src={c.gata_foto} alt={c.gata_nome} className="card-photo" />
-                ) : (
-                  <span className="card-photo-placeholder"><Cat size={26} /></span>
-                )}
+                <div className="cio-duo">
+                  {c.gata_foto ? (
+                    <img src={c.gata_foto} alt={c.gata_nome} className="cio-photo" />
+                  ) : (
+                    <span className="cio-photo-placeholder"><Cat size={22} /></span>
+                  )}
+                  <span className="cio-heart"><Heart size={12} fill="currentColor" /></span>
+                  {c.macho_foto ? (
+                    <img src={c.macho_foto} alt={c.macho_nome} className="cio-photo" />
+                  ) : (
+                    <span className="cio-photo-placeholder"><Cat size={22} /></span>
+                  )}
+                </div>
                 <div style={{ flex: 1 }}>
                   <p className="card-title">{c.gata_nome || 'Gata não informada'}</p>
                   <p className="card-meta">
                     Macho: {c.macho_nome || 'Não informado'}
                   </p>
-                  <p className="card-meta" style={{ display: 'flex', gap: 14, marginTop: 6 }}>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                      <Calendar size={14} /> {c.data_registro ? c.data_registro.split('-').reverse().join('/') : '—'}
-                    </span>
-                  </p>
+                  <span className="cio-date-pill">
+                    <Calendar size={12} /> {diasAtras(c.data_registro)}
+                  </span>
                   <div className="card-actions">
                     <button className="icon-btn danger" onClick={() => setConfirmCioId(c.id)}>
                       <Trash2 size={15} /> Excluir
