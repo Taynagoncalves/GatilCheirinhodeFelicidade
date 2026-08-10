@@ -14,6 +14,7 @@ import NinhadasList from './pages/Ninhadas/NinhadasList';
 import NinhadaForm from './pages/Ninhadas/NinhadaForm';
 import NinhadaDetalhe from './pages/Ninhadas/NinhadaDetalhe';
 import NinhadaEditForm from './pages/Ninhadas/NinhadaEditForm';
+import CioForm from './pages/Ninhadas/CioForm';
 import SaudeList from './pages/Saude/SaudeList';
 import MedicamentosCatalogo from './pages/Saude/MedicamentosCatalogo';
 import MedicamentoForm from './pages/Saude/MedicamentoForm';
@@ -46,6 +47,7 @@ export default function App() {
       <Route path="/ninhadas/nova" element={<NinhadaForm />} />
       <Route path="/ninhadas/:id" element={<NinhadaDetalhe />} />
       <Route path="/ninhadas/:id/editar" element={<NinhadaEditForm />} />
+      <Route path="/ninhadas/cios/novo" element={<CioForm />} />
 
       <Route path="/saude" element={<SaudeList />} />
       <Route path="/saude/registrar" element={<RegistroForm />} />

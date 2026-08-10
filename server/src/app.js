@@ -22,6 +22,16 @@ async function initDb() {
       criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `);
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS cios (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      gata_id INT NOT NULL,
+      macho_id INT NULL,
+      data_registro DATE NOT NULL,
+      observacoes TEXT,
+      criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
   for (const sql of [
     `ALTER TABLE gatos ADD COLUMN peso DECIMAL(7,1) NULL`,
     `ALTER TABLE pais  ADD COLUMN peso DECIMAL(7,1) NULL`,
@@ -122,6 +132,7 @@ app.use(express.json());
 app.use('/api/dashboard', require('./routes/dashboard'));
 app.use('/api/pais', require('./routes/pais'));
 app.use('/api/ninhadas', require('./routes/ninhadas'));
+app.use('/api/cios', require('./routes/cios'));
 app.use('/api/gatos', require('./routes/gatos'));
 app.use('/api/medicamentos', require('./routes/medicamentos'));
 app.use('/api/aplicacoes', require('./routes/aplicacoes'));
