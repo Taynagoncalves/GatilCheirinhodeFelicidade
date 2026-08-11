@@ -181,6 +181,9 @@ export default function NinhadasList() {
                   <span className="cio-date-pill">
                     <Calendar size={12} /> {diasAtras(c.data_registro)}
                   </span>
+                  {c.observacoes && (
+                    <p className="card-meta" style={{ marginTop: 6 }}>{c.observacoes}</p>
+                  )}
                   <div className="card-actions">
                     <button className="icon-btn danger" onClick={() => setConfirmCioId(c.id)}>
                       <Trash2 size={15} /> Excluir
