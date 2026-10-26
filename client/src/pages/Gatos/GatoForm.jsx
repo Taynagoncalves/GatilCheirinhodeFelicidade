@@ -78,14 +78,18 @@ export default function GatoForm() {
     Object.entries({ ...form, peso: pesoEmGramas || '' }).forEach(([k, v]) => data.append(k, v));
     if (foto) data.append('foto', foto);
 
-    if (isEdit) {
-      await api.put(`/gatos/${id}`, data);
-      toast('Gato atualizado com sucesso!');
-    } else {
-      await api.post('/gatos', data);
-      toast('Gato cadastrado com sucesso!');
+    try {
+      if (isEdit) {
+        await api.put(`/gatos/${id}`, data);
+        toast('Gato atualizado com sucesso!');
+      } else {
+        await api.post('/gatos', data);
+        toast('Gato cadastrado com sucesso!');
+      }
+      navigate('/gatos');
+    } catch {
+      toast('Não foi possível salvar. Tente outra foto ou tente novamente.', 'error');
     }
-    navigate('/gatos');
   };
 
   return (
