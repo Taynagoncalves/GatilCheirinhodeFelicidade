@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Cat } from 'lucide-react';
 import Layout from '../../components/Layout';
+import ImageCropper from '../../components/ImageCropper';
 import { useToast } from '../../components/Toast';
 import api from '../../api/client';
 
@@ -13,6 +14,7 @@ export default function NinhadaEditForm() {
   const [paisList, setPaisList] = useState([]);
   const [foto, setFoto] = useState(null);
   const [preview, setPreview] = useState(null);
+  const [arquivoCorte, setArquivoCorte] = useState(null);
   const [form, setForm] = useState(null);
 
   useEffect(() => {
@@ -72,7 +74,14 @@ export default function NinhadaEditForm() {
           <span style={{ fontSize: '0.78rem', color: '#718096' }}>
             {preview ? 'Toque para trocar a foto' : 'Toque para adicionar foto'}
           </span>
-          <input id="foto-ninhada-edit" type="file" accept="image/*" hidden onChange={(e) => { const f = e.target.files?.[0]; if (f) handlePhoto(f); }} />
+          <input id="foto-ninhada-edit" type="file" accept="image/*" hidden onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ''; if (f) setArquivoCorte(f); }} />
+          {arquivoCorte && (
+            <ImageCropper
+              file={arquivoCorte}
+              onConfirm={(f) => { setArquivoCorte(null); handlePhoto(f); }}
+              onCancel={() => setArquivoCorte(null)}
+            />
+          )}
         </div>
 
         <div className="field">
