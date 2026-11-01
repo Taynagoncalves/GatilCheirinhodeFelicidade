@@ -16,7 +16,7 @@ const TOUR_CLIENTES = [
   {
     selector: '[data-tour="cli-stats"]',
     titulo: 'Resumo de Clientes',
-    texto: 'Veja o total de clientes ativos, gatos vendidos e reservas. Toque em "Gatos Vendidos" para ver a lista completa, ou em "Reservas" para filtrar os clientes com pagamento pendente.',
+    texto: 'No topo aparece quanto ainda falta receber dos clientes. Abaixo, veja clientes ativos, gatos vendidos e reservas. Toque em "Gatos vendidos" para ver a lista completa, ou em "Reservas" para filtrar os clientes com gato reservado.',
   },
   {
     selector: '[data-tour="cli-cadastrar"]',
@@ -25,13 +25,13 @@ const TOUR_CLIENTES = [
   },
   {
     selector: '[data-tour="cli-busca"]',
-    titulo: 'Busca',
-    texto: 'Pesquise por nome, cidade ou nome do gato vinculado para encontrar rapidamente um cliente.',
+    titulo: 'Busca e Filtros',
+    texto: 'Pesquise por nome, cidade ou nome do gato vinculado, e filtre os clientes por status (Ativos, Reservas, Finalizados, Inativos).',
   },
   {
     selector: '[data-tour="cli-cards"]',
     titulo: 'Cards de Clientes',
-    texto: 'Cada card mostra nome, contato e os gatos adquiridos com a barra de pagamento. Toque em "Ver Gatos" para abrir o perfil completo com controle de pagamento por gato.',
+    texto: 'Cada card mostra nome, contato e os gatos adquiridos com a barra de pagamento. Use os botões para chamar no WhatsApp, abrir os gatos com controle de pagamento, editar ou excluir o cliente.',
   },
 ];
 
@@ -385,15 +385,26 @@ function TabHistorico({ onIrMes }) {
 
 // ── Aba Clientes ───────────────────────────────────────────────────────────
 const STATUS_CLIENTE = {
-  ativo:      { label: 'Cliente Ativo',    cor: '#16a34a', bg: '#dcfce7' },
-  reserva:    { label: 'Reserva',          cor: '#d97706', bg: '#fef3c7' },
-  finalizado: { label: 'Finalizado',       cor: '#2563eb', bg: '#dbeafe' },
-  inativo:    { label: 'Inativo',          cor: '#64748b', bg: '#f1f5f9' },
+  ativo:      { label: 'Ativo',      cor: '#3f8c5a', bg: '#e3f3e8' },
+  reserva:    { label: 'Reserva',    cor: '#b8863a', bg: '#fbf1de' },
+  finalizado: { label: 'Finalizado', cor: '#2f6690', bg: '#eaf2f8' },
+  inativo:    { label: 'Inativo',    cor: '#64748b', bg: '#f1f5f9' },
 };
 const FILTROS_CLIENTE = [
   { v: '', l: 'Todos' }, { v: 'ativo', l: 'Ativos' }, { v: 'reserva', l: 'Reservas' },
   { v: 'finalizado', l: 'Finalizados' }, { v: 'inativo', l: 'Inativos' },
 ];
+const AVATAR_CORES = [
+  ['#2f6690', '#4a86b8'], ['#7a4fa0', '#a07cc5'], ['#3f8c5a', '#62b07d'],
+  ['#b8863a', '#d8a95e'], ['#c2568a', '#dc80ab'], ['#1f4e6e', '#3d7aa3'],
+];
+
+function corAvatar(nome) {
+  let h = 0;
+  for (const ch of nome) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  const [a, b] = AVATAR_CORES[h % AVATAR_CORES.length];
+  return `linear-gradient(135deg, ${a}, ${b})`;
+}
 
 function TabClientes() {
   const navigate = useNavigate();
@@ -431,6 +442,9 @@ function TabClientes() {
     return matchStatus && matchBusca;
   });
 
+  const aReceber = clientes.reduce((sum, c) => sum + (c.gatos || []).reduce(
+    (s, g) => s + Math.max(0, (Number(g.valor) || 0) - (Number(g.valor_pago) || 0)), 0), 0);
+
   const abrirGatosVendidos = () => {
     setFiltroStatus('');
     api.get('/gatos?status=vendido').then(r => { setGatosVendidos(r.data); setShowGatosVendidos(true); });
@@ -446,9 +460,14 @@ function TabClientes() {
     setForm({ nome: '', telefone: '', cidade: '', data_venda: new Date().toISOString().slice(0, 10), status: 'ativo' });
     setShowForm(true);
   };
+  const abrirEditar = (c) => {
+    setEditando(c);
+    setForm({ nome: c.nome, telefone: c.telefone || '', cidade: c.cidade || '', data_venda: c.data_venda || '', status: c.status || 'ativo' });
+    setShowForm(true);
+  };
   const salvar = async (e) => {
     e.preventDefault();
-    if (editando) await api.put(`/clientes/${editando.id}`, form);
+    if (editando) await api.put(`/clientes/${editando.id}`, { ...form, valor_venda: editando.valor_venda });
     else await api.post('/clientes', form);
     setShowForm(false);
     toast(editando ? 'Cliente atualizado!' : 'Cliente cadastrado!');
@@ -462,47 +481,75 @@ function TabClientes() {
   };
 
   return (
-    <div>
-      {/* Stats */}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+      {/* Resumo */}
       {stats && (
-        <div data-tour="cli-stats" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 4 }}>
-          {[
-            { icon: <Users size={18} />, valor: stats.total_ativos, label: 'Clientes Ativos', sub: `+${stats.novos_mes} este mês`, cor: '#7c3aed', bg: '#f5f0ff', onClick: null },
-            { icon: <Cat size={18} />, valor: stats.total_vendidos, label: 'Gatos Vendidos', sub: `+${stats.novos_vendidos} este mês`, cor: '#16a34a', bg: '#dcfce7', onClick: abrirGatosVendidos },
-            { icon: <Wallet size={18} />, valor: stats.total_reservas, label: 'Reservas', sub: 'pendentes', cor: '#d97706', bg: '#fef3c7', onClick: () => setFiltroStatus(filtroStatus === 'reserva' ? '' : 'reserva') },
-          ].map((s) => (
-            <div key={s.label} onClick={s.onClick || undefined} style={{
-              background: s.onClick && filtroStatus === 'reserva' && s.label === 'Reservas' ? '#fef3c7' : '#fff',
-              borderRadius: 14, padding: '10px 8px', boxShadow: '0 1px 6px rgba(0,0,0,0.07)', textAlign: 'center',
-              cursor: s.onClick ? 'pointer' : 'default',
-              border: s.onClick && filtroStatus === 'reserva' && s.label === 'Reservas' ? '2px solid #d97706' : '2px solid transparent',
-              transition: 'all 0.15s',
-            }}>
-              <div style={{ width: 34, height: 34, borderRadius: '50%', background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', color: s.cor, margin: '0 auto 6px' }}>{s.icon}</div>
-              <p style={{ margin: 0, fontSize: '1.3rem', fontWeight: 900, color: s.cor, lineHeight: 1 }}>{s.valor}</p>
-              <p style={{ margin: '2px 0 0', fontSize: '0.62rem', fontWeight: 700, color: '#475569', lineHeight: 1.3 }}>{s.label}</p>
-              <p style={{ margin: '2px 0 0', fontSize: '0.6rem', color: '#94a3b8' }}>{s.sub}</p>
+        <div className="cl-hero" data-tour="cli-stats">
+          <div className="cl-hero-topo">
+            <div>
+              <span className="cl-hero-label">A receber</span>
+              <p className="cl-hero-valor">{formatVal(aReceber)}</p>
             </div>
-          ))}
+            <span className="cl-hero-icone"><Wallet size={22} /></span>
+          </div>
+          <div className="cl-hero-stats">
+            <div className="cl-hero-stat">
+              <span className="cl-hero-num">{stats.total_ativos}</span>
+              <span className="cl-hero-txt">Clientes ativos</span>
+              <span className="cl-hero-sub">+{stats.novos_mes} este mês</span>
+            </div>
+            <button className="cl-hero-stat" onClick={abrirGatosVendidos}>
+              <span className="cl-hero-num">{stats.total_vendidos}</span>
+              <span className="cl-hero-txt">Gatos vendidos <ChevronRight size={11} /></span>
+              <span className="cl-hero-sub">+{stats.novos_vendidos} este mês</span>
+            </button>
+            <button
+              className={`cl-hero-stat${filtroStatus === 'reserva' ? ' ativo' : ''}`}
+              onClick={() => setFiltroStatus(filtroStatus === 'reserva' ? '' : 'reserva')}
+            >
+              <span className="cl-hero-num">{stats.total_reservas}</span>
+              <span className="cl-hero-txt">Reservas <ChevronRight size={11} /></span>
+              <span className="cl-hero-sub">pendentes</span>
+            </button>
+          </div>
         </div>
       )}
 
       <button className="btn btn-primary" data-tour="cli-cadastrar" onClick={abrirNovo}><Plus size={16} /> Cadastrar Cliente</button>
 
-      <div className="search-input" data-tour="cli-busca">
-        <Search size={16} />
-        <input placeholder="Buscar cliente..." value={busca} onChange={(e) => setBusca(e.target.value)} />
+      <div className="gl-toolbar">
+        <div className="search-input" data-tour="cli-busca">
+          <Search size={16} />
+          <input placeholder="Buscar por nome, cidade ou gato..." value={busca} onChange={(e) => setBusca(e.target.value)} />
+          {busca && <X size={16} style={{ cursor: 'pointer' }} onClick={() => setBusca('')} />}
+        </div>
+        <div className="gl-chips">
+          {FILTROS_CLIENTE.map((f) => {
+            const st = STATUS_CLIENTE[f.v];
+            return (
+              <button
+                key={f.v}
+                className={`gl-chip${filtroStatus === f.v ? ' ativo' : ''}`}
+                style={st ? { '--chip-cor': st.cor } : undefined}
+                onClick={() => setFiltroStatus(f.v)}
+              >
+                {st && <span className="gl-dot" style={{ background: st.cor }} />} {f.l}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-        <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#64748b' }}>Clientes</span>
-        {filtrados.length > 0 && <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#7c3aed', background: '#f5f0ff', borderRadius: 20, padding: '1px 8px' }}>{filtrados.length}</span>}
+      <div className="gl-resumo">
+        <span className="gl-resumo-texto">
+          <strong>{filtrados.length}</strong> {filtrados.length === 1 ? 'cliente' : 'clientes'}
+        </span>
       </div>
 
       {clientes.length === 0 && <EmptyState icon={Users} title="Nenhum cliente cadastrado" description="Cadastre os compradores dos filhotes aqui." />}
 
-      <div data-tour="cli-cards">
-      {filtrados.map((c) => {
+      <div className="gl-lista" data-tour="cli-cards">
+      {filtrados.map((c, i) => {
         const iniciais = c.nome.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase();
         const st = STATUS_CLIENTE[c.status] || STATUS_CLIENTE.ativo;
         const gatos_c = c.gatos || [];
@@ -511,82 +558,76 @@ function TabClientes() {
         const pct = totalGasto > 0 ? Math.min(100, Math.round((totalPago / totalGasto) * 100)) : 0;
         const pagamentoCompleto = totalGasto > 0 && totalPago >= totalGasto;
         const pagamentoParcial  = totalPago > 0 && !pagamentoCompleto;
+        const corPagamento = pagamentoCompleto ? '#3f8c5a' : pagamentoParcial ? '#b8863a' : '#94a3b8';
         return (
-          <div key={c.id} onClick={() => navigate(`/clientes/${c.id}`)} style={{ background: '#fff', borderRadius: 16, marginBottom: 10, boxShadow: '0 2px 12px rgba(0,0,0,0.07)', overflow: 'hidden', cursor: 'pointer' }}>
-            <div style={{ padding: '14px 14px 10px', display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-              <div style={{ width: 48, height: 48, borderRadius: '50%', flexShrink: 0, background: 'linear-gradient(135deg, #5b21b6, #7c3aed)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: '1rem' }}>
+          <div key={c.id} className="gl-card" onClick={() => navigate(`/clientes/${c.id}`)} style={{ animationDelay: `${Math.min(i, 8) * 40}ms` }}>
+            <div className="cl-topo">
+              <div className="cl-avatar" style={{ background: corAvatar(c.nome) }}>
                 {iniciais}
+                <span className="cl-avatar-status" style={{ background: st.cor }} />
               </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                  <p style={{ margin: 0, fontWeight: 800, fontSize: '0.98rem', color: '#1e293b' }}>{c.nome}</p>
-                  <span style={{ fontSize: '0.68rem', fontWeight: 700, color: st.cor, background: st.bg, borderRadius: 20, padding: '2px 8px' }}>{st.label}</span>
+              <div className="gl-info">
+                <div className="gl-topo">
+                  <p className="gl-nome">{c.nome}</p>
+                  <span className="gl-status-pill" style={{ background: st.bg, color: st.cor, cursor: 'default' }}>
+                    <span className="gl-dot" style={{ background: st.cor }} /> {st.label}
+                  </span>
                 </div>
-                <div style={{ marginTop: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
-                  {c.telefone && <span style={{ fontSize: '0.78rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: 4 }}><Phone size={12} color="#7c3aed" /> {c.telefone}</span>}
-                  {c.cidade && <span style={{ fontSize: '0.78rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: 4 }}><MapPin size={12} color="#7c3aed" /> {c.cidade}</span>}
-                  {c.criado_em && <span style={{ fontSize: '0.75rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: 4 }}><CalendarDays size={11} /> Cliente desde {c.criado_em.split('-').reverse().join('/')}</span>}
+                <div className="cl-meta">
+                  {c.telefone && <span><Phone size={12} /> {c.telefone}</span>}
+                  {c.cidade && <span><MapPin size={12} /> {c.cidade}</span>}
                 </div>
+                {c.criado_em && <span className="cl-desde"><CalendarDays size={11} /> Cliente desde {formatData(c.criado_em)}</span>}
               </div>
             </div>
 
-            {(c.gato_nome || totalGasto > 0) && (
-              <div style={{ margin: '0 14px', borderRadius: 10, background: '#f8fafc', padding: '8px 12px' }}>
-                {/* linha topo: gato + total */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: totalGasto > 0 ? 8 : 0 }}>
-                  {c.gato_nome && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <Cat size={14} color="#7c3aed" />
-                      <div>
-                        <p style={{ margin: 0, fontSize: '0.68rem', color: '#94a3b8' }}>{gatos_c.length} {gatos_c.length === 1 ? 'gato adquirido' : 'gatos adquiridos'}</p>
-                        <p style={{ margin: 0, fontSize: '0.82rem', fontWeight: 700, color: '#1e293b' }}>{c.gato_nome}{gatos_c.length > 1 ? ` +${gatos_c.length - 1}` : ''}</p>
-                      </div>
+            {(gatos_c.length > 0 || totalGasto > 0) && (
+              <div className="cl-compra">
+                {gatos_c.length > 0 && (
+                  <div className="cl-gatos">
+                    <div className="gl-avatares">
+                      {gatos_c.slice(0, 3).map((g) => g.foto
+                        ? <img key={g.id} className="gl-avatar cl-gato-foto" src={g.foto} alt={g.nome} />
+                        : <span key={g.id} className="gl-avatar cl-gato-foto" style={{ background: 'var(--color-primary-light)' }}><Cat size={14} color="var(--color-primary)" /></span>)}
+                      {gatos_c.length > 3 && <span className="gl-avatar cl-gato-foto cl-gato-mais">+{gatos_c.length - 3}</span>}
                     </div>
-                  )}
-                  {totalGasto > 0 && (
-                    <div style={{ textAlign: 'right' }}>
-                      <p style={{ margin: 0, fontSize: '0.68rem', color: '#94a3b8' }}>Total</p>
-                      <p style={{ margin: 0, fontSize: '0.88rem', fontWeight: 800, color: '#16a34a' }}>{Number(totalGasto).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
+                    <div className="gl-pais-nomes">
+                      <span>{gatos_c.length} {gatos_c.length === 1 ? 'gato adquirido' : 'gatos adquiridos'}</span>
+                      <span><b>{gatos_c.map((g) => g.nome || 'Sem nome').join(', ')}</b></span>
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
 
-                {/* barra de pagamento */}
                 {totalGasto > 0 && (
-                  <>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                      <span style={{ fontSize: '0.68rem', fontWeight: 700, color: pagamentoCompleto ? '#16a34a' : pagamentoParcial ? '#d97706' : '#94a3b8' }}>
+                  <div className="cl-pagamento">
+                    <div className="cl-pagamento-linha">
+                      <span style={{ color: corPagamento, fontWeight: 700 }}>
                         {pagamentoCompleto ? '✓ Pago integralmente' : pagamentoParcial ? `${pct}% pago` : 'Aguardando pagamento'}
                       </span>
-                      <span style={{ fontSize: '0.68rem', color: '#94a3b8' }}>
-                        {Number(totalPago).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} / {Number(totalGasto).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                      </span>
+                      <span><b>{formatVal(totalPago)}</b> / {formatVal(totalGasto)}</span>
                     </div>
-                    <div style={{ height: 5, background: '#e2e8f0', borderRadius: 3, overflow: 'hidden' }}>
-                      <div style={{
-                        height: '100%', borderRadius: 3, width: `${pct}%`,
-                        background: pagamentoCompleto ? 'linear-gradient(90deg,#16a34a,#22c55e)' : 'linear-gradient(90deg,#d97706,#f59e0b)',
-                        transition: 'width 0.4s ease',
-                      }} />
+                    <div className="cl-barra">
+                      <div style={{ width: `${pct}%`, background: corPagamento }} />
                     </div>
-                  </>
+                  </div>
                 )}
               </div>
             )}
 
-            <div style={{ display: 'flex', borderTop: '1px solid #f1f5f9', marginTop: 10 }} onClick={e => e.stopPropagation()}>
+            <div className="cl-acoes" onClick={e => e.stopPropagation()}>
               {c.telefone && (
-                <button onClick={() => abrirWhatsApp(c.telefone)} style={{ flex: 1, border: 'none', background: 'none', cursor: 'pointer', padding: '10px 4px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, color: '#16a34a', fontSize: '0.65rem', fontWeight: 700 }}>
-                  <MessageCircle size={16} /> WhatsApp
+                <button className="cl-acao-whats" onClick={() => abrirWhatsApp(c.telefone)}>
+                  <MessageCircle size={15} /> WhatsApp
                 </button>
               )}
-              {gatos_c.length > 0 && (
-                <button onClick={() => navigate(`/clientes/${c.id}`)} style={{ flex: 1, border: 'none', background: 'none', cursor: 'pointer', padding: '10px 4px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, color: '#1d4ed8', fontSize: '0.65rem', fontWeight: 700, borderLeft: '1px solid #f1f5f9' }}>
-                  <Cat size={16} /> Ver Gatos
-                </button>
-              )}
-              <button onClick={() => setConfirmando(c)} style={{ flex: 1, border: 'none', background: 'none', cursor: 'pointer', padding: '10px 4px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, color: '#dc2626', fontSize: '0.65rem', fontWeight: 700, borderLeft: '1px solid #f1f5f9' }}>
-                <Trash2 size={16} /> Excluir
+              <button onClick={() => navigate(`/clientes/${c.id}`)}>
+                <Cat size={15} /> {gatos_c.length > 0 ? 'Ver gatos' : 'Perfil'}
+              </button>
+              <button className="cl-acao-icone" onClick={() => abrirEditar(c)} aria-label="Editar">
+                <Pencil size={15} />
+              </button>
+              <button className="cl-acao-icone danger" onClick={() => setConfirmando(c)} aria-label="Excluir">
+                <Trash2 size={15} />
               </button>
             </div>
           </div>

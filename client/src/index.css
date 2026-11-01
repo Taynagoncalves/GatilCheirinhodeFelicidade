@@ -1911,3 +1911,248 @@ h1, h2, h3, p {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* ── Lista de Clientes ──────────────────────────────── */
+.cl-hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  padding: 18px 16px 14px;
+  color: #fff;
+  background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%);
+  box-shadow: var(--shadow-elevated);
+}
+
+.cl-hero::before {
+  content: '';
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  right: -60px;
+  top: -70px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.cl-hero-topo {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.cl-hero-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.8;
+  font-weight: 600;
+}
+
+.cl-hero-valor {
+  margin: 2px 0 0;
+  font-size: 1.7rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.cl-hero-icone {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.16);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cl-hero-stats {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.cl-hero-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  padding: 10px;
+  border-radius: 14px;
+  border: 1.5px solid transparent;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  text-align: left;
+  font: inherit;
+  min-width: 0;
+}
+
+button.cl-hero-stat { cursor: pointer; }
+
+.cl-hero-stat.ativo {
+  background: rgba(255, 255, 255, 0.24);
+  border-color: rgba(255, 255, 255, 0.7);
+}
+
+.cl-hero-num {
+  font-size: 1.3rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.cl-hero-txt {
+  font-size: 0.68rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.cl-hero-sub {
+  font-size: 0.62rem;
+  opacity: 0.75;
+}
+
+.cl-topo {
+  display: flex;
+  gap: 12px;
+  padding: 14px 14px 10px;
+}
+
+.cl-avatar {
+  position: relative;
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 800;
+  font-size: 1.05rem;
+  letter-spacing: 0.02em;
+}
+
+.cl-avatar-status {
+  position: absolute;
+  right: -3px;
+  bottom: -3px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2.5px solid var(--color-surface);
+}
+
+.cl-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+}
+
+.cl-meta span,
+.cl-desde {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.cl-meta svg { color: var(--color-primary); }
+
+.cl-desde {
+  font-size: 0.72rem;
+  color: #94a3b8;
+}
+
+.cl-compra {
+  margin: 0 14px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: var(--color-bg);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cl-gatos {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.cl-gato-foto {
+  width: 32px;
+  height: 32px;
+  border-color: var(--color-bg);
+}
+
+.cl-gato-mais {
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.cl-pagamento-linha {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+  margin-bottom: 5px;
+}
+
+.cl-pagamento-linha b { color: var(--color-text); }
+
+.cl-barra {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--color-border);
+  overflow: hidden;
+}
+
+.cl-barra div {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.5s ease;
+}
+
+.cl-acoes {
+  display: flex;
+  gap: 6px;
+  padding: 12px 14px 14px;
+}
+
+.cl-acoes button {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 36px;
+  border: none;
+  border-radius: 12px;
+  background: var(--color-primary-light);
+  color: var(--color-primary-dark);
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.cl-acoes .cl-acao-whats {
+  background: #e3f3e8;
+  color: #2e7048;
+}
+
+.cl-acoes .cl-acao-icone {
+  flex: 0 0 36px;
+  background: var(--color-bg);
+  color: var(--color-text-muted);
+}
+
+.cl-acoes .cl-acao-icone.danger { color: var(--color-danger); }
