@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Search, Plus, Cat, X, PawPrint, Users, Trash2, Layers, CheckCircle2, AlertCircle, Clock, ChevronDown, Mars, Venus, LayoutGrid, List, Syringe } from 'lucide-react';
 import Layout from '../../components/Layout';
 import EmptyState from '../../components/EmptyState';
+import Observacao from '../../components/Observacao';
 import ConfirmModal from '../../components/ConfirmModal';
 import { useToast } from '../../components/Toast';
 import { useTour } from '../../contexts/TourContext';
@@ -242,6 +243,8 @@ export default function GatosList() {
           </div>
         </div>
 
+        <Observacao texto={g.observacoes} />
+
         {(temPais || alerta) && (
           <div className="gl-rodape">
             {temPais && (
@@ -294,6 +297,7 @@ export default function GatosList() {
             ? <><Syringe size={13} style={{ flexShrink: 0 }} /><span>{alerta.status}</span></>
             : <><Layers size={13} style={{ flexShrink: 0 }} /><span>{g.ninhada_nome || 'Sem ninhada'}</span></>}
         </div>
+        <Observacao texto={g.observacoes} compacta />
       </div>
     );
   };

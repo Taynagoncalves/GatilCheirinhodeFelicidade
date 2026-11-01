@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Search, Plus, PawPrint, Pencil, Trash2, X, Mars, Venus, List, LayoutGrid, Syringe, AlertCircle, Clock, CheckCircle2, Palette } from 'lucide-react';
 import Layout from '../../components/Layout';
 import EmptyState from '../../components/EmptyState';
+import Observacao from '../../components/Observacao';
 import ConfirmModal from '../../components/ConfirmModal';
 import { useToast } from '../../components/Toast';
 import { useTour } from '../../contexts/TourContext';
@@ -156,6 +157,8 @@ export default function PaisList() {
           </div>
         </div>
 
+        <Observacao texto={p.observacoes} />
+
         {alerta && (
           <div className="gl-rodape">
             <div className={`gl-dose${alerta.urgente ? ' gl-dose-urgente' : ''}`} style={{ background: alerta.bg, maxWidth: '100%' }}>
@@ -191,6 +194,7 @@ export default function PaisList() {
             ? <><Syringe size={13} style={{ flexShrink: 0 }} /><span>{alerta.status}</span></>
             : <><Syringe size={13} style={{ flexShrink: 0 }} /><span>Sem dose agendada</span></>}
         </div>
+        <Observacao texto={p.observacoes} compacta />
       </div>
     );
   };
