@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Cat, Syringe, Pill, Plus, Trash2, Weight, X, Scale, GitBranch, User, Share2, ChevronRight } from 'lucide-react';
+import { Cat, Syringe, Pill, Plus, Trash2, Weight, X, Scale, GitBranch, User, Share2, ChevronRight, Maximize2 } from 'lucide-react';
+import FotoTelaCheia from '../../components/FotoTelaCheia';
 import { formatarPeso } from '../../utils/peso';
 import Layout from '../../components/Layout';
 import StatusBadge from '../../components/StatusBadge';
@@ -44,6 +45,7 @@ export default function GatoPerfil() {
   const navigate = useNavigate();
   const [gato, setGato] = useState(null);
   const [confirmando, setConfirmando] = useState(null);
+  const [fotoAberta, setFotoAberta] = useState(false);
   const [showPesoModal, setShowPesoModal] = useState(false);
   const [pesoValor, setPesoValor] = useState('');
   const [pesoUnidade, setPesoUnidade] = useState('g');
@@ -74,7 +76,7 @@ export default function GatoPerfil() {
     const serverOrigin = apiBase ? new URL(apiBase).origin : window.location.origin;
     const url = `${serverOrigin}/g/${id}`;
     if (navigator.share) {
-      try { await navigator.share({ title: gato.nome || 'Gatinho', url }); } catch {}
+      try { await navigator.share({ title: gato.nome || 'Gatinho', text: `Conheça ${gato.nome || 'este gatinho'} 🐾 — Gatil Cheirinho de Felicidade`, url }); } catch {}
     } else {
       await navigator.clipboard.writeText(url);
       toast('Link copiado!');
@@ -92,9 +94,15 @@ export default function GatoPerfil() {
 
   return (
     <Layout title="Perfil do Gato" showBack>
+      {fotoAberta && (
+        <FotoTelaCheia src={gato.foto_url} alt={gato.nome} legenda={gato.nome} onClose={() => setFotoAberta(false)} />
+      )}
       <div className="card" data-tour="perfil-info">
         {gato.foto_url ? (
-          <img src={gato.foto_url} alt={gato.nome} style={{ width: '100%', height: 220, objectFit: 'cover', borderRadius: 'var(--radius-md)' }} />
+          <div className="foto-ampliavel" onClick={() => setFotoAberta(true)}>
+            <img src={gato.foto_url} alt={gato.nome} style={{ width: '100%', height: 220, objectFit: 'cover', borderRadius: 'var(--radius-md)', display: 'block' }} />
+            <span className="foto-ampliavel-dica"><Maximize2 size={12} /> Ampliar</span>
+          </div>
         ) : (
           <div style={{ width: '100%', height: 220, borderRadius: 'var(--radius-md)', background: 'var(--color-accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-primary)' }}>
             <Cat size={48} />

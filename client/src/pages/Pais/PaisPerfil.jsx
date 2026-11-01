@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { PawPrint, Weight, X, Scale, Syringe, Pill, Plus, Trash2, GitBranch, Share2 } from 'lucide-react';
+import { PawPrint, Weight, X, Scale, Syringe, Pill, Plus, Trash2, GitBranch, Share2, Maximize2 } from 'lucide-react';
+import FotoTelaCheia from '../../components/FotoTelaCheia';
 import Layout from '../../components/Layout';
 import EmptyState from '../../components/EmptyState';
 import ConfirmModal from '../../components/ConfirmModal';
@@ -42,6 +43,7 @@ export default function PaisPerfil() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [pai, setPai] = useState(null);
+  const [fotoAberta, setFotoAberta] = useState(false);
   const [showPesoModal, setShowPesoModal] = useState(false);
   const [pesoValor, setPesoValor] = useState('');
   const [pesoUnidade, setPesoUnidade] = useState('kg');
@@ -69,7 +71,7 @@ export default function PaisPerfil() {
     const serverOrigin = apiBase ? new URL(apiBase).origin : window.location.origin;
     const url = `${serverOrigin}/p/${id}`;
     if (navigator.share) {
-      try { await navigator.share({ title: pai.nome || 'Reprodutor', url }); } catch {}
+      try { await navigator.share({ title: pai.nome || 'Reprodutor', text: `Conheça ${pai.nome || 'nosso reprodutor'} 🐾 — Gatil Cheirinho de Felicidade`, url }); } catch {}
     } else {
       await navigator.clipboard.writeText(url);
       toast('Link copiado!');
@@ -107,9 +109,15 @@ export default function PaisPerfil() {
 
   return (
     <Layout title="Perfil do Pai / Mãe" showBack>
+      {fotoAberta && (
+        <FotoTelaCheia src={pai.foto_url} alt={pai.nome} legenda={pai.nome} onClose={() => setFotoAberta(false)} />
+      )}
       <div className="card" data-tour="paiperfil-info">
         {pai.foto_url ? (
-          <img src={pai.foto_url} alt={pai.nome} style={{ width: '100%', height: 220, objectFit: 'cover', borderRadius: 'var(--radius-md)' }} />
+          <div className="foto-ampliavel" onClick={() => setFotoAberta(true)}>
+            <img src={pai.foto_url} alt={pai.nome} style={{ width: '100%', height: 220, objectFit: 'cover', borderRadius: 'var(--radius-md)', display: 'block' }} />
+            <span className="foto-ampliavel-dica"><Maximize2 size={12} /> Ampliar</span>
+          </div>
         ) : (
           <div style={{ width: '100%', height: 220, borderRadius: 'var(--radius-md)', background: 'var(--color-accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-primary)' }}>
             <PawPrint size={48} />

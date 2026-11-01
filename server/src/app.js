@@ -4,6 +4,7 @@ const path = require('path');
 require('dotenv').config();
 
 const pool = require('./db/pool');
+const { paginaPublica, esc, icone } = require('./paginaPublica');
 
 async function initDb() {
   await pool.query(`
@@ -143,160 +144,41 @@ app.use('/api/clientes', require('./routes/clientes'));
 
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 
-// Página pública do gato — renderizada pelo servidor, sem precisar do React
+// Páginas públicas compartilhadas — renderizadas pelo servidor, sem precisar do React
+function urlCompleta(req) {
+  const proto = (req.get('x-forwarded-proto') || req.protocol).split(',')[0];
+  return `${proto}://${req.get('host')}${req.originalUrl}`;
+}
+
 app.get('/g/:id', async (req, res) => {
   const [rows] = await pool.query(
-    `SELECT nome, foto_url, sexo, DATE_FORMAT(data_nascimento, '%Y-%m-%d') AS data_nascimento, peso FROM gatos WHERE id = ?`,
+    `SELECT nome, foto_url, sexo, cor, status, DATE_FORMAT(data_nascimento, '%Y-%m-%d') AS data_nascimento, peso FROM gatos WHERE id = ?`,
     [req.params.id]
   );
   if (!rows.length) return res.status(404).send('<p>Gato não encontrado.</p>');
-  const g = rows[0];
-
-  function calcIdade(nasc) {
-    if (!nasc) return null;
-    const hoje = new Date(); const d = new Date(nasc + 'T00:00:00');
-    const meses = (hoje.getFullYear() - d.getFullYear()) * 12 + (hoje.getMonth() - d.getMonth());
-    if (meses < 1) return 'Menos de 1 mês';
-    if (meses < 12) return `${meses} ${meses === 1 ? 'mês' : 'meses'}`;
-    const anos = Math.floor(meses / 12); const m = meses % 12;
-    return m > 0 ? `${anos} ${anos === 1 ? 'ano' : 'anos'} e ${m} ${m === 1 ? 'mês' : 'meses'}` : `${anos} ${anos === 1 ? 'ano' : 'anos'}`;
-  }
-  function formatPeso(p) {
-    if (!p) return null;
-    return p >= 1000 ? `${(p / 1000).toFixed(2).replace('.', ',')} kg` : `${p} g`;
-  }
-  function formatData(d) { return d ? d.split('-').reverse().join('/') : null; }
-
-  const nome = g.nome || 'Sem nome';
-  const sexo = g.sexo === 'macho' ? 'Macho' : 'Fêmea';
-  const nasc = formatData(g.data_nascimento);
-  const idade = calcIdade(g.data_nascimento);
-  const peso = formatPeso(g.peso);
-
-  function chip(emoji, label, valor, sub) {
-    return `<div style="background:rgba(255,255,255,0.09);border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:12px;">
-      <span style="font-size:1.4rem;flex-shrink:0">${emoji}</span>
-      <div>
-        <p style="margin:0;font-size:0.65rem;font-weight:600;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:0.08em">${label}</p>
-        <p style="margin:2px 0 0;font-size:1rem;font-weight:800;color:#fff;line-height:1.2">${valor}</p>
-        ${sub ? `<p style="margin:2px 0 0;font-size:0.72rem;color:rgba(255,255,255,0.5)">${sub}</p>` : ''}
-      </div>
-    </div>`;
-  }
-
-  res.send(`<!DOCTYPE html><html lang="pt-BR"><head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>${nome} — Cheirinho de Felicidade</title>
-    <meta property="og:title" content="${nome}">
-    <meta property="og:image" content="${g.foto_url || ''}">
-    <style>*{box-sizing:border-box;margin:0;padding:0}body{min-height:100dvh;background:linear-gradient(160deg,#1a0533 0%,#3b1260 45%,#0f1f3d 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px;font-family:'Segoe UI',system-ui,sans-serif}</style>
-  </head><body>
-    <div style="width:100%;max-width:380px">
-      <div style="background:rgba(255,255,255,0.07);backdrop-filter:blur(20px);border-radius:28px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,0.5),0 0 0 1px rgba(255,255,255,0.08)">
-        <div style="position:relative">
-          ${g.foto_url
-            ? `<img src="${g.foto_url}" alt="${nome}" style="width:100%;height:320px;object-fit:cover;display:block">`
-            : `<div style="width:100%;height:320px;background:linear-gradient(135deg,#2d1065,#5b21b6);display:flex;align-items:center;justify-content:center;font-size:5rem">🐱</div>`}
-          <div style="position:absolute;bottom:0;left:0;right:0;height:120px;background:linear-gradient(to top,rgba(15,5,30,0.95) 0%,transparent 100%)"></div>
-          <p style="position:absolute;bottom:16px;left:20px;font-size:1.7rem;font-weight:900;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,0.5)">${nome}</p>
-        </div>
-        <div style="padding:20px 22px 24px">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-            ${chip('⚤', 'Sexo', sexo, null)}
-            ${chip('🎂', 'Nascimento', nasc || '—', idade)}
-            <div style="grid-column:span 2">${chip('⚖️', 'Peso', peso || '—', null)}</div>
-          </div>
-        </div>
-      </div>
-      <div style="text-align:center;margin-top:28px">
-        <p style="font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.35);font-weight:600">apresentado por</p>
-        <p style="margin:6px 0 0;font-size:1.1rem;font-weight:800;color:rgba(255,255,255,0.75)">🐾 Cheirinho de Felicidade</p>
-      </div>
-    </div>
-  </body></html>`);
+  res.send(paginaPublica({ animal: rows[0], url: urlCompleta(req), tipo: 'filhote' }));
 });
 
-// Página pública do reprodutor
 app.get('/p/:id', async (req, res) => {
   const [rows] = await pool.query(
-    `SELECT nome, foto_url, sexo, DATE_FORMAT(data_nascimento, '%Y-%m-%d') AS data_nascimento, peso, pkd, pkd_arquivo_url, pkd_arquivo_tipo FROM pais WHERE id = ?`,
+    `SELECT nome, foto_url, sexo, cor, DATE_FORMAT(data_nascimento, '%Y-%m-%d') AS data_nascimento, peso, pkd, pkd_arquivo_url, pkd_arquivo_tipo FROM pais WHERE id = ?`,
     [req.params.id]
   );
   if (!rows.length) return res.status(404).send('<p>Não encontrado.</p>');
   const p = rows[0];
 
-  function calcIdade(nasc) {
-    if (!nasc) return null;
-    const hoje = new Date(); const d = new Date(nasc + 'T00:00:00');
-    const meses = (hoje.getFullYear() - d.getFullYear()) * 12 + (hoje.getMonth() - d.getMonth());
-    if (meses < 1) return 'Menos de 1 mês';
-    if (meses < 12) return `${meses} ${meses === 1 ? 'mês' : 'meses'}`;
-    const anos = Math.floor(meses / 12); const m = meses % 12;
-    return m > 0 ? `${anos} ${anos === 1 ? 'ano' : 'anos'} e ${m} ${m === 1 ? 'mês' : 'meses'}` : `${anos} ${anos === 1 ? 'ano' : 'anos'}`;
-  }
-  function formatPeso(v) {
-    if (!v) return null;
-    return v >= 1000 ? `${(v/1000).toFixed(2).replace('.',',')} kg` : `${v} g`;
-  }
-  function formatData(d) { return d ? d.split('-').reverse().join('/') : null; }
+  const pkd = {
+    negativo: { label: '✓ PKD Negativo', cor: '#2e7048', bg: '#e3f3e8' },
+    positivo: { label: '✕ PKD Positivo', cor: '#a8403a', bg: '#fdecea' },
+  }[p.pkd];
+  const extra = [
+    pkd ? `<span class="pkd" style="background:${pkd.bg};color:${pkd.cor}">${pkd.label}</span>` : '',
+    p.pkd_arquivo_url
+      ? `<a class="botao botao-sec" href="${esc(p.pkd_arquivo_url)}" target="_blank" rel="noopener">${icone('documento')} Ver resultado PKD</a>`
+      : '',
+  ].join('');
 
-  const nome = p.nome || 'Sem nome';
-  const sexo = p.sexo === 'macho' ? 'Macho' : 'Fêmea';
-  const nasc = formatData(p.data_nascimento);
-  const idade = calcIdade(p.data_nascimento);
-  const peso = formatPeso(p.peso);
-  const pkdCor = p.pkd === 'negativo' ? '#16a34a' : p.pkd === 'positivo' ? '#dc2626' : null;
-  const pkdBg  = p.pkd === 'negativo' ? 'rgba(22,163,74,0.18)' : p.pkd === 'positivo' ? 'rgba(220,38,38,0.18)' : null;
-  const pkdLabel = p.pkd === 'negativo' ? '✓ PKD Negativado' : p.pkd === 'positivo' ? '✕ PKD Positivo' : null;
-
-  function chip(emoji, label, valor, sub) {
-    return `<div style="background:rgba(255,255,255,0.09);border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:12px;">
-      <span style="font-size:1.4rem;flex-shrink:0">${emoji}</span>
-      <div>
-        <p style="margin:0;font-size:0.65rem;font-weight:600;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:0.08em">${label}</p>
-        <p style="margin:2px 0 0;font-size:1rem;font-weight:800;color:#fff;line-height:1.2">${valor}</p>
-        ${sub ? `<p style="margin:2px 0 0;font-size:0.72rem;color:rgba(255,255,255,0.5)">${sub}</p>` : ''}
-      </div>
-    </div>`;
-  }
-
-  const pkdBotao = p.pkd_arquivo_url ? `
-    <a href="${p.pkd_arquivo_url}" target="_blank" style="display:inline-flex;align-items:center;gap:8px;margin-top:16px;padding:12px 20px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:14px;color:#fff;text-decoration:none;font-weight:700;font-size:0.88rem;">
-      ${p.pkd_arquivo_tipo === 'pdf' ? '📄' : '🔬'} Ver resultado PKD
-    </a>` : '';
-
-  res.send(`<!DOCTYPE html><html lang="pt-BR"><head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>${nome} — Cheirinho de Felicidade</title>
-    <meta property="og:title" content="${nome}">
-    <meta property="og:image" content="${p.foto_url || ''}">
-    <style>*{box-sizing:border-box;margin:0;padding:0}body{min-height:100dvh;background:linear-gradient(160deg,#1a0533 0%,#3b1260 45%,#0f1f3d 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px;font-family:'Segoe UI',system-ui,sans-serif}</style>
-  </head><body>
-    <div style="width:100%;max-width:380px">
-      <div style="background:rgba(255,255,255,0.07);backdrop-filter:blur(20px);border-radius:28px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,0.5),0 0 0 1px rgba(255,255,255,0.08)">
-        <div style="position:relative">
-          ${p.foto_url
-            ? `<img src="${p.foto_url}" alt="${nome}" style="width:100%;height:300px;object-fit:cover;display:block">`
-            : `<div style="width:100%;height:300px;background:linear-gradient(135deg,#2d1065,#5b21b6);display:flex;align-items:center;justify-content:center;font-size:5rem">🐾</div>`}
-          <div style="position:absolute;bottom:0;left:0;right:0;height:120px;background:linear-gradient(to top,rgba(15,5,30,0.95) 0%,transparent 100%)"></div>
-          <p style="position:absolute;bottom:16px;left:20px;font-size:1.7rem;font-weight:900;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,0.5)">${nome}</p>
-        </div>
-        <div style="padding:20px 22px 24px">
-          ${pkdLabel ? `<div style="display:inline-flex;align-items:center;gap:6px;padding:5px 14px;background:${pkdBg};border-radius:20px;margin-bottom:14px"><span style="font-size:0.82rem;font-weight:800;color:${pkdCor}">${pkdLabel}</span></div>` : ''}
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-            ${chip('⚤', 'Sexo', sexo, null)}
-            ${chip('🎂', 'Nascimento', nasc || '—', idade)}
-            ${peso ? `<div style="grid-column:span 2">${chip('⚖️', 'Peso', peso, null)}</div>` : ''}
-          </div>
-          ${pkdBotao}
-        </div>
-      </div>
-      <div style="text-align:center;margin-top:28px">
-        <p style="font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.35);font-weight:600">apresentado por</p>
-        <p style="margin:6px 0 0;font-size:1.1rem;font-weight:800;color:rgba(255,255,255,0.75)">🐾 Cheirinho de Felicidade</p>
-      </div>
-    </div>
-  </body></html>`);
+  res.send(paginaPublica({ animal: p, url: urlCompleta(req), tipo: 'reprodutor', extra }));
 });
 
 const clientDist = path.join(__dirname, '../../client/dist');
